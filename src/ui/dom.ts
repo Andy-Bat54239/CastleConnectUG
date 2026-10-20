@@ -36,3 +36,22 @@ export function button(label: string, cls = 'btn', onClick?: () => void): HTMLBu
   if (onClick) b.addEventListener('click', onClick)
   return b
 }
+
+/**
+ * What a screen shows while its lesson is being fetched: a small spinner with a label, and grey shimmering blocks
+ * in the shape of the page that is coming, so the screen does not jump when the real content arrives.
+ */
+export function loadingView(label: string): HTMLElement {
+  return h(
+    'div',
+    { class: 'screen loading-view', role: 'status', 'aria-live': 'polite' },
+    h('p', { class: 'loading-label' }, h('span', { class: 'spinner', 'aria-hidden': 'true' }), label),
+    h('div', { class: 'sk sk-kicker' }),
+    h('div', { class: 'sk sk-title' }),
+    h('div', { class: 'sk sk-line' }),
+    h('div', { class: 'sk sk-line short' }),
+    h('div', { class: 'sk sk-block' }),
+    h('div', { class: 'sk sk-block' }),
+    h('div', { class: 'sk sk-block' }),
+  )
+}

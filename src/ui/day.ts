@@ -4,7 +4,7 @@ import * as store from '../lib/store'
 import { dayOpen, formatDate, getNow, isPreview, parseStart, unlockAt } from '../lib/time'
 import { buildMessage, pictureName, shareImage, shareText, waLink } from '../lib/share'
 import { renderCard, scoredKeys, type CardView } from './cards'
-import { button, h } from './dom'
+import { button, h, loadingView } from './dom'
 import { themeButton } from './themeButton'
 
 type Part = 'intro' | 'core' | 'deeper'
@@ -34,7 +34,7 @@ function saveBanner(): HTMLElement | null {
 
 export async function mountDay(root: HTMLElement, day: number, current: () => boolean = () => true): Promise<void> {
   const home = button('All days', 'btn alt', () => (location.hash = '#/'))
-  root.replaceChildren(h('p', { class: 'loading' }, 'Loading…'))
+  root.replaceChildren(loadingView(`Loading Day ${day}…`))
 
   const startMs = parseStart(course.startDate)
   if (!dayOpen(day, { nowMs: getNow(), startMs, unlockAll: course.unlockAll, preview: isPreview() })) {

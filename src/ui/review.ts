@@ -5,7 +5,7 @@ import { mateAvoidingMoves, matingMoves } from '../lib/chessUtil'
 import { answersByMethod } from '../lib/verify'
 import { createBoard } from './board'
 import { estimateMinutes } from '../lib/estimate'
-import { h, paragraphs, rich } from './dom'
+import { h, loadingView, paragraphs, rich } from './dom'
 
 function rv(cls: string, text: string): HTMLElement {
   const p = h('p', { class: cls })
@@ -71,7 +71,7 @@ function cardBlock(c: Card, i: number): HTMLElement {
 }
 
 export async function mountReview(root: HTMLElement, day: number, current: () => boolean = () => true): Promise<void> {
-  root.replaceChildren(h('p', { class: 'loading' }, 'Loading…'))
+  root.replaceChildren(loadingView(`Loading Day ${day}…`))
   const c: DayContent | null = await loadDay(day)
   if (!current()) return
   if (!c) {

@@ -14,8 +14,79 @@
       // Apply the saved theme before first paint so dark-mode members do not see a light flash.
       try { document.documentElement.dataset.theme = localStorage.getItem('bg:theme') === 'dark' ? 'dark' : 'light' } catch (e) { document.documentElement.dataset.theme = 'light' }
     </script>
+    <style>
+      /* Loading screen. It lives in this file, not in the main stylesheet, so it paints before anything else arrives.
+         The logo starts as a faint grey outline and fills with its real colours from the bottom up as the app loads. */
+      #splash { position: fixed; top: 0; right: 0; bottom: 0; left: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; background: #fefae7; color: #034f3b; transition: opacity 0.35s ease, visibility 0.35s; }
+      :root[data-theme='dark'] #splash { background: #0a1612; color: #f4eed6; }
+      #splash.done { opacity: 0; visibility: hidden; pointer-events: none; }
+      .sp-inner { display: flex; flex-direction: column; align-items: center; padding: 24px; text-align: center; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; opacity: 0; animation: sp-in 0.5s ease 0.18s forwards; }
+      .sp-panel { padding: 26px 34px; border-radius: 30px; background: transparent; }
+      :root[data-theme='dark'] .sp-panel { background: #fefae7; }
+      .sp-logo { position: relative; width: 220px; }
+      .sp-logo img { display: block; width: 100%; height: auto; }
+      .sp-ghost { filter: grayscale(1); opacity: 0.2; }
+      .sp-fill { position: absolute; top: 0; left: 0; -webkit-clip-path: inset(calc(100% - var(--p, 0) * 1%) 0 0 0); clip-path: inset(calc(100% - var(--p, 0) * 1%) 0 0 0); transition: clip-path 0.4s ease-out, -webkit-clip-path 0.4s ease-out; }
+      .sp-sub { margin: 18px 0 0; font-size: 15px; font-weight: 700; line-height: 1.4; opacity: 0.8; }
+      .sp-slow { display: none; margin: 18px 0 0; max-width: 300px; font-size: 15px; line-height: 1.5; }
+      .sp-slow button { display: block; margin: 12px auto 0; padding: 10px 22px; border: 2px solid currentColor; border-radius: 12px; background: transparent; color: inherit; font: inherit; font-weight: 800; cursor: pointer; }
+      #splash.slow .sp-slow { display: block; }
+      #splash.failed .sp-ok, #splash.failed .sp-sub { display: none; }
+      #splash:not(.failed) .sp-bad { display: none; }
+      @keyframes sp-in { to { opacity: 1; } }
+      @media (prefers-reduced-motion: reduce) {
+        .sp-inner { animation: none; opacity: 1; }
+        .sp-fill { -webkit-clip-path: none; clip-path: none; transition: none; }
+        #splash { transition: none; }
+      }
+    </style>
   </head>
   <body>
+    <div id="splash" role="status" aria-live="polite">
+      <div class="sp-inner">
+        <div class="sp-panel">
+          <div class="sp-logo">
+            <img class="sp-ghost" src="./icons/logo-full.png" width="480" height="555" alt="" />
+            <img class="sp-fill" id="sp-fill" src="./icons/logo-full.png" width="480" height="555" alt="Castle Connect" />
+          </div>
+        </div>
+        <p class="sp-sub">Bridge Grind · Getting your lessons ready</p>
+        <div class="sp-slow">
+          <span class="sp-ok">Still loading. A slow connection? Keep this page open and it will appear.</span>
+          <span class="sp-bad">We could not load the app. Check your connection, then try again.</span>
+          <button type="button" onclick="location.reload()">Try again</button>
+        </div>
+      </div>
+    </div>
+    <script>
+      // The logo fills as the app loads: quickly at first, then slowly towards 92%, because we cannot know how long a
+      // slow connection will take. The app calls window.__bgReady() once its first screen is on the page; the logo then
+      // fills to the top and the loading screen leaves. If the app is ready almost at once, it leaves without showing.
+      (function () {
+        var el = document.getElementById('splash')
+        var started = Date.now()
+        var p = 6
+        var live = true
+        function show(v) { p = v; el.style.setProperty('--p', String(v)) }
+        function remove() { if (el.parentNode) el.parentNode.removeChild(el) }
+        show(p)
+        var tick = setInterval(function () { show(p + (92 - p) * 0.06) }, 100)
+        var timer = setTimeout(function () { el.classList.add('slow') }, 9000)
+        document.addEventListener('error', function (e) {
+          var t = e.target
+          if (live && t && t.tagName === 'SCRIPT') { clearInterval(tick); clearTimeout(timer); el.classList.add('slow', 'failed') }
+        }, true)
+        window.__bgReady = function () {
+          if (!live) return
+          live = false
+          clearInterval(tick)
+          clearTimeout(timer)
+          if (Date.now() - started < 300) { remove(); return }
+          show(100)
+          setTimeout(function () { el.classList.add('done'); setTimeout(remove, 600) }, 550)
+        }
+      })()
+    </script>
     <header class="app-bar">
       <div class="bar-inner">
         <a class="brand" href="#/" aria-label="Bridge Grind home">
@@ -25,7 +96,7 @@
         <span id="theme-slot"></span>
       </div>
     </header>
-    <main id="app"><p class="loading">Loading…</p></main>
+    <main id="app"></main>
     <noscript><p style="padding:24px">Bridge Grind needs JavaScript to run. Please turn it on, or open this link in Chrome.</p></noscript>
     <script type="module" src="/src/main.ts"></script>
   </body>

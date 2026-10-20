@@ -169,6 +169,78 @@ body[data-lesson] main {
   color: var(--mute);
   padding: 24px 0;
 }
+/* While a lesson is being fetched: a spinner with a label, and shimmering blocks shaped like the page to come. */
+:root {
+  --sk-a: #efe6c2;
+  --sk-b: #f8f1d6;
+}
+:root[data-theme='dark'] {
+  --sk-a: #1a3328;
+  --sk-b: #244436;
+}
+.loading-view {
+  padding-top: 8px;
+}
+.loading-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 18px;
+  color: var(--mute);
+  font-weight: 700;
+}
+.spinner {
+  width: 18px;
+  height: 18px;
+  flex: none;
+  border-radius: 50%;
+  border: 3px solid var(--line);
+  border-top-color: var(--gold);
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.sk {
+  border-radius: 12px;
+  background: var(--sk-a);
+  background: linear-gradient(90deg, var(--sk-a) 0%, var(--sk-b) 50%, var(--sk-a) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+@keyframes shimmer {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+.sk-kicker {
+  width: 120px;
+  height: 14px;
+  margin-bottom: 14px;
+}
+.sk-title {
+  width: 70%;
+  height: 34px;
+  margin-bottom: 18px;
+}
+.sk-line {
+  height: 16px;
+  margin-bottom: 10px;
+}
+.sk-line.short {
+  width: 60%;
+  margin-bottom: 22px;
+}
+.sk-block {
+  height: 54px;
+  margin-bottom: 12px;
+  border-radius: 14px;
+}
 .screen {
   padding-top: 8px;
 }
