@@ -59,31 +59,47 @@
       </div>
     </div>
     <script>
-      // The logo fills as the app loads: quickly at first, then slowly towards 92%, because we cannot know how long a
-      // slow connection will take. The app calls window.__bgReady() once its first screen is on the page; the logo then
-      // fills to the top and the loading screen leaves. If the app is ready almost at once, it leaves without showing.
+      // The loading screen always stays for at least two seconds, so members see the logo fill. The logo fills with its
+      // colours over the first 1.6 seconds, but holds at 92% until the app calls window.__bgReady() (its first screen is
+      // on the page), because a slow connection can take longer. Once the app is ready and two seconds have passed, the
+      // logo is full and the screen fades away. If the app is slow, it waits for the app, then fills to the top and leaves.
       (function () {
+        var MIN_MS = 2000
+        var FILL_MS = 1600
         var el = document.getElementById('splash')
         var started = Date.now()
         var p = 6
-        var live = true
+        var isReady = false
+        var gone = false
         function show(v) { p = v; el.style.setProperty('--p', String(v)) }
         function remove() { if (el.parentNode) el.parentNode.removeChild(el) }
+        function leave() {
+          if (gone) return
+          gone = true
+          clearInterval(tick)
+          clearTimeout(timer)
+          var hold = p < 99.5 ? 550 : 0 // a late app: let the last fill be seen before leaving
+          show(100)
+          setTimeout(function () { el.classList.add('done'); setTimeout(remove, 600) }, hold)
+        }
+        function step() {
+          var elapsed = Date.now() - started
+          var target = 6 + 94 * Math.min(1, elapsed / FILL_MS)
+          show(isReady ? target : Math.min(target, 92))
+          if (isReady && elapsed >= MIN_MS) leave()
+        }
         show(p)
-        var tick = setInterval(function () { show(p + (92 - p) * 0.06) }, 100)
+        var tick = setInterval(step, 50)
         var timer = setTimeout(function () { el.classList.add('slow') }, 9000)
         document.addEventListener('error', function (e) {
           var t = e.target
-          if (live && t && t.tagName === 'SCRIPT') { clearInterval(tick); clearTimeout(timer); el.classList.add('slow', 'failed') }
+          if (!gone && !isReady && t && t.tagName === 'SCRIPT') { clearInterval(tick); clearTimeout(timer); el.classList.add('slow', 'failed') }
         }, true)
         window.__bgReady = function () {
-          if (!live) return
-          live = false
-          clearInterval(tick)
+          if (gone || isReady) return
+          isReady = true
           clearTimeout(timer)
-          if (Date.now() - started < 300) { remove(); return }
-          show(100)
-          setTimeout(function () { el.classList.add('done'); setTimeout(remove, 600) }, 550)
+          if (Date.now() - started >= MIN_MS) leave() // otherwise the timer above finishes at two seconds
         }
       })()
     </script>
