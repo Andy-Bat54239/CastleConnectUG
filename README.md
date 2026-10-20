@@ -139,9 +139,10 @@ lesson fixes reach members promptly) and cache the fingerprinted files for a yea
 
 **The "Powered by Netlify" badge.** Free-plan Netlify projects can show a badge in the bottom-right
 corner of every page. To remove it: **Project configuration, General, Powered by Netlify badge**, switch
-it off and save (no redeploy needed). If it stays on, the app notices Netlify's badge script and keeps
-the lesson's Back/Next row clear of the corner (`src/lib/hostBadge.ts`): on phones the row is lifted above
-the badge, on larger screens the buttons stay at the bottom and Next stops short of the badge.
+it off and save (no redeploy needed). If it stays on, the app notices Netlify's badge script
+(`src/lib/hostBadge.ts`): on tablets and computers the buttons stay at the bottom and Next stops short of the
+badge. On phones the buttons stay on the bottom edge and the badge can cover part of Next, so switching
+the badge off is the way to avoid that.
 
 **Never publish the parent folder.** This project lives in `bridge-grind/`. The folder around it holds
 the source book PDF and working files that must not go on the internet.
