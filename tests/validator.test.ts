@@ -227,6 +227,14 @@ describe('content validator', () => {
     expect(read({ materialDiff: 0 }).out).toContain('material minus')
   })
 
+  it('checks tap-the-defender cards', () => {
+    const board = { fen: 'r4rk1/pp3ppp/5n2/3p4/8/2N5/PP3PPP/3R2K1 w - - 0 1' }
+    const spot = (targets: string[], square = 'd5') => dayWith([{ type: 'spot', prompt: 'x', board, targets, explain: 'x', verify: { kind: 'defenders', square } }])
+    expect(run(spot(['f6'])).code).toBe(0)
+    expect(run(spot(['g7'])).code).toBe(1)
+    expect(run(spot(['f6'], 'b2')).code).toBe(1) // nothing defends b2, so there is nothing to tap
+  })
+
   it('checks tap-the-isolated-pawn cards', () => {
     const board = { fen: 'r4rk1/ppp3pp/4p3/8/3P4/8/PPP2PPP/R4RK1 w - - 0 1' }
     const spot = (targets: string[]) => dayWith([{ type: 'spot', prompt: 'x', board, targets, explain: 'x', verify: { kind: 'isolatedPawns', color: 'b' } }])

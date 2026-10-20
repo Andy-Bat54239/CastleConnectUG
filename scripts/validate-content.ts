@@ -451,6 +451,10 @@ function checkSpot(c: Obj) {
     const wanted = v.kind === 'mateSquares' ? moves.filter((m) => m.san.endsWith('#')) : moves.filter((m) => /[+#]/.test(m.san))
     actual = [...new Set(wanted.map((m) => m.to as string))]
     if (!actual.length) return err(`the piece on ${v.square} has no move that ${v.kind === 'mateSquares' ? 'gives checkmate' : 'gives check'}`)
+  } else if (v.kind === 'defenders') {
+    if (!v.square || !chess.get(v.square as never)) return err('verify.square must hold the piece whose defenders are listed')
+    actual = defendersOf(chess, v.square)
+    if (!actual.length) return err(`the piece on ${v.square} has no defender`)
   } else if (v.kind === 'isolatedPawns') {
     if (v.color !== 'w' && v.color !== 'b') return err('verify.color must be "w" or "b"')
     actual = isolatedPawns(chess, v.color)

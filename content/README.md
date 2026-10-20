@@ -114,7 +114,7 @@ pieces that piece attacks), `loose` + `color` (the pieces with no defender), `le
 `forkSquares` + `square` (squares that piece could move to and attack two or more enemy pieces, not
 counting pawns), `pinned` + `color` (the pieces pinned to their own king) and `checkSquares` + `square`
 (the squares that piece can legally move to and give check from), `mateSquares` + `square` (the same, but
-checkmate) and `isolatedPawns` + `color` (that side's isolated pawns). For these two the piece can belong to either side, so a card can ask "where would Black's queen
+checkmate) `isolatedPawns` + `color` (that side's isolated pawns) and `defenders` + `square` (the pieces defending the piece on that square). For these two the piece can belong to either side, so a card can ask "where would Black's queen
 mate?" while White is to move.
 
 ### `puzzleSet`: 2 to 6 short puzzles

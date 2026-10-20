@@ -121,9 +121,9 @@ export interface SpotVerify {
    * the undefended pieces of `color` / the squares the piece on `square` can legally move to / the squares the
    * piece on `square` could move to and attack two or more enemy pieces (fork squares) / the pieces of `color`
    * pinned to their own king / the squares the piece on `square` can legally move to and give check from / the same
-   * but checkmate (the piece may belong to either side, whoever is to move) / the isolated pawns of `color`.
+   * but checkmate (the piece may belong to either side, whoever is to move) / the isolated pawns of `color` / the friendly pieces that defend the piece on `square`.
    */
-  kind: 'checkers' | 'attackedBy' | 'loose' | 'legalMoves' | 'forkSquares' | 'pinned' | 'checkSquares' | 'mateSquares' | 'isolatedPawns'
+  kind: 'checkers' | 'attackedBy' | 'loose' | 'legalMoves' | 'forkSquares' | 'pinned' | 'checkSquares' | 'mateSquares' | 'isolatedPawns' | 'defenders'
   square?: Square
   color?: 'w' | 'b'
 }
