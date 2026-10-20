@@ -1,0 +1,403 @@
+{
+  "day": 13,
+  "title": "Endgames",
+  "level": "1200-1400",
+  "blurb": "King and pawn endings, solved exactly: the rule of the square, the opposition, key squares and the rook pawn. Then rook endings, queen against a pawn, and opposite-coloured bishops.",
+  "deeperTitle": "Rook endgame ideas; queen vs pawn; opposite-coloured bishops",
+  "share": {
+    "prompt": "One thing I learned today…"
+  },
+  "core": [
+    {
+      "type": "read",
+      "title": "The king joins the fight",
+      "body": [
+        "In the endgame there is little danger of checkmate, so the **king** becomes a strong piece. Bring it to the centre, and use it to help your pawns and stop theirs.",
+        "King and pawn endings are exact: one wrong step turns a win into a draw."
+      ]
+    },
+    {
+      "type": "read",
+      "title": "The rule of the square",
+      "body": [
+        "Can a king catch a runaway pawn? Draw a **square** from the pawn to its queening square. If the king can step **inside** it on its turn, it catches the pawn. If not, the pawn queens.",
+        "This pawn needs four moves, so the square is four files wide. It works when the other king is too far away to help."
+      ],
+      "board": {
+        "fen": "8/8/6k1/8/2P5/8/8/K7 b - - 0 1",
+        "highlight": [
+          "c4",
+          "f4",
+          "c8",
+          "f8"
+        ],
+        "caption": "The square runs from c4 to f8 (its four corners are marked)."
+      }
+    },
+    {
+      "type": "choice",
+      "prompt": "White’s king is far away and Black is to move. Can the black king on g6 stop the pawn?",
+      "board": {
+        "fen": "8/8/6k1/8/2P5/8/8/K7 b - - 0 1",
+        "assert": {
+          "endgame": "draw"
+        }
+      },
+      "options": [
+        "Yes: it steps into the square, and the pawn is lost",
+        "No: the pawn queens",
+        "Only if White moves first"
+      ],
+      "answer": 0,
+      "explain": "The king on g6 is one file outside the square, but it is Black’s move, so it steps to f6 (or f5 or f7) and is inside. It catches the pawn: a draw."
+    },
+    {
+      "type": "choice",
+      "prompt": "Now the black king is on h6, one file further away. Black is to move. Can it stop the pawn?",
+      "board": {
+        "fen": "8/8/7k/8/2P5/8/8/K7 b - - 0 1",
+        "assert": {
+          "endgame": "win"
+        }
+      },
+      "options": [
+        "Yes: it still catches the pawn",
+        "No: it is too far, and the pawn queens",
+        "Only if White moves first"
+      ],
+      "answer": 1,
+      "explain": "From h6 one step brings the king to g6, which is still outside the square. The pawn queens, so White wins."
+    },
+    {
+      "type": "findMove",
+      "prompt": "You are Black, with the king on g6 and the move. Step into the square.",
+      "fen": "8/8/6k1/8/2P5/8/8/K7 b - - 0 1",
+      "solution": [
+        "Kf6"
+      ],
+      "accept": [
+        "Kf5",
+        "Kf7"
+      ],
+      "keeps": "draw",
+      "hint": "Move the king towards the pawn’s path, into the square.",
+      "explain": "**Kf6** (or **Kf5**, **Kf7**) puts the king inside the square. Any other move lets the pawn run."
+    },
+    {
+      "type": "read",
+      "title": "The opposition",
+      "body": [
+        "Kings **face each other** with one square between them. The side that does **not** have to move has the **opposition**, and the other king must step aside.",
+        "In king and pawn endings the opposition often decides between a win and a draw."
+      ],
+      "board": {
+        "fen": "8/4k3/8/4K3/4P3/8/8/8 b - - 0 1",
+        "caption": "White has the opposition: Black to move must give way.",
+        "assert": {
+          "endgame": "win"
+        }
+      }
+    },
+    {
+      "type": "findMove",
+      "prompt": "Take the opposition. Find the only king move that keeps the win.",
+      "fen": "8/4k3/8/3K4/4P3/8/8/8 w - - 0 1",
+      "solution": [
+        "Ke5"
+      ],
+      "keeps": "win",
+      "hint": "Put your king in front of the pawn, facing the black king with one square between.",
+      "explain": "**Ke5** takes the opposition: the kings face each other with one square between, and Black is to move. Any other move lets Black draw."
+    },
+    {
+      "type": "read",
+      "title": "Key squares",
+      "body": [
+        "A **key square** is a square where, if your king stands on it, the pawn queens by force whoever is to move. For a pawn on the fifth rank, the key squares are the **three squares in front of it** on the sixth rank.",
+        "Get your king to a key square and the game is won."
+      ],
+      "board": {
+        "fen": "4k3/8/4K3/4P3/8/8/8/8 w - - 0 1",
+        "highlight": [
+          "d6",
+          "e6",
+          "f6"
+        ],
+        "caption": "For the pawn on e5, the key squares are d6, e6 and f6. White’s king is on one.",
+        "assert": {
+          "endgame": "win"
+        }
+      }
+    },
+    {
+      "type": "spot",
+      "prompt": "Tap a key square for the pawn on d5.",
+      "board": {
+        "fen": "k7/8/8/3P4/8/8/8/7K w - - 0 1"
+      },
+      "targets": [
+        "c6",
+        "d6",
+        "e6"
+      ],
+      "verify": {
+        "kind": "keySquares"
+      },
+      "explain": "The three squares in front of the pawn: **c6**, **d6** and **e6**. A king on any of them wins."
+    },
+    {
+      "type": "findMove",
+      "prompt": "Take your king to the key square in front of the pawn. It is the only move that keeps the win.",
+      "fen": "8/8/5k2/3K4/4P3/8/8/8 w - - 0 1",
+      "solution": [
+        "Kd6"
+      ],
+      "keeps": "win",
+      "hint": "The key squares are on the sixth rank.",
+      "explain": "**Kd6** is the only winning move: the king gets in front of the pawn, onto the sixth rank. Other moves let the black king in front, and the game is drawn."
+    },
+    {
+      "type": "read",
+      "title": "The rook pawn is different",
+      "body": [
+        "A pawn on the **a** or **h** file is a **rook pawn**. The defending king only needs to reach the corner in front of it, and the game is a draw: the pawn cannot get past, or the defender is stalemated.",
+        "Even with the king on the sixth rank, a rook pawn does not win."
+      ],
+      "board": {
+        "fen": "k7/8/1K6/P7/8/8/8/8 b - - 0 1",
+        "caption": "White’s king is on the sixth rank, but a rook pawn only draws.",
+        "assert": {
+          "endgame": "draw"
+        }
+      }
+    },
+    {
+      "type": "choice",
+      "prompt": "White to move, with king and rook pawn against the king in the corner. Can White win?",
+      "board": {
+        "fen": "k7/8/1K6/P7/8/8/8/8 w - - 0 1",
+        "assert": {
+          "endgame": "draw"
+        }
+      },
+      "options": [
+        "No, it is a draw",
+        "Yes, by pushing the pawn",
+        "Yes, by bringing the king closer"
+      ],
+      "answer": 0,
+      "explain": "Black keeps the king in the corner. White cannot push the pawn past it, and driving the king out of the corner ends in stalemate. With a pawn on the e-file instead (and the kings where they are), White wins."
+    },
+    {
+      "type": "puzzleSet",
+      "title": "King and pawn puzzles",
+      "theme": "kingPawn",
+      "ratingMin": 1200,
+      "ratingMax": 1400,
+      "intro": "Each has exactly one move that keeps the win, or the draw. The last one is from Black’s side.",
+      "puzzles": [
+        {
+          "fen": "8/3k4/8/2K5/4P3/8/8/8 w - - 0 1",
+          "solution": [
+            "Kd5"
+          ],
+          "keeps": "win",
+          "hint": "Get your king in front of the pawn.",
+          "explain": "**Kd5** puts the king in front of the pawn. It is the only move that keeps the win."
+        },
+        {
+          "fen": "8/1K6/8/1k2P3/8/8/8/8 b - - 0 1",
+          "solution": [
+            "Kc5"
+          ],
+          "keeps": "draw",
+          "hint": "You are the defender. Where must your king stand?",
+          "explain": "**…Kc5** keeps the black king close enough to the pawn. Any other move loses the draw."
+        },
+        {
+          "fen": "8/8/8/4p3/2k5/8/3K4/8 b - - 0 1",
+          "solution": [
+            "Kd4"
+          ],
+          "keeps": "win",
+          "hint": "You are Black now. Get your king in front of the pawn.",
+          "explain": "The same idea from Black’s side: the king goes in front of the pawn, on the way to a key square."
+        }
+      ]
+    },
+    {
+      "type": "read",
+      "title": "The outside passed pawn",
+      "body": [
+        "A **passed pawn** far from the other pawns is an **outside passed pawn**. The enemy king has to run across the board to stop it.",
+        "While he is away, your king walks into his pawns and wins them. It is one of the strongest assets in an endgame."
+      ]
+    },
+    {
+      "type": "choice",
+      "prompt": "White has a passed pawn on the a-file, far from the kingside where the kings and the other pawns are. Why is it so strong?",
+      "options": [
+        "The black king must run to stop it, and the kingside pawns are left to White’s king",
+        "A rook pawn always queens",
+        "It cannot be captured"
+      ],
+      "answer": 0,
+      "explain": "The outside pawn drags the enemy king away. Then White’s king takes the pawns on the other side. A rook pawn does not always queen, as you saw."
+    }
+  ],
+  "deeper": [
+    {
+      "type": "read",
+      "title": "Rook endings: three rules",
+      "body": [
+        "**Rooks belong behind passed pawns**, yours or theirs, so they protect the pawn all the way and are not in its way.",
+        "Also **cut off the enemy king** along a file or rank, and **keep your rook active**. A rook stuck passively in front of its pawn loses."
+      ],
+      "board": {
+        "fen": "7k/8/8/P7/8/8/8/R3K3 w - - 0 1",
+        "caption": "The rook on a1 sees the pawn on a5 from behind.",
+        "assert": {
+          "attackedFrom": {
+            "a1": [
+              "a5"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "type": "choice",
+      "prompt": "White has a passed pawn on a5. Where is the best square for the rook?",
+      "board": {
+        "fen": "7k/8/8/P7/8/8/8/R3K3 w - - 0 1"
+      },
+      "options": [
+        "Behind the pawn, on a1",
+        "In front of the pawn, on a8",
+        "Away from the a-file, on h5"
+      ],
+      "answer": 0,
+      "explain": "Behind the pawn the rook protects it all the way up the file, and it is not blocking it. In front of the pawn the rook gets in the way."
+    },
+    {
+      "type": "read",
+      "title": "Queen against a pawn on the seventh",
+      "body": [
+        "A queen usually beats a pawn that is one step from queening: it stops the pawn and the king walks over.",
+        "But with a **rook pawn** or a **bishop pawn**, and the attacking king far away, the defender can often draw by **stalemate**."
+      ],
+      "board": {
+        "fen": "8/8/8/3Q4/8/8/p1K5/k7 b - - 0 1",
+        "caption": "Stalemate: Black has no move and is not in check. White has a queen, and it is a draw.",
+        "assert": {
+          "status": "stalemate"
+        }
+      }
+    },
+    {
+      "type": "choice",
+      "prompt": "Which pawns on the seventh can sometimes hold a draw against a queen when the attacking king is far away?",
+      "options": [
+        "Rook pawns and bishop pawns",
+        "Centre pawns, such as the d-pawn and e-pawn",
+        "Every pawn"
+      ],
+      "answer": 0,
+      "explain": "Rook and bishop pawns leave the defending king a corner where stalemate tricks work. Against a centre pawn the queen wins."
+    },
+    {
+      "type": "read",
+      "title": "Opposite-coloured bishops",
+      "body": [
+        "Each side has one bishop, on **opposite** colours. Neither bishop can attack the squares of the other, so the stronger side cannot force the win.",
+        "Even with an extra pawn or two, the defender often builds a **fortress** and draws. With more pieces on the board, the ending is less drawish."
+      ]
+    },
+    {
+      "type": "choice",
+      "prompt": "Which ending is the most drawish, even a pawn ahead?",
+      "options": [
+        "Opposite-coloured bishops",
+        "Two rooks against one rook",
+        "A queen against a bishop"
+      ],
+      "answer": 0,
+      "explain": "With opposite-coloured bishops the extra pawn is hard to use, because the defender’s bishop controls squares that the attacker’s bishop can never reach."
+    },
+    {
+      "type": "puzzleSet",
+      "title": "Rook mates",
+      "theme": "king and rook mate",
+      "ratingMin": 500,
+      "ratingMax": 900,
+      "intro": "One mate in one, then two where a quiet waiting move comes first.",
+      "puzzles": [
+        {
+          "fen": "r7/8/8/8/8/4k3/8/4K3 b - - 0 1",
+          "solution": [
+            "Ra1#"
+          ],
+          "hint": "You are Black, and the kings are facing each other.",
+          "explain": "The kings face each other, so the rook checks along the first rank and the king has no escape."
+        },
+        {
+          "fen": "4k3/8/5K2/8/8/8/8/7R w - - 0 1",
+          "solution": [
+            "Rd1",
+            "Kf8",
+            "Rd8#"
+          ],
+          "hint": "The kings are not facing. Take a file away with a quiet move.",
+          "explain": "Rd1 takes the d-file and leaves the king only f8. Then Rd8 is checkmate."
+        },
+        {
+          "fen": "r7/8/8/8/8/3k4/8/4K3 b - - 0 1",
+          "solution": [
+            "Rf8",
+            "Kd1",
+            "Rf1#"
+          ],
+          "hint": "You are Black. Take away the f-file with a quiet move.",
+          "explain": "Rf8 takes the f-file and leaves the white king only d1. Then Rf1 is checkmate."
+        }
+      ]
+    },
+    {
+      "type": "puzzleSet",
+      "title": "More king and pawn",
+      "theme": "kingPawn",
+      "ratingMin": 1200,
+      "ratingMax": 1400,
+      "intro": "More one-move answers. Each keeps the win, and the last is from Black’s side.",
+      "puzzles": [
+        {
+          "fen": "8/8/8/8/4P1k1/8/5K2/8 w - - 0 1",
+          "solution": [
+            "Ke3"
+          ],
+          "keeps": "win",
+          "hint": "Bring the king towards the pawn and the black king.",
+          "explain": "**Ke3** keeps the king close to the pawn. Any other move lets the black king stop it."
+        },
+        {
+          "fen": "8/8/8/2k5/4P3/4K3/8/8 w - - 0 1",
+          "solution": [
+            "Kf4"
+          ],
+          "keeps": "win",
+          "hint": "The black king is on the left of the pawn. Go up the right side.",
+          "explain": "**Kf4** heads for the front of the pawn on the side away from the black king. It is the only move that keeps the win."
+        },
+        {
+          "fen": "8/5k2/8/4p1K1/8/8/8/8 b - - 0 1",
+          "solution": [
+            "Ke6"
+          ],
+          "keeps": "win",
+          "hint": "You are Black now.",
+          "explain": "The same idea from Black’s side: the king stays close to the pawn."
+        }
+      ]
+    }
+  ]
+}
