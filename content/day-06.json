@@ -1,0 +1,296 @@
+{
+  "day": 6,
+  "title": "The checklist",
+  "level": "600-1000",
+  "blurb": "Before every move, ask three questions: any checks, any captures, any attacks? Learn the habit that stops you hanging pieces and starts you finding tactics.",
+  "deeperTitle": "Discovered attacks and checks; danger levels",
+  "share": { "prompt": "One thing I learned today…" },
+  "core": [
+    {
+      "type": "read",
+      "title": "Checks, captures, attacks",
+      "body": [
+        "Before you move, ask three quick questions: any **checks**? Any **captures**? Any **attacks**? Look at yours first, then at your opponent's.",
+        "These are the forcing moves. They leave the other side few replies, so you can see what happens next."
+      ],
+      "board": {
+        "fen": "r1bqkb1r/pppp1ppp/2n2n2/4p1N1/2B1P3/8/PPPP1PPP/RNBQK2R b KQkq - 5 4",
+        "arrows": [["g5", "f7"], ["c4", "f7"]],
+        "highlight": ["f7"],
+        "caption": "An attack: the knight and the bishop both aim at f7.",
+        "assert": { "attackedFrom": { "g5": ["f7"], "c4": ["f7"] } }
+      }
+    },
+    {
+      "type": "spot",
+      "prompt": "Checks come first. Tap a square where your knight can give check.",
+      "board": { "fen": "6k1/5ppp/8/3N4/8/8/5PPP/6K1 w - - 0 1" },
+      "targets": ["e7", "f6"],
+      "verify": { "kind": "checkSquares", "square": "d5" },
+      "explain": "From **e7** or **f6** the knight attacks the king on g8. Always list every check you have, even the ones that look odd. Sometimes one of them wins."
+    },
+    {
+      "type": "findMove",
+      "prompt": "White to move. Find the check that leads to checkmate in two.",
+      "fen": "6k1/ppQ2ppp/8/4b1b1/6N1/8/5PPP/6K1 w - - 0 1",
+      "solution": ["Qc8+", "Bd8", "Qxd8#"],
+      "hint": "You have several checks. Which one leaves Black only one legal reply?",
+      "explain": "**Qc8+** leaves Black one reply: the bishop must block on d8, because the king has no square. Then **Qxd8#** is checkmate. None of your other checks forces mate. Your queen is attacked by the bishop on e5, but with a check every move Black never gets to take it."
+    },
+    {
+      "type": "spot",
+      "prompt": "Now captures. Before you take anything, ask which pieces are not protected. Tap a black piece that nothing protects.",
+      "board": { "fen": "3q1rk1/pp3ppp/2b2n2/4n1B1/3P4/2NB4/PPP2PPP/R2Q1RK1 w - - 0 1" },
+      "targets": ["e5", "a7"],
+      "verify": { "kind": "loose", "color": "b" },
+      "explain": "Nothing protects the knight on **e5**, or the pawn on a7. A piece that nothing protects can be taken for free, so look for one before you capture."
+    },
+    {
+      "type": "findMove",
+      "prompt": "Several pieces can be taken here, but only one capture wins material. Find it.",
+      "fen": "3q1rk1/pp3ppp/2b2n2/4n1B1/3P4/2NB4/PPP2PPP/R2Q1RK1 w - - 0 1",
+      "solution": ["dxe5"],
+      "wins": 3,
+      "after": { "attackedFrom": { "e5": ["f6"] } },
+      "hint": "Before you take anything, ask: is it protected? One black piece is not.",
+      "explain": "**dxe5** wins a knight that nothing protects, and the pawn now attacks the knight on f6 as well. **Bxh7+** looks tempting, but the knight on f6 simply takes the bishop."
+    },
+    {
+      "type": "findMove",
+      "prompt": "Now an attack. You have no checks here. Find the quiet move that forces checkmate in two.",
+      "fen": "1qb3k1/prp2ppp/7B/4Pb2/8/4Q3/1PP2PPP/1R3NK1 w - - 0 1",
+      "solution": ["Qg5", "f6", "Qxg7#"],
+      "after": { "lines": [{ "kind": "pin", "attacker": "g5", "front": "g7", "back": "g8" }] },
+      "hint": "Your bishop on h6 and your queen can both attack g7. Where should the queen go?",
+      "explain": "**Qg5** threatens **Qxg7#**. Black cannot take the bishop with the g7 pawn, because that pawn is pinned to the king by your queen. Whatever Black plays, the mate cannot be stopped."
+    },
+    {
+      "type": "read",
+      "title": "Now do it for your opponent",
+      "body": [
+        "Then run the same three questions for the other side. If it were their move, what check, capture or attack would they play?",
+        "If the answer is dangerous, deal with it first."
+      ],
+      "board": {
+        "fen": "6k1/pp3ppp/3q4/8/6n1/8/PPP2PPP/R1B2RK1 w - - 0 1",
+        "caption": "White to move. What would Black do with the move?"
+      }
+    },
+    {
+      "type": "spot",
+      "prompt": "If it were Black's move, the queen would give checkmate. Tap the square.",
+      "board": { "fen": "6k1/pp3ppp/3q4/8/6n1/8/PPP2PPP/R1B2RK1 w - - 0 1" },
+      "targets": ["h2"],
+      "verify": { "kind": "mateSquares", "square": "d6" },
+      "explain": "**Qxh2#**. The knight on g4 protects the queen, and your king has no square to run to. You found Black's threat by asking the checklist for the other side."
+    },
+    {
+      "type": "findMove",
+      "prompt": "Now stop it. Make a move after which Black has no checkmate.",
+      "fen": "6k1/pp3ppp/3q4/8/6n1/8/PPP2PPP/R1B2RK1 w - - 0 1",
+      "goal": "avoidMate",
+      "hint": "You can block the queen's diagonal, or give your king a square to run to.",
+      "explain": "**f4**, **g3** and **Bf4** all block the diagonal. **Re1** gives the king the f1 square. A move like **h3** does not help: the queen still takes on h2 with the knight's support."
+    },
+    {
+      "type": "puzzleSet",
+      "title": "Checks first",
+      "theme": "mateIn2",
+      "ratingMin": 600,
+      "ratingMax": 1000,
+      "intro": "List your checks, then pick the one that leaves Black the fewest replies. Each of these is checkmate in two.",
+      "puzzles": [
+        {
+          "fen": "6k1/1pp2ppp/8/Qb1N4/8/8/P4PPP/6KR w - - 0 1",
+          "solution": ["Qa8+", "Be8", "Qxe8#"],
+          "hint": "A queen check on the back rank. Where can Black block?",
+          "explain": "**Qa8+** forces the bishop to block on e8, and **Qxe8#** takes it with checkmate."
+        },
+        {
+          "fen": "6k1/1pbQ1ppp/3q2B1/8/8/2B5/P4PPP/6K1 w - - 0 1",
+          "solution": ["Qxf7+", "Kh8", "Qxg7#"],
+          "hint": "Take with check. Where does the king have to go?",
+          "explain": "**Qxf7+** drives the king to h8. Then **Qxg7#** is checkmate, because the bishop on c3 protects the queen."
+        },
+        {
+          "fen": "6k1/pp3ppp/8/5n2/3Q4/3N4/P1q2PPP/6K1 b - - 0 1",
+          "solution": ["Qd1+", "Ne1", "Qxe1#"],
+          "hint": "You are Black. Check on the back rank, and see what the knight must do.",
+          "explain": "**Qd1+** forces the knight to block on e1, and **Qxe1#** is checkmate."
+        }
+      ]
+    },
+    {
+      "type": "puzzleSet",
+      "title": "Checklist for Black",
+      "theme": "checklist",
+      "ratingMin": 600,
+      "ratingMax": 1000,
+      "intro": "The same habit from Black's side. The board is flipped, so take your time. One quiet attack, one capture.",
+      "puzzles": [
+        {
+          "fen": "1r3nk1/1pp2ppp/4q3/8/4pB2/7b/PRP2PPP/1QB3K1 b - - 0 1",
+          "solution": ["Qg4", "f3", "Qxg2#"],
+          "hint": "No check is needed. Aim at the weak pawn next to the king.",
+          "explain": "**Qg4** threatens **Qxg2#**, and the g2 pawn is pinned to the king, so White cannot take the bishop on h3 with it. The mate cannot be stopped."
+        },
+        {
+          "fen": "r2q1rk1/ppp2ppp/2nb4/3p4/4N1b1/2B2N2/PP3PPP/3Q1RK1 b - - 0 1",
+          "solution": ["dxe4"],
+          "wins": 3,
+          "after": { "attackedFrom": { "e4": ["f3"] } },
+          "hint": "One white piece is not protected by anything.",
+          "explain": "**dxe4** wins a knight for free, and the pawn attacks the knight on f3 as well."
+        }
+      ]
+    }
+  ],
+  "deeper": [
+    {
+      "type": "read",
+      "title": "The hidden attacker",
+      "body": [
+        "A **discovered attack** happens when you move a piece out of the way and a piece behind it suddenly attacks. One move, two threats: the piece that moved, and the one it uncovered."
+      ],
+      "board": {
+        "fen": "4q1k1/5ppp/8/8/4N3/8/5PPP/4R1K1 w - - 0 1",
+        "arrows": [["e1", "e8"]],
+        "highlight": ["e4"],
+        "caption": "The rook looks at the queen through its own knight."
+      }
+    },
+    {
+      "type": "findMove",
+      "prompt": "Move the knight with check, and win the queen.",
+      "fen": "4q1k1/ppp2ppp/8/8/4N3/8/PPP2PPP/4R1K1 w - - 0 1",
+      "solution": ["Nf6+", "gxf6", "Rxe8+"],
+      "wins": 6,
+      "after": { "attackedFrom": { "e1": ["e8"], "f6": ["g8"] } },
+      "hint": "Which knight move gives check? Then look at what the rook behind it can do.",
+      "explain": "**Nf6+** is check, and it also uncovers the rook's attack on the queen. Black has to answer the check, so the queen cannot move. Next move the rook takes her."
+    },
+    {
+      "type": "findMove",
+      "prompt": "Your bishop is in front of your rook. Move it with check and win the queen.",
+      "fen": "3q2k1/5pp1/8/2b4R/8/3B4/PPP2PPP/3R2K1 w - - 0 1",
+      "solution": ["Bh7+", "Kh8", "Rxd8+"],
+      "wins": 9,
+      "after": { "attackedFrom": { "d1": ["d8"], "h7": ["g8"] } },
+      "hint": "The bishop can give check on the h7 square. What does that uncover?",
+      "explain": "**Bh7+** is protected by the rook on h5, so the king cannot take it. The check uses up Black's turn, and the rook on d1 now takes the queen."
+    },
+    {
+      "type": "choice",
+      "prompt": "Why is a discovered check so strong?",
+      "board": { "fen": "4q1k1/ppp2ppp/5N2/8/8/8/PPP2PPP/4R1K1 b - - 0 1", "arrows": [["f6", "g8"], ["e1", "e8"]], "assert": { "status": "check" } },
+      "options": [
+        "The moved piece can make its own threat while Black must answer the check",
+        "A king in check cannot capture anything",
+        "It can never be answered"
+      ],
+      "answer": 0,
+      "explain": "Black has to deal with the check, which uses their move. Meanwhile your moved piece can do something useful, and the piece it uncovered attacks as well."
+    },
+    {
+      "type": "read",
+      "title": "Danger levels",
+      "body": [
+        "Not every threat is equal. A **check** or a threat of **mate** is more dangerous than a threat to a piece.",
+        "So when one of your pieces is attacked, do not rush to save it. First look: do I have a check, or a bigger threat, that Black must answer?"
+      ],
+      "board": {
+        "fen": "6k1/ppp2ppp/8/1N2r3/8/8/PP3PPP/6K1 w - - 0 1",
+        "arrows": [["e5", "b5"]],
+        "caption": "Black's rook attacks your knight. Must you move it?"
+      }
+    },
+    {
+      "type": "findMove",
+      "prompt": "Your knight is attacked. Don't save it. Find the check that leads to checkmate in two.",
+      "fen": "6k1/ppp2ppp/8/1N2r3/7Q/8/PP3PPP/6K1 w - - 0 1",
+      "solution": ["Qd8+", "Re8", "Qxe8#"],
+      "hint": "Which queen check on the back rank forces mate?",
+      "explain": "**Qd8+** forces the rook to block on e8, and **Qxe8#** is checkmate. The knight on b5 never matters: a mate threat outranks a threat to a piece."
+    },
+    {
+      "type": "findMove",
+      "prompt": "Your knight is attacked by the queen. Don't move it away. Find the better move.",
+      "fen": "6k1/ppp2ppp/2q5/3N3p/8/8/PPP2PPP/6K1 w - - 0 1",
+      "solution": ["Ne7+"],
+      "wins": 6,
+      "after": { "attackedFrom": { "e7": ["g8", "c6"] } },
+      "hint": "A check that also attacks something big.",
+      "explain": "**Ne7+** gives check and attacks the queen at the same time. Black must answer the check, and then your knight takes the queen."
+    },
+    {
+      "type": "choice",
+      "prompt": "Black attacks your bishop. You can give check, but it wins nothing. What should you do?",
+      "options": [
+        "Look for a reply that wins something, or just save the bishop. A check that wins nothing only helps Black.",
+        "Always play the check, because checks come first",
+        "Ignore both and push a pawn"
+      ],
+      "answer": 0,
+      "explain": "The checklist tells you what to **look at**, not what to play. A check is only worth playing if it leads somewhere. If it does not, save the piece."
+    },
+    {
+      "type": "puzzleSet",
+      "title": "Discovered attacks",
+      "theme": "discoveredAttack",
+      "ratingMin": 600,
+      "ratingMax": 1000,
+      "intro": "Move the front piece and let the one behind it do the damage.",
+      "puzzles": [
+        {
+          "fen": "6k1/pp1q1ppp/8/3N4/8/8/1PP2PPP/3R2K1 w - - 0 1",
+          "solution": ["Nf6+", "gxf6", "Rxd7"],
+          "wins": 6,
+          "hint": "Move the knight with check. What does the rook on d1 now attack?",
+          "explain": "**Nf6+** is check, and it uncovers the rook's attack on the queen. After the king deals with the check, **Rxd7** wins her."
+        },
+        {
+          "fen": "3r2k1/ppp2ppp/5r2/3N4/8/8/PPP2PPP/3R2K1 w - - 0 1",
+          "solution": ["Nxf6+", "gxf6", "Rxd8+"],
+          "wins": 7,
+          "hint": "Capture with check, and see what is uncovered.",
+          "explain": "**Nxf6+** takes a rook with check and uncovers the rook on d1's attack on the other one. After the recapture, **Rxd8+** wins the second rook."
+        },
+        {
+          "fen": "3r2k1/ppp2ppp/8/8/3b4/4N3/PP4PP/3Q2K1 b - - 0 1",
+          "solution": ["Bxe3+", "Kf1", "Rxd1+"],
+          "wins": 12,
+          "hint": "You are Black. Take the knight with check, and look at the d-file.",
+          "explain": "**Bxe3+** wins the knight with check and uncovers the rook's attack on the queen. After the king moves, **Rxd1+** wins her."
+        }
+      ]
+    },
+    {
+      "type": "puzzleSet",
+      "title": "Danger levels",
+      "theme": "dangerLevels",
+      "ratingMin": 600,
+      "ratingMax": 1000,
+      "intro": "One of your pieces is attacked in each of these. Ignore it, and find the move that is more dangerous.",
+      "puzzles": [
+        {
+          "fen": "6k1/ppp2ppp/8/1n2r3/3p4/R6Q/PPP2PPP/6K1 w - - 0 1",
+          "solution": ["Qc8+", "Re8", "Qxe8#"],
+          "hint": "Your rook is attacked, but a check comes first.",
+          "explain": "**Qc8+** forces the rook to block on e8, and **Qxe8#** is checkmate. The attack on your rook never matters."
+        },
+        {
+          "fen": "6k1/pp3ppp/p1qr4/3B1Q2/8/8/PPP2PPP/6K1 w - - 0 1",
+          "solution": ["Qxf7+", "Kh8", "Qf8#"],
+          "hint": "Your bishop is attacked twice. Ignore that, and take on f7 with check.",
+          "explain": "**Qxf7+** is protected by the bishop, so the king has to go to h8. Then **Qf8#** is checkmate, because the queen covers the whole back rank. The attacks on your bishop never mattered."
+        },
+        {
+          "fen": "6k1/pp3ppp/2qP4/8/3n4/8/PP1R1PPP/6K1 b - - 0 1",
+          "solution": ["Qc1+", "Rd1", "Qxd1#"],
+          "hint": "You are Black. Your knight is attacked, but check comes first.",
+          "explain": "**Qc1+** forces the rook to block on d1, and **Qxd1#** is checkmate."
+        }
+      ]
+    }
+  ]
+}
