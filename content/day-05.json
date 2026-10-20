@@ -1,0 +1,323 @@
+{
+  "day": 5,
+  "title": "Forks",
+  "level": "400-900",
+  "blurb": "A fork attacks two pieces at once, and your opponent can only save one. Learn to spot forks for you and against you, then meet their cousins: pins and skewers.",
+  "deeperTitle": "Pins and skewers",
+  "share": { "prompt": "One thing I learned today…" },
+  "core": [
+    {
+      "type": "read",
+      "title": "A fork attacks two things at once",
+      "body": [
+        "A **fork** is one move that attacks two (or more) enemy pieces at once. Your opponent can only fix one problem per turn, so you win the other.",
+        "Knights are the great forkers, because their L-shaped jump is easy to miss. But any piece can fork."
+      ],
+      "board": {
+        "fen": "6k1/3q1p1p/5N2/8/8/8/PPP2PPP/6K1 b - - 0 1",
+        "arrows": [["f6", "g8"], ["f6", "d7"]],
+        "caption": "The knight on f6 attacks the king and the queen.",
+        "assert": { "status": "check", "attackedFrom": { "f6": ["g8", "d7"] } }
+      }
+    },
+    {
+      "type": "findMove",
+      "prompt": "Fork the king and the queen with your knight.",
+      "fen": "6k1/3q1p1p/8/8/4N3/8/PPP2PPP/6K1 w - - 0 1",
+      "solution": ["Nf6+", "Kg7", "Nxd7"],
+      "wins": 9,
+      "after": { "attackedFrom": { "f6": ["g8", "d7"] } },
+      "hint": "Find the square from which the knight attacks both the king and the queen.",
+      "explain": "**Nf6+** attacks the king and the queen at once. The king must move, and then **Nxd7** wins the queen."
+    },
+    {
+      "type": "spot",
+      "prompt": "Both black knights are loose. Tap the square where your rook forks them.",
+      "board": { "fen": "6k1/pp4pp/8/1n5n/8/5R2/PP4PP/6K1 w - - 0 1" },
+      "targets": ["f5"],
+      "verify": { "kind": "forkSquares", "square": "f3" },
+      "explain": "From **f5** the rook attacks both knights along the 5th rank, and neither knight can attack it back. One of them falls."
+    },
+    {
+      "type": "findMove",
+      "prompt": "Fork the king and the rook with your bishop.",
+      "fen": "6k1/pp4pp/7b/5B2/2r5/8/PP4PP/6K1 w - - 0 1",
+      "solution": ["Be6+"],
+      "wins": 5,
+      "after": { "attackedFrom": { "e6": ["g8", "c4"] } },
+      "hint": "Check the king along one diagonal while attacking the rook along another.",
+      "explain": "**Be6+** checks the king and attacks the rook on c4. The king has to deal with the check, and then **Bxc4** wins the rook."
+    },
+    {
+      "type": "findMove",
+      "prompt": "A pawn can fork too. Fork the two rooks.",
+      "fen": "6k1/pp4pp/8/r1r5/8/2P5/PP4PP/6K1 w - - 0 1",
+      "solution": ["b4"],
+      "wins": 4,
+      "after": { "attackedFrom": { "b4": ["a5", "c5"] } },
+      "hint": "Which pawn move attacks both a5 and c5?",
+      "explain": "**b4** attacks both rooks. Black can save one (and may grab a pawn on the way), but you win the other rook for a pawn."
+    },
+    {
+      "type": "findMove",
+      "prompt": "Fork the king and the rook with your queen.",
+      "fen": "r5k1/p5pp/8/8/8/8/PPP2PPP/3Q2K1 w - - 0 1",
+      "solution": ["Qd5+"],
+      "wins": 5,
+      "after": { "attackedFrom": { "d5": ["g8", "a8"] } },
+      "hint": "The king and the rook are both on diagonals that meet on one square.",
+      "explain": "**Qd5+** checks the king along the diagonal to g8 and attacks the rook along the diagonal to a8. The king must move, and then the queen takes the rook."
+    },
+    {
+      "type": "findMove",
+      "prompt": "Your knight can fork in two different ways, but only one of them wins. Find it.",
+      "fen": "6k1/pp3ppp/2q1b3/5N2/8/8/PP3P1P/6K1 w - - 0 1",
+      "solution": ["Ne7+"],
+      "wins": 6,
+      "after": { "attackedFrom": { "e7": ["g8", "c6"] } },
+      "hint": "One of the forks comes with check.",
+      "explain": "**Ne7+** attacks the king and the queen, and the check means Black has no time to save her. **Nd4** also attacks the queen (and the bishop), but Black answers **Qc1+** and escapes with check."
+    },
+    {
+      "type": "choice",
+      "prompt": "Why is a fork with check so strong?",
+      "board": {
+        "fen": "6k1/3q1p1p/5N2/8/8/8/PPP2PPP/6K1 b - - 0 1",
+        "arrows": [["f6", "g8"], ["f6", "d7"]],
+        "assert": { "status": "check" }
+      },
+      "options": ["The king must move, so the other piece cannot be saved", "A king in check cannot be attacked again", "A check lets you move twice in a row"],
+      "answer": 0,
+      "explain": "A king in check **has** to be dealt with. That uses up the opponent's turn, and you take the second piece next move."
+    },
+    {
+      "type": "read",
+      "title": "Watch for forks against you",
+      "body": [
+        "Before every move, look at your opponent's knights too. Where could one jump to attack two of your pieces? That square is a **fork square**.",
+        "If you see one, guard the square, or move one of the two pieces first."
+      ]
+    },
+    {
+      "type": "spot",
+      "prompt": "It is your move. Black's knight is about to fork two of your pieces. Tap the square it would jump to.",
+      "board": { "fen": "6k1/ppp2ppp/8/4n3/8/8/3Q1P1P/6K1 w - - 0 1" },
+      "targets": ["f3"],
+      "verify": { "kind": "forkSquares", "square": "e5" },
+      "explain": "The knight would jump to **f3**, giving check to the king on g1 and attacking the queen on d2. Move the queen, or make f3 unsafe for the knight, before it happens."
+    },
+    {
+      "type": "puzzleSet",
+      "title": "Fork puzzles",
+      "theme": "fork",
+      "ratingMin": 400,
+      "ratingMax": 900,
+      "intro": "Find the fork. Each one wins material by force.",
+      "puzzles": [
+        {
+          "fen": "6k1/ppp2ppp/8/4n3/8/8/3Q1P1P/6K1 b - - 0 1",
+          "solution": ["Nf3+", "Kg2", "Nxd2"],
+          "wins": 9,
+          "after": { "attackedFrom": { "f3": ["g1", "d2"] } },
+          "hint": "You are Black. Jump to the square that checks the king and attacks the queen.",
+          "explain": "The knight on f3 attacks the king and the queen. After the king moves, the queen falls."
+        },
+        {
+          "fen": "6k1/pp4pp/8/8/5r1r/5P2/PP4PP/6K1 w - - 0 1",
+          "solution": ["g3"],
+          "wins": 3,
+          "after": { "attackedFrom": { "g3": ["f4", "h4"] } },
+          "hint": "A pawn can attack two rooks at once.",
+          "explain": "The pawn on g3 attacks both rooks, and neither rook can take it. Black cannot save both."
+        },
+        {
+          "fen": "6k1/pp4pp/B7/8/8/br6/PP4PP/6K1 w - - 0 1",
+          "solution": ["Bc4+"],
+          "wins": 4,
+          "after": { "attackedFrom": { "c4": ["g8", "b3"] } },
+          "hint": "Check the king and attack the rook at the same time.",
+          "explain": "The bishop checks the king and attacks the rook on b3, so the rook falls next."
+        }
+      ]
+    },
+    {
+      "type": "puzzleSet",
+      "title": "Forks for Black",
+      "theme": "fork",
+      "ratingMin": 400,
+      "ratingMax": 900,
+      "intro": "The same ideas from Black's side. The board is flipped, so take your time.",
+      "puzzles": [
+        {
+          "fen": "3q2k1/ppp2ppp/8/8/8/8/P5PP/R5K1 b - - 0 1",
+          "solution": ["Qd4+"],
+          "wins": 5,
+          "after": { "attackedFrom": { "d4": ["g1", "a1"] } },
+          "hint": "Check the king along one diagonal and attack the rook along the other.",
+          "explain": "**Qd4+** attacks the king and the rook on a1. After the king moves, the queen takes the rook."
+        },
+        {
+          "fen": "6k1/pp4pp/5r2/8/1N5N/8/PP4PP/6K1 b - - 0 1",
+          "solution": ["Rf4"],
+          "wins": 3,
+          "after": { "attackedFrom": { "f4": ["b4", "h4"] } },
+          "hint": "Both white knights stand on the 4th rank.",
+          "explain": "The rook attacks both knights along the 4th rank, and neither knight can attack it. One of them falls."
+        },
+        {
+          "fen": "6k1/pp4pp/8/2R5/5b2/7B/PP4PP/6K1 b - - 0 1",
+          "solution": ["Be3+"],
+          "wins": 5,
+          "after": { "attackedFrom": { "e3": ["g1", "c5"] } },
+          "hint": "Check the king and attack the rook with one bishop move.",
+          "explain": "**Be3+** checks the king and attacks the rook on c5, so the rook falls next."
+        }
+      ]
+    }
+  ],
+  "deeper": [
+    {
+      "type": "read",
+      "title": "The pin",
+      "body": [
+        "A **pin** attacks a piece that cannot move without exposing something more valuable behind it.",
+        "Here the knight on c6 is pinned to the king. If it moved, the bishop would be giving check, which is illegal. So the knight is frozen."
+      ],
+      "board": {
+        "fen": "4k3/1p3ppp/2n5/1B6/3P4/8/PPP2PPP/4K3 b - - 0 1",
+        "arrows": [["b5", "e8"]],
+        "caption": "The bishop, the knight and the king stand in one line.",
+        "assert": { "lines": [{ "kind": "pin", "attacker": "b5", "front": "c6", "back": "e8" }] }
+      }
+    },
+    {
+      "type": "spot",
+      "prompt": "Tap the pinned piece.",
+      "board": { "fen": "4k3/1p3ppp/2n5/1B6/3P4/8/PPP2PPP/4K3 b - - 0 1" },
+      "targets": ["c6"],
+      "verify": { "kind": "pinned", "color": "b" },
+      "explain": "The knight on c6 is the only piece that would expose its king if it moved."
+    },
+    {
+      "type": "findMove",
+      "prompt": "Pin the black knight to its king with your bishop.",
+      "fen": "4k3/1p3ppp/2n5/8/3P4/8/PPP2PPP/4KB2 w - - 0 1",
+      "solution": ["Bb5"],
+      "after": { "lines": [{ "kind": "pin", "attacker": "b5", "front": "c6", "back": "e8" }] },
+      "hint": "Which bishop move attacks the knight with the king right behind it?",
+      "explain": "**Bb5** attacks the knight on c6, and the king on e8 is directly behind it. The knight cannot move."
+    },
+    {
+      "type": "findMove",
+      "prompt": "The pinned knight cannot run away. Attack it with a pawn.",
+      "fen": "4k3/1p3ppp/2n5/1B6/3P4/8/PPP2PPP/4K3 w - - 0 1",
+      "solution": ["d5"],
+      "wins": 2,
+      "after": { "attacked": ["c6"] },
+      "hint": "A pawn attacks diagonally. Which pawn move hits the knight?",
+      "explain": "**d5** attacks a knight that cannot move away. Black can only defend it, so you win a knight for a pawn."
+    },
+    {
+      "type": "read",
+      "title": "The skewer",
+      "body": [
+        "A **skewer** is a pin in reverse. You attack a **valuable** piece, it has to move, and the piece behind it is left to be captured.",
+        "Here the rook checks the king along the c-file. The king must step aside, and then the rook takes the rook behind it."
+      ],
+      "board": {
+        "fen": "2r5/pp3ppp/8/2k5/8/8/PP3P1P/2R3K1 b - - 0 1",
+        "arrows": [["c1", "c8"]],
+        "caption": "The king is in front, the rook is behind it.",
+        "assert": { "status": "check", "lines": [{ "kind": "skewer", "attacker": "c1", "front": "c5", "back": "c8" }] }
+      }
+    },
+    {
+      "type": "findMove",
+      "prompt": "Skewer the king and the rook behind it.",
+      "fen": "2r5/pp3ppp/8/2k5/8/8/PP3P1P/1R4K1 w - - 0 1",
+      "solution": ["Rc1+", "Kd6", "Rxc8"],
+      "wins": 5,
+      "after": { "lines": [{ "kind": "skewer", "attacker": "c1", "front": "c5", "back": "c8" }] },
+      "hint": "Check the king along the file that the other rook is on.",
+      "explain": "**Rc1+** attacks the king, with the black rook right behind it on the same file. The king has to move, and then **Rxc8** takes the rook."
+    },
+    {
+      "type": "choice",
+      "prompt": "What is the bishop doing here?",
+      "board": {
+        "fen": "3q2k1/5ppp/5n2/6B1/8/8/PPP2PPP/4K3 w - - 0 1",
+        "arrows": [["g5", "d8"]],
+        "assert": { "lines": [{ "kind": "pin", "attacker": "g5", "front": "f6", "back": "d8" }] }
+      },
+      "options": ["A fork", "A pin", "A skewer"],
+      "answer": 1,
+      "explain": "The bishop attacks the knight, and the queen is behind it. The knight is worth less than the queen, so it is a **pin**. (The knight may move, but then **Bxd8** wins the queen.)"
+    },
+    {
+      "type": "choice",
+      "prompt": "And what is the rook doing here?",
+      "board": {
+        "fen": "8/pp6/8/8/R2k2r1/8/5P1P/7K b - - 0 1",
+        "arrows": [["a4", "g4"]],
+        "assert": { "status": "check", "lines": [{ "kind": "skewer", "attacker": "a4", "front": "d4", "back": "g4" }] }
+      },
+      "options": ["A fork", "A pin", "A skewer"],
+      "answer": 2,
+      "explain": "The rook checks the king, and a less valuable piece, a rook, stands behind it. The king has to move, and the rook behind falls: a **skewer**."
+    },
+    {
+      "type": "choice",
+      "prompt": "One more. What is the knight doing?",
+      "board": {
+        "fen": "6k1/3q1p1p/5N2/8/8/8/PPP2PPP/6K1 b - - 0 1",
+        "arrows": [["f6", "g8"], ["f6", "d7"]],
+        "assert": { "attackedFrom": { "f6": ["g8", "d7"] } }
+      },
+      "options": ["A fork", "A pin", "A skewer"],
+      "answer": 0,
+      "explain": "One piece attacks two enemy pieces at once: a **fork**. A pin and a skewer both need the pieces to stand in one line."
+    },
+    {
+      "type": "puzzleSet",
+      "title": "Pins and skewers",
+      "theme": "pin and skewer",
+      "ratingMin": 500,
+      "ratingMax": 900,
+      "intro": "Three skewers and a pinned piece to win. Look for pieces that stand in a line.",
+      "puzzles": [
+        {
+          "fen": "q7/p4ppp/8/3k4/8/8/PP3P1P/3B2K1 w - - 0 1",
+          "solution": ["Bf3+"],
+          "wins": 8,
+          "after": { "lines": [{ "kind": "skewer", "attacker": "f3", "front": "d5", "back": "a8" }] },
+          "hint": "Check the king along the long diagonal. The queen is on the same line.",
+          "explain": "**Bf3+** checks the king, and the queen on a8 is behind it on the same diagonal. The king must move, and then the bishop takes the queen."
+        },
+        {
+          "fen": "8/pp6/8/8/3k2r1/8/5P1P/R6K w - - 0 1",
+          "solution": ["Ra4+"],
+          "wins": 5,
+          "after": { "lines": [{ "kind": "skewer", "attacker": "a4", "front": "d4", "back": "g4" }] },
+          "hint": "The rook checks along the 4th rank, with the other rook at the end of it.",
+          "explain": "**Ra4+** checks the king along the 4th rank. When the king steps away, your rook takes the rook on g4."
+        },
+        {
+          "fen": "1r4k1/pp3p1p/8/8/2K5/8/PP3PPP/2R5 b - - 0 1",
+          "solution": ["Rc8+"],
+          "wins": 5,
+          "after": { "lines": [{ "kind": "skewer", "attacker": "c8", "front": "c4", "back": "c1" }] },
+          "hint": "You are Black. Check the king along the file where the white rook stands.",
+          "explain": "**Rc8+** checks the king along the c-file, and the white rook is behind it. After the king moves, the rook takes the rook."
+        },
+        {
+          "fen": "4k3/ppp2ppp/8/3p4/1b6/2N5/1P3PPP/4K3 b - - 0 1",
+          "solution": ["d4"],
+          "wins": 2,
+          "after": { "attacked": ["c3"] },
+          "hint": "You are Black. The knight on c3 is pinned to its king. Attack it with a pawn.",
+          "explain": "The white knight is pinned by the bishop on b4. **d4** attacks it, and it cannot move away, so you win a knight for a pawn."
+        }
+      ]
+    }
+  ]
+}
