@@ -1,0 +1,518 @@
+{
+  "day": 12,
+  "title": "Strategy: pawn structure",
+  "level": "1100-1400",
+  "blurb": "Learn the weaknesses that pawns create (doubled and backward pawns), how to attack them with a pawn break, and then outposts, bishop versus knight, and active rooks.",
+  "deeperTitle": "Bishop vs knight; outposts; rook activity",
+  "share": {
+    "prompt": "One thing I learned today…"
+  },
+  "core": [
+    {
+      "type": "read",
+      "title": "Pawns are the skeleton",
+      "body": [
+        "Pawns cannot move backwards, so every pawn move changes the position for good. The **pawn structure** tells you where your pieces belong and where the weak points are.",
+        "Today: three weaknesses (doubled, backward and, from Day 8, isolated pawns) and how to attack them with a **pawn break**."
+      ]
+    },
+    {
+      "type": "read",
+      "title": "Doubled pawns",
+      "body": [
+        "**Doubled pawns** are two pawns of the same colour on one file. They cannot protect each other, and the front one blocks the one behind.",
+        "Usually a weakness. Sometimes it is worth it: the half-open file helps your rooks."
+      ],
+      "board": {
+        "fen": "4k3/pp3ppp/8/8/8/2P5/PPP2PPP/4K3 w - - 0 1",
+        "highlight": [
+          "c2",
+          "c3"
+        ],
+        "caption": "White’s pawns on c2 and c3 are doubled.",
+        "assert": {
+          "doubled": [
+            "c3",
+            "c2"
+          ]
+        }
+      }
+    },
+    {
+      "type": "spot",
+      "prompt": "Tap a doubled pawn in Black’s position.",
+      "board": {
+        "fen": "r4rk1/pp3p1p/5p2/8/8/8/PPP2PPP/R4RK1 w - - 0 1"
+      },
+      "targets": [
+        "f7",
+        "f6"
+      ],
+      "verify": {
+        "kind": "doubledPawns",
+        "color": "b"
+      },
+      "explain": "The pawns on **f7** and **f6** share a file. Neither can protect the other, and Black’s kingside is weaker for it."
+    },
+    {
+      "type": "findMove",
+      "prompt": "Take the knight. If Black takes back with the g-pawn, the f-pawns are doubled and the g-file is open. Then check with the queen.",
+      "fen": "r1r3k1/ppp2ppp/5n2/6B1/8/8/PPP2PPP/R2Q2K1 w - - 0 1",
+      "solution": [
+        "Bxf6",
+        "gxf6",
+        "Qg4+"
+      ],
+      "final": {
+        "doubled": [
+          "f6",
+          "f7"
+        ]
+      },
+      "hint": "The bishop takes first, and after …gxf6 the queen can reach the open g-file.",
+      "explain": "**Bxf6** takes the defender of the kingside. After **…gxf6** Black has doubled f-pawns and an open g-file, and **Qg4+** checks along it. Doubling the enemy’s pawns is a real gain, even without winning material."
+    },
+    {
+      "type": "read",
+      "title": "Backward pawns",
+      "body": [
+        "A **backward pawn** has fallen behind its neighbours, so no pawn can ever protect it, and the square in front of it is controlled by an enemy pawn.",
+        "It cannot move safely, and a rook on its file can attack it. The square in front is a hole for your pieces."
+      ],
+      "board": {
+        "fen": "4k3/8/3p4/2p1p3/4P3/8/8/4K3 b - - 0 1",
+        "arrows": [
+          [
+            "e4",
+            "d5"
+          ]
+        ],
+        "highlight": [
+          "d5"
+        ],
+        "caption": "Black’s d6 pawn is behind c5 and e5, and White’s e4 pawn controls d5.",
+        "assert": {
+          "backward": [
+            "d6"
+          ]
+        }
+      }
+    },
+    {
+      "type": "spot",
+      "prompt": "Tap Black’s backward pawn.",
+      "board": {
+        "fen": "r4rk1/pp3ppp/3p4/2p1p3/4P3/2N2N2/PPP2PPP/R4RK1 w - - 0 1"
+      },
+      "targets": [
+        "d6"
+      ],
+      "verify": {
+        "kind": "backwardPawns",
+        "color": "b"
+      },
+      "explain": "The pawn on **d6** is behind c5 and e5, and White’s e4 pawn controls d5. Nothing can protect it except pieces."
+    },
+    {
+      "type": "findMove",
+      "prompt": "Black’s backward pawn on d6 is not defended by anything. Win it.",
+      "fen": "6kb/pp3ppp/3pn3/2p1p3/4P3/3R4/2N2PPP/6K1 w - - 0 1",
+      "solution": [
+        "Rxd6"
+      ],
+      "wins": 1,
+      "hint": "Which of your pieces looks at d6 along an open file?",
+      "explain": "The rook sees d6 down the open file, and nothing defends it. **Rxd6** wins a pawn. Backward pawns on open files are the first things to attack."
+    },
+    {
+      "type": "choice",
+      "prompt": "Black’s pawn structure has three kinds of weakness. Which pawn is **isolated** (no black pawn on a neighbouring file)?",
+      "board": {
+        "fen": "r4rk1/pp3p1p/3p1p2/2p1p3/4P3/2N2N2/PPP2PPP/R4RK1 w - - 0 1",
+        "assert": {
+          "isolated": [
+            "h7"
+          ],
+          "doubled": [
+            "f7",
+            "f6"
+          ],
+          "backward": [
+            "d6"
+          ]
+        }
+      },
+      "options": [
+        "h7",
+        "b7",
+        "e5"
+      ],
+      "answer": 0,
+      "explain": "The pawn on **h7** has no black pawn on the g file, so no pawn can ever protect it. The pawns on f7 and f6 are doubled, and d6 is backward."
+    },
+    {
+      "type": "choice",
+      "prompt": "Which black pawns are **doubled** in the same position?",
+      "board": {
+        "fen": "r4rk1/pp3p1p/3p1p2/2p1p3/4P3/2N2N2/PPP2PPP/R4RK1 w - - 0 1",
+        "assert": {
+          "doubled": [
+            "f7",
+            "f6"
+          ]
+        }
+      },
+      "options": [
+        "f7 and f6",
+        "a7 and b7",
+        "c5 and d6"
+      ],
+      "answer": 0,
+      "explain": "**f7** and **f6** are on the same file. a7 and b7 are side by side, which is healthy, and c5 and d6 are on different files."
+    },
+    {
+      "type": "read",
+      "title": "Pawn breaks",
+      "body": [
+        "A **pawn break** is a pawn move that attacks an enemy pawn, to open lines or break up the enemy structure.",
+        "Break where the enemy is weakest, and where your pieces are ready to use the open lines."
+      ],
+      "board": {
+        "fen": "r4rk1/pp3ppp/2p1p3/3p4/3P4/4P3/PPP2PPP/R4RK1 w - - 0 1",
+        "arrows": [
+          [
+            "c2",
+            "c4"
+          ],
+          [
+            "e3",
+            "e4"
+          ]
+        ],
+        "caption": "White’s c4 and e4 would both attack the pawn on d5."
+      }
+    },
+    {
+      "type": "findMove",
+      "prompt": "White has two pawn breaks against the pawn on d5. Play one of them.",
+      "fen": "r4rk1/pp3ppp/2p1p3/3p4/3P4/4P3/PPP2PPP/R4RK1 w - - 0 1",
+      "solution": [
+        "c4"
+      ],
+      "accept": [
+        "e4"
+      ],
+      "after": {
+        "attackedFrom": {
+          "c4": [
+            "d5"
+          ]
+        }
+      },
+      "hint": "A pawn move that attacks the pawn on d5.",
+      "explain": "**c4** and **e4** both attack d5. **c4** keeps your pawn chain and opens the c-file; **e4** builds a big centre. Choose the one that fits your plan, and calculate what happens after Black takes."
+    },
+    {
+      "type": "findMove",
+      "prompt": "Now you are Black. Black has two pawn breaks against the pawn on d4. Play one of them.",
+      "fen": "r4rk1/ppp2ppp/4p3/3p4/3P4/2P1P3/PP3PPP/R4RK1 b - - 0 1",
+      "solution": [
+        "c5"
+      ],
+      "accept": [
+        "e5"
+      ],
+      "after": {
+        "attackedFrom": {
+          "c5": [
+            "d4"
+          ]
+        }
+      },
+      "hint": "A pawn move that attacks the pawn on d4.",
+      "explain": "**…c5** and **…e5** both attack d4. The same idea from Black’s side: break where it opens lines for your pieces."
+    },
+    {
+      "type": "puzzleSet",
+      "title": "Hit the weak pawn",
+      "theme": "weakPawn",
+      "ratingMin": 1100,
+      "ratingMax": 1400,
+      "intro": "Each position has a backward pawn on d6. Find the move that wins it.",
+      "puzzles": [
+        {
+          "fen": "4r1k1/pp1b1ppp/1n1p4/2p1p3/2N1P3/R7/PP3PPP/1R4K1 w - - 0 1",
+          "solution": [
+            "Nxd6"
+          ],
+          "wins": 1,
+          "hint": "A knight can take the pawn and attack two things at once.",
+          "explain": "**Nxd6** wins the backward pawn and forks the rook on e8 and the pawn on b7. After the rook moves, **Nxb7** wins a second pawn."
+        },
+        {
+          "fen": "3q2k1/pp3ppp/3p1b2/1Bp1p3/2N1P3/5R2/PP3PPP/6K1 w - - 0 1",
+          "solution": [
+            "Rd3"
+          ],
+          "wins": 1,
+          "hint": "The pawn is attacked once and defended once. Add an attacker.",
+          "explain": "**Rd3** adds a second attacker on the backward pawn, and Black cannot hold it. Piling up on a weak pawn works when it cannot be defended enough."
+        },
+        {
+          "fen": "6k1/2n2ppp/3r4/4p3/2P1P3/3PN3/PP3PPP/6KB b - - 0 1",
+          "solution": [
+            "Rxd3"
+          ],
+          "wins": 1,
+          "hint": "You are Black. Which black pawn is backward?",
+          "explain": "The same idea from Black’s side: the rook takes the undefended backward pawn down the open file."
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "prompt": "The enemy has a backward pawn. What is the best plan?",
+      "options": [
+        "Put a rook on its file, and a piece on the square in front of it",
+        "Push your own pawns past it as fast as possible",
+        "Trade all your pieces"
+      ],
+      "answer": 0,
+      "explain": "A backward pawn cannot move and cannot be protected by pawns, so attack it with rooks on its file, and plant a piece on the hole in front of it."
+    }
+  ],
+  "deeper": [
+    {
+      "type": "read",
+      "title": "Outposts",
+      "body": [
+        "An **outpost** is a square deep in the enemy half that **no enemy pawn can ever attack**, and that one of your pawns protects.",
+        "A knight there is very hard to remove. Here White’s d5 is an outpost: Black’s c and e pawns have already moved past it, so none can ever attack it."
+      ],
+      "board": {
+        "fen": "r4rk1/pp3ppp/3p4/2p1p3/4P3/2N2N2/PPP2PPP/R4RK1 w - - 0 1",
+        "highlight": [
+          "d5"
+        ],
+        "caption": "White’s pawn on e4 protects d5, and no black pawn can ever attack it.",
+        "assert": {
+          "outposts": {
+            "w": [
+              "d5"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "type": "spot",
+      "prompt": "Tap the outpost square for White’s knight.",
+      "board": {
+        "fen": "r4rk1/pp3ppp/3p4/8/2P1P3/2N2N2/PP3PPP/R4RK1 w - - 0 1"
+      },
+      "targets": [
+        "d5"
+      ],
+      "verify": {
+        "kind": "outpostSquares",
+        "color": "w"
+      },
+      "explain": "**d5** is protected by the pawns on c4 and e4, and Black has no pawn on the c or e file that could ever attack it."
+    },
+    {
+      "type": "findMove",
+      "prompt": "Put your knight on the outpost.",
+      "fen": "r4rk1/pp3ppp/3p4/8/2P1P3/2N2N2/PP3PPP/R4RK1 w - - 0 1",
+      "solution": [
+        "Nd5"
+      ],
+      "after": {
+        "outposts": {
+          "w": [
+            "d5"
+          ]
+        },
+        "attackedFrom": {
+          "d5": [
+            "b6",
+            "c7",
+            "e7",
+            "f6"
+          ]
+        }
+      },
+      "hint": "Which knight can reach d5?",
+      "explain": "**Nd5** puts the knight where it cannot be chased by a pawn. From there it attacks b6, c7, e7 and f6."
+    },
+    {
+      "type": "choice",
+      "prompt": "How many squares does the knight on d5 attack?",
+      "board": {
+        "fen": "r4rk1/pp3ppp/3p4/3N4/2P1P3/5N2/PP3PPP/R4RK1 b - - 0 1",
+        "highlight": [
+          "b4",
+          "b6",
+          "c3",
+          "c7",
+          "e3",
+          "e7",
+          "f4",
+          "f6"
+        ],
+        "assert": {
+          "attackCount": {
+            "d5": 8
+          },
+          "highlightIsAttacksOf": "d5"
+        }
+      },
+      "options": [
+        "4",
+        "8",
+        "12"
+      ],
+      "answer": 1,
+      "explain": "Eight, the most a knight can have. A knight in the centre is strong; on the edge it attacks far fewer squares."
+    },
+    {
+      "type": "findMove",
+      "prompt": "Now you are Black. Put your knight on the outpost.",
+      "fen": "r4rk1/pp3ppp/2n2n2/2p1p3/8/3P4/PP3PPP/R4RK1 b - - 0 1",
+      "solution": [
+        "Nd4"
+      ],
+      "after": {
+        "outposts": {
+          "b": [
+            "d4"
+          ]
+        }
+      },
+      "hint": "The same idea from the other side of the board.",
+      "explain": "**…Nd4** is the outpost: protected by the pawns on c5 and e5, and no white pawn can attack it."
+    },
+    {
+      "type": "read",
+      "title": "Bishop or knight?",
+      "body": [
+        "Bishops like **open** positions with long diagonals. Knights like **closed** positions and outposts, because they jump over pawns.",
+        "A knight on a strong outpost is often better than a bishop hemmed in by its own pawns. But in an open game with pawns on both wings, the bishop usually wins."
+      ]
+    },
+    {
+      "type": "choice",
+      "prompt": "The centre is locked with pawns, and White has a safe outpost on d5. Which piece is usually better for White?",
+      "options": [
+        "A knight, which can sit on the outpost",
+        "A bishop, because it is a long-range piece",
+        "They are always equal"
+      ],
+      "answer": 0,
+      "explain": "Closed position, outpost on d5: the knight is usually better. It jumps over the pawns and sits on a square that cannot be attacked by pawns."
+    },
+    {
+      "type": "read",
+      "title": "Active rooks",
+      "body": [
+        "Rooks are strongest on **open files** and on the **seventh rank**, where they attack the enemy pawns from behind.",
+        "A passive rook behind your own pawns does nothing. Look for the file nobody is using."
+      ]
+    },
+    {
+      "type": "choice",
+      "prompt": "Which of White’s rooks attacks more squares?",
+      "board": {
+        "fen": "r5k1/pp3ppp/8/8/8/8/PP3PPP/R2R2K1 w - - 0 1",
+        "assert": {
+          "attackCount": {
+            "a1": 4,
+            "d1": 13
+          }
+        }
+      },
+      "options": [
+        "The rook on d1, on the open file",
+        "The rook on a1, behind the pawn",
+        "They attack the same number"
+      ],
+      "answer": 0,
+      "explain": "The rook on d1 attacks 13 squares, the one on a1 only 4. A rook behind its own pawns is passive. Put it on the open file."
+    },
+    {
+      "type": "findMove",
+      "prompt": "Rooks belong on open files. Put one of your rooks on an open file.",
+      "fen": "r4rk1/pp3ppp/8/8/8/8/PP3PPP/R4RK1 w - - 0 1",
+      "solution": [
+        "Rac1"
+      ],
+      "accept": [
+        "Rad1",
+        "Rae1",
+        "Rfc1",
+        "Rfd1",
+        "Rfe1"
+      ],
+      "after": {
+        "openFiles": [
+          "c",
+          "d",
+          "e"
+        ]
+      },
+      "hint": "Which files have no pawns?",
+      "explain": "The c, d and e files are open, so any of these works. From an open file a rook can reach the other side of the board; on a closed file it is stuck behind its own pawns."
+    },
+    {
+      "type": "findMove",
+      "prompt": "The d-file is open. Put your rook on the seventh rank, where it attacks two pawns.",
+      "fen": "r5k1/pp3ppp/8/8/8/8/PP3PPP/3R2K1 w - - 0 1",
+      "solution": [
+        "Rd7"
+      ],
+      "after": {
+        "attackedFrom": {
+          "d7": [
+            "b7",
+            "f7"
+          ]
+        }
+      },
+      "hint": "Up the open file as far as it goes.",
+      "explain": "**Rd7** attacks b7 and f7 from behind. Black’s pieces are tied to defending them, and a rook on the seventh often wins pawns later."
+    },
+    {
+      "type": "puzzleSet",
+      "title": "Back-rank mates",
+      "theme": "back rank mate",
+      "ratingMin": 0,
+      "ratingMax": 600,
+      "intro": "Same idea, three different looks.",
+      "puzzles": [
+        {
+          "fen": "6k1/5ppp/8/8/8/8/8/R5K1 w - - 0 1",
+          "solution": [
+            "Ra8#"
+          ],
+          "hint": "Rooks love open files.",
+          "explain": "The black pawns trap their own king."
+        },
+        {
+          "fen": "r5k1/5ppp/8/8/8/8/5PPP/6K1 b - - 0 1",
+          "solution": [
+            "Ra1#"
+          ],
+          "hint": "Black can use the same trick against White.",
+          "explain": "White forgot to make luft, so the back rank falls."
+        },
+        {
+          "fen": "6k1/5ppp/8/8/8/8/5PPP/3Q2K1 w - - 0 1",
+          "solution": [
+            "Qd8#"
+          ],
+          "hint": "The queen also travels along files.",
+          "explain": "A queen does the job of a rook here."
+        }
+      ]
+    }
+  ]
+}
