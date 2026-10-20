@@ -113,8 +113,8 @@ pieces that piece attacks), `loose` + `color` (the pieces with no defender), `le
 (the squares the piece on that square can legally move to, for example a king's escape squares),
 `forkSquares` + `square` (squares that piece could move to and attack two or more enemy pieces, not
 counting pawns), `pinned` + `color` (the pieces pinned to their own king) and `checkSquares` + `square`
-(the squares that piece can legally move to and give check from) and `mateSquares` + `square` (the same, but
-checkmate). For these two the piece can belong to either side, so a card can ask "where would Black's queen
+(the squares that piece can legally move to and give check from), `mateSquares` + `square` (the same, but
+checkmate) and `isolatedPawns` + `color` (that side's isolated pawns). For these two the piece can belong to either side, so a card can ask "where would Black's queen
 mate?" while White is to move.
 
 ### `puzzleSet`: 2 to 6 short puzzles
@@ -139,6 +139,16 @@ position, so a sentence like "this knight attacks eight squares" cannot be wrong
 ```
 Available: `status` (`checkmate`, `stalemate`, `check`, `normal`, `insufficient`), `attackCount`,
 `highlightIsAttacksOf`, `undefended`, `defended`, `attacked`.
+
+Structure and counting facts, also proven:
+
+- `counts`: `{ "d5": { "attackers": 2, "defenders": 1 } }` (enemy pieces attacking the piece on d5, friendly pieces defending it).
+- `isolated`: `["d5"]`: each pawn has no friendly pawn on either neighbouring file.
+- `openFiles`: `["c", "d", "e"]`: exactly the files with no pawn of either colour (`[]` for none).
+- `space`: `{ "w": 9, "b": 5 }`: how many squares on the **other** side of the board (ranks 5-8 for White, 1-4 for Black)
+  each side attacks. This is a simple way to count space, not a full evaluation, so say "attacks" in the lesson.
+
+`npm run probe` prints all of these (isolated pawns, open files, space, and each side's legal moves).
 
 ## Tactics are proven too
 

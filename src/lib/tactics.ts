@@ -275,3 +275,48 @@ export function stalemateTrapMoves(chess: Chess): string[] {
   }
   return out
 }
+
+/** Pawns of `color` with no friendly pawn on either neighbouring file: nothing can ever protect them from behind. */
+export function isolatedPawns(chess: Chess, color: 'w' | 'b'): Square[] {
+  const pawnFiles = new Set<number>()
+  const pawns: Square[] = []
+  for (const sq of ALL_SQUARES) {
+    const p = chess.get(sq as never)
+    if (p && p.type === 'p' && p.color === color) {
+      pawns.push(sq)
+      pawnFiles.add(FILE(sq))
+    }
+  }
+  return pawns.filter((sq) => !pawnFiles.has(FILE(sq) - 1) && !pawnFiles.has(FILE(sq) + 1))
+}
+
+/** Files (as letters) that have no pawn of either colour on them. */
+export function openFiles(chess: Chess): string[] {
+  const used = new Set<string>()
+  for (const sq of ALL_SQUARES) {
+    const p = chess.get(sq as never)
+    if (p && p.type === 'p') used.add(sq[0])
+  }
+  return 'abcdefgh'.split('').filter((f) => !used.has(f))
+}
+
+/**
+ * A simple measure of space: how many squares on the opponent's half of the board (ranks 5 to 8 for White,
+ * ranks 1 to 4 for Black) the side attacks with any of its pieces and pawns.
+ */
+export function spaceCount(chess: Chess, color: 'w' | 'b'): number {
+  return ALL_SQUARES.filter((sq) => (color === 'w' ? RANK(sq) >= 4 : RANK(sq) <= 3) && chess.attackers(sq as never, color).length > 0).length
+}
+
+/** How many legal moves `color` has in this position (the turn is flipped if it is not their move). Null if the position cannot be set up that way. */
+export function mobility(chess: Chess, color: 'w' | 'b'): number | null {
+  if (chess.turn() === color) return chess.moves().length
+  try {
+    const parts = chess.fen().split(' ')
+    parts[1] = color
+    parts[3] = '-'
+    return new Chess(parts.join(' ')).moves().length
+  } catch {
+    return null
+  }
+}

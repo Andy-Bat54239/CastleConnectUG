@@ -21,6 +21,14 @@ export interface BoardAssert {
   attackedFrom?: Record<Square, Square[]>
   /** Pins and skewers that must really exist in the position. */
   lines?: LineClaim[]
+  /** For the piece on each key square: how many enemy pieces attack it and how many friendly pieces defend it. */
+  counts?: Record<Square, { attackers: number; defenders: number }>
+  /** These pawns must be isolated: no friendly pawn on either neighbouring file. */
+  isolated?: Square[]
+  /** The files (letters) with no pawn of either colour must be exactly these. */
+  openFiles?: string[]
+  /** Squares each side attacks on the opponent's half of the board (ranks 5-8 for White, 1-4 for Black). */
+  space?: { w?: number; b?: number }
 }
 
 /** A rook, bishop or queen (`attacker`) sees `front`, with `back` behind it on the same line. */
@@ -109,9 +117,9 @@ export interface SpotVerify {
    * the undefended pieces of `color` / the squares the piece on `square` can legally move to / the squares the
    * piece on `square` could move to and attack two or more enemy pieces (fork squares) / the pieces of `color`
    * pinned to their own king / the squares the piece on `square` can legally move to and give check from / the same
-   * but checkmate. The piece may belong to either side, whoever is to move.
+   * but checkmate (the piece may belong to either side, whoever is to move) / the isolated pawns of `color`.
    */
-  kind: 'checkers' | 'attackedBy' | 'loose' | 'legalMoves' | 'forkSquares' | 'pinned' | 'checkSquares' | 'mateSquares'
+  kind: 'checkers' | 'attackedBy' | 'loose' | 'legalMoves' | 'forkSquares' | 'pinned' | 'checkSquares' | 'mateSquares' | 'isolatedPawns'
   square?: Square
   color?: 'w' | 'b'
 }

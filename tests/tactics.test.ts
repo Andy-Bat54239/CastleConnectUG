@@ -1,6 +1,6 @@
 import { Chess } from 'chess.js'
 import { describe, expect, it } from 'vitest'
-import { alignment, forkSquares, moveGain, perpetualMoves, pinnedPieces, stalemateTrapMoves, winningMoves } from '../src/lib/tactics'
+import { alignment, forkSquares, isolatedPawns, moveGain, openFiles, perpetualMoves, pinnedPieces, spaceCount, stalemateTrapMoves, winningMoves } from '../src/lib/tactics'
 
 const KNIGHT_FORK = '6k1/3q1p1p/8/8/4N3/8/PPP2PPP/6K1 w - - 0 1' // Nf6+ forks king and queen
 const DECOY = '6k1/pp3ppp/2q1b3/5N2/8/8/PP3P1P/6K1 w - - 0 1' // Ne7+ wins; Nd4 attacks the queen but gives no check
@@ -74,5 +74,22 @@ describe('draw resources', () => {
   })
   it('does not call a move a trap when the opponent has a choice', () => {
     expect(stalemateTrapMoves(new Chess('k3r3/8/1Q6/8/8/2B5/6PP/7K b - - 0 1'))).toEqual([])
+  })
+})
+
+describe('structure facts', () => {
+  it('finds isolated pawns', () => {
+    const c = new Chess('r4rk1/ppp3pp/4p3/8/3P4/8/PPP2PPP/R4RK1 w - - 0 1')
+    expect(isolatedPawns(c, 'b')).toEqual(['e6'])
+    expect(isolatedPawns(c, 'w')).toEqual([])
+  })
+  it('lists the files with no pawns at all', () => {
+    expect(openFiles(new Chess('r4rk1/pp3ppp/8/8/8/8/PP3PPP/R4RK1 w - - 0 1'))).toEqual(['c', 'd', 'e'])
+    expect(openFiles(new Chess())).toEqual([])
+  })
+  it('counts the squares attacked on the other half of the board', () => {
+    const c = new Chess('rnbq1rk1/pp3pbp/3p1np1/2pP4/4P3/2N2N2/PP2BPPP/R1BQ1RK1 w - - 0 1')
+    expect(spaceCount(c, 'w')).toBe(9)
+    expect(spaceCount(c, 'b')).toBe(5)
   })
 })

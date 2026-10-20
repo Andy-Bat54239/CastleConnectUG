@@ -11,6 +11,7 @@ import { Chess } from 'chess.js'
 import type { BoardAssert, Card, DayContent } from '../src/types'
 import {
   ALL_SQUARES,
+  attackersOf,
   attacksOf,
   checkers,
   defendersOf,
@@ -23,7 +24,7 @@ import {
 } from '../src/lib/chessUtil'
 import { estimateMinutes } from '../src/lib/estimate'
 import { answersByMethod, classifyAnswer, isSafe } from '../src/lib/verify'
-import { alignment, forkSquares, moveGain, movesOfPiece, perpetualMoves, pinnedPieces, positionKey, stalemateTrapMoves, winningMoves } from '../src/lib/tactics'
+import { alignment, forkSquares, isolatedPawns, moveGain, movesOfPiece, openFiles, perpetualMoves, pinnedPieces, positionKey, spaceCount, stalemateTrapMoves, winningMoves } from '../src/lib/tactics'
 
 // BG_CONTENT_DIR lets the tests point the validator at a scratch folder.
 const ROOT = process.env.BG_CONTENT_DIR ? resolve(process.env.BG_CONTENT_DIR) + '/' : new URL('../content/', import.meta.url).pathname
@@ -111,7 +112,7 @@ function sameSet(a: string[], b: string[]): boolean {
 }
 
 function checkAssert(chess: Chess, a: BoardAssert, highlight: string[], label: string) {
-  const known = ['status', 'attackCount', 'highlightIsAttacksOf', 'undefended', 'defended', 'attacked', 'attackedFrom', 'lines']
+  const known = ['status', 'attackCount', 'highlightIsAttacksOf', 'undefended', 'defended', 'attacked', 'attackedFrom', 'lines', 'counts', 'isolated', 'openFiles', 'space']
   onlyKeys(a as Obj, known)
   if (a.status) {
     const actual = chess.isCheckmate()
@@ -143,6 +144,26 @@ function checkAssert(chess: Chess, a: BoardAssert, highlight: string[], label: s
     else if (!defendersOf(chess, sq).length) err(`${label}: the piece on ${sq} has no defender`)
   }
   checkTactics(chess, a, label)
+  for (const [sq, want] of Object.entries(a.counts ?? {})) {
+    if (!chess.get(sq as never)) {
+      err(`${label}: counts square ${sq} is empty`)
+      continue
+    }
+    const got = { attackers: attackersOf(chess, sq).length, defenders: defendersOf(chess, sq).length }
+    if (got.attackers !== want.attackers || got.defenders !== want.defenders) {
+      err(`${label}: the piece on ${sq} is attacked ${got.attackers} time(s) and defended ${got.defenders} time(s), not ${want.attackers} and ${want.defenders}`)
+    }
+  }
+  for (const sq of a.isolated ?? []) {
+    const p = chess.get(sq as never)
+    if (!p || p.type !== 'p') err(`${label}: isolated square ${sq} does not hold a pawn`)
+    else if (!isolatedPawns(chess, p.color).includes(sq)) err(`${label}: the pawn on ${sq} is not isolated (a friendly pawn stands on a neighbouring file)`)
+  }
+  if (a.openFiles && !sameSet(openFiles(chess), a.openFiles)) err(`${label}: the open files are ${openFiles(chess).join(' ') || 'none'}, not ${a.openFiles.join(' ') || 'none'}`)
+  for (const side of ['w', 'b'] as const) {
+    const want = a.space?.[side]
+    if (want !== undefined && spaceCount(chess, side) !== want) err(`${label}: ${side === 'w' ? 'White' : 'Black'} attacks ${spaceCount(chess, side)} squares on the other side of the board, not ${want}`)
+  }
   for (const sq of a.attacked ?? []) {
     const p = chess.get(sq as never)
     if (!p) err(`${label}: attacked square ${sq} is empty`)
@@ -425,6 +446,10 @@ function checkSpot(c: Obj) {
     const wanted = v.kind === 'mateSquares' ? moves.filter((m) => m.san.endsWith('#')) : moves.filter((m) => /[+#]/.test(m.san))
     actual = [...new Set(wanted.map((m) => m.to as string))]
     if (!actual.length) return err(`the piece on ${v.square} has no move that ${v.kind === 'mateSquares' ? 'gives checkmate' : 'gives check'}`)
+  } else if (v.kind === 'isolatedPawns') {
+    if (v.color !== 'w' && v.color !== 'b') return err('verify.color must be "w" or "b"')
+    actual = isolatedPawns(chess, v.color)
+    if (!actual.length) return err(`${v.color === 'w' ? 'White' : 'Black'} has no isolated pawn here`)
   } else if (v.kind === 'pinned') {
     if (v.color !== 'w' && v.color !== 'b') return err('verify.color must be "w" or "b"')
     actual = pinnedPieces(chess, v.color)

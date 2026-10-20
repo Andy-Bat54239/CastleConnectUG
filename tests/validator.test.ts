@@ -207,6 +207,25 @@ describe('content validator', () => {
     expect(notTrap.out).toContain('is not a stalemate trap')
   })
 
+  it('proves counts, isolated pawns, open files and space on a board', () => {
+    const fen = 'r4rk1/pp3ppp/5n2/3p4/8/2N5/PP3PPP/3R2K1 w - - 0 1'
+    const read = (assert: unknown) => run(dayWith([{ type: 'read', title: 't', body: 'b', board: { fen, assert } }]))
+    expect(read({ counts: { d5: { attackers: 2, defenders: 1 } }, isolated: ['d5'], openFiles: ['c', 'e'], space: { w: 2, b: 3 } }).code).toBe(0)
+    const badCount = read({ counts: { d5: { attackers: 3, defenders: 1 } } })
+    expect(badCount.code).toBe(1)
+    expect(badCount.out).toContain('attacked 2 time(s) and defended 1 time(s)')
+    expect(read({ isolated: ['b7'] }).out).toContain('is not isolated')
+    expect(read({ openFiles: ['c'] }).out).toContain('the open files are')
+    expect(read({ space: { b: 99 } }).out).toContain('squares on the other side of the board')
+  })
+
+  it('checks tap-the-isolated-pawn cards', () => {
+    const board = { fen: 'r4rk1/ppp3pp/4p3/8/3P4/8/PPP2PPP/R4RK1 w - - 0 1' }
+    const spot = (targets: string[]) => dayWith([{ type: 'spot', prompt: 'x', board, targets, explain: 'x', verify: { kind: 'isolatedPawns', color: 'b' } }])
+    expect(run(spot(['e6'])).code).toBe(0)
+    expect(run(spot(['a7'])).code).toBe(1)
+  })
+
   it('rejects an unlockAll that is not true or false', () => {
     const dir = dayWith([{ type: 'read', title: 't', body: 'b' }])
     writeFileSync(join(dir, 'config.json'), JSON.stringify({ startDate: '2026-10-26T00:00:00+03:00', challengeName: 'x', unlockAll: 'yes' }))
