@@ -100,3 +100,82 @@ export function checkers(chess: Chess): Square[] {
 export function sideName(turn: 'w' | 'b'): string {
   return turn === 'w' ? 'White' : 'Black'
 }
+
+/**
+ * Can the side to move force checkmate within `n` of its own moves, whatever the opponent answers?
+ * A full search of every reply, so keep `n` small (3 is fine for endgames with few pieces).
+ * Stalemate and other draws count as failures.
+ */
+export function canForceMate(chess: Chess, n: number): boolean {
+  if (n <= 0) return false
+  for (const m of chess.moves()) {
+    chess.move(m)
+    let wins: boolean
+    if (chess.isCheckmate()) wins = true
+    else if (n === 1 || chess.isGameOver()) wins = false
+    else {
+      wins = true
+      for (const reply of chess.moves()) {
+        chess.move(reply)
+        const next = canForceMate(chess, n - 1)
+        chess.undo()
+        if (!next) {
+          wins = false
+          break
+        }
+      }
+    }
+    chess.undo()
+    if (wins) return true
+  }
+  return false
+}
+
+/** The first moves (SAN) that force checkmate within `n` moves. Used when writing lessons, to see every right answer. */
+export function forcedMateMoves(chess: Chess, n: number): string[] {
+  const out: string[] = []
+  for (const m of chess.moves()) {
+    chess.move(m)
+    let wins: boolean
+    if (chess.isCheckmate()) wins = true
+    else if (n <= 1 || chess.isGameOver()) wins = false
+    else {
+      wins = true
+      for (const reply of chess.moves()) {
+        chess.move(reply)
+        const next = canForceMate(chess, n - 1)
+        chess.undo()
+        if (!next) {
+          wins = false
+          break
+        }
+      }
+    }
+    chess.undo()
+    if (wins) out.push(m)
+  }
+  return out
+}
+
+/**
+ * Check a stored line that ends in checkmate (your move, their reply, your move...). Playing the line must
+ * work AND it must be forced: at every point, whatever else the opponent could have replied, you still mate in
+ * the moves you have left. Returns what is wrong, or null when the line is a genuine forced mate.
+ */
+export function lineIsForcedMate(startFen: string, line: string[]): string | null {
+  const chess = new Chess(startFen)
+  const solverMoves = (line.length + 1) / 2
+  for (let i = 0; i < line.length; i++) {
+    chess.move(line[i])
+    if (i % 2 === 0 && i < line.length - 1) {
+      const left = solverMoves - (i / 2 + 1)
+      for (const reply of chess.moves()) {
+        chess.move(reply)
+        const ok = canForceMate(chess, left)
+        chess.undo()
+        if (!ok) return `after ${line[i]}, ${reply} lets the opponent escape: it is not a forced mate in ${solverMoves}`
+      }
+    }
+  }
+  return chess.isCheckmate() ? null : 'the line does not end in checkmate'
+}

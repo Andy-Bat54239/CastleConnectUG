@@ -16,6 +16,7 @@ import {
   defendersOf,
   hasMateInOne,
   isFileRank,
+  lineIsForcedMate,
   loosePieces,
   mateAvoidingMoves,
   matingMoves,
@@ -199,6 +200,14 @@ function checkChoice(c: Obj) {
   }
 }
 
+/** A line that ends in checkmate must be a *forced* mate, not just a legal sequence the opponent could dodge. */
+function checkForced(fen: string, line: string[], label: string) {
+  if (!line.length || !line[line.length - 1].endsWith('#')) return
+  if ((line.length + 1) / 2 > 3) return warn(`${label}: mate in more than 3 moves, so "forced" was not proven (check it by hand)`)
+  const problem = lineIsForcedMate(fen, line)
+  if (problem) err(`${label}: ${problem}`)
+}
+
 function checkFindMove(c: Obj) {
   onlyKeys(c, ['type', 'prompt', 'fen', 'goal', 'solution', 'accept', 'hint', 'explain', 'highlight', 'arrows', 'verify'])
   need(c, 'prompt', 'string')
@@ -240,7 +249,7 @@ function checkFindMove(c: Obj) {
   } else {
     const line = c.solution
     if (!Array.isArray(line) || line.length % 2 === 0) err('"solution" must list moves alternating yours, reply, yours... so it needs an odd number of moves')
-    playLine(fen, line, 'solution')
+    if (playLine(fen, line, 'solution')) checkForced(fen, line as string[], 'solution')
   }
 
   const accept = (c.accept ?? []) as unknown[]
@@ -294,6 +303,9 @@ function checkSpot(c: Obj) {
       const q = chess.get(s as never)
       return q && q.color !== p.color
     })
+  } else if (v.kind === 'legalMoves') {
+    if (!v.square || !chess.get(v.square as never)) return err('verify.square must hold the piece whose moves are listed')
+    actual = [...new Set(chess.moves({ square: v.square as never, verbose: true }).map((m) => m.to as string))]
   } else if (v.kind === 'loose') {
     if (v.color !== 'w' && v.color !== 'b') return err('verify.color must be "w" or "b"')
     actual = loosePieces(chess, v.color)
@@ -320,6 +332,7 @@ function checkPuzzleSet(c: Obj) {
     if (end && start) {
       const sol = p.solution as string[]
       const last = sol[sol.length - 1] ?? ''
+      if (last.endsWith('#') && end.isCheckmate()) checkForced(p.fen as string, sol, label)
       if (last.endsWith('#') && !end.isCheckmate()) err(`${label}: ends with # but is not checkmate`)
       if (!last.endsWith('#') && end.isCheckmate()) err(`${label}: the last move is checkmate but is written without #`)
       const first = (p.solution as string[])[0]

@@ -20,6 +20,7 @@ npm run dev                          # then open  /?preview=1#/day/4   to play i
                                      #            /?preview=1#/review/4 to read it
 npm run probe -- "<fen>"             # facts about a position (mates, loose pieces, safe moves)
 npm run probe -- "<fen>" d4          # ...and what the piece on d4 attacks / is attacked by
+npm run probe -- "<fen>" --mate 2     # every first move that FORCES checkmate within 2 moves (try 1 to 3)
 npm run line  -- "e4 e5 Nf3 Nc6"     # plays moves and prints the FEN after each
 ```
 
@@ -108,7 +109,8 @@ Members get a hint after one miss and a **Show me** button after two, so nobody 
 ```
 `verify` is optional but strongly recommended. It makes the validator prove the claim:
 `checkers` (targets are exactly the pieces giving check), `attackedBy` + `square` (the enemy
-pieces that piece attacks), `loose` + `color` (the pieces with no defender).
+pieces that piece attacks), `loose` + `color` (the pieces with no defender), `legalMoves` + `square`
+(the squares the piece on that square can legally move to, for example a king's escape squares).
 
 ### `puzzleSet`: 2 to 6 short puzzles
 
@@ -132,6 +134,13 @@ position, so a sentence like "this knight attacks eight squares" cannot be wrong
 ```
 Available: `status` (`checkmate`, `stalemate`, `check`, `normal`, `insufficient`), `attackCount`,
 `highlightIsAttacksOf`, `undefended`, `defended`, `attacked`.
+
+## Mates are proven, not just played
+
+When a stored line ends in `#` (a `solution` or a puzzle), the validator does not only check that the
+moves are legal. It searches **every** defence and fails the build if the opponent has any reply that
+escapes the mate. So "Mate in two" in a lesson really is forced. It does this for mates in up to 3
+moves. Use `npm run probe -- "<fen>" --mate 2` while writing to see which first moves truly work.
 
 ## Rules the validator enforces
 

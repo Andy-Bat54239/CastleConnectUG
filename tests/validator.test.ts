@@ -106,6 +106,31 @@ describe('content validator', () => {
     expect(r.out).toContain('not in danger')
   })
 
+  it('rejects a mating line the opponent can dodge', () => {
+    const good = { fen: 'k7/7R/8/8/8/8/8/2R3K1 w - - 0 1', solution: ['Rc8#'] }
+    // Black's king on d7 can answer Rb7+ with Kc8, so this is NOT a forced mate in two.
+    const dodgeable = { fen: '8/3k4/R7/8/8/8/8/1R5K w - - 0 1', solution: ['Rb7+', 'Ke8', 'Ra8#'] }
+    const r = run(dayWith([{ type: 'puzzleSet', title: 'x', theme: 'x', puzzles: [good, dodgeable] }]))
+    expect(r.code).toBe(1)
+    expect(r.out).toContain('not a forced mate')
+  })
+
+  it('accepts a genuinely forced two-move mate', () => {
+    const good = { fen: '8/4k3/R7/8/8/8/8/1R5K w - - 0 1', solution: ['Rb7+', 'Kd8', 'Ra8#'] }
+    const easy = { fen: 'k7/7R/8/8/8/8/8/2R3K1 w - - 0 1', solution: ['Rc8#'] }
+    expect(run(dayWith([{ type: 'puzzleSet', title: 'x', theme: 'x', puzzles: [good, easy] }])).code).toBe(0)
+  })
+
+  it('checks the squares a tap-the-square card says a piece can go to', () => {
+    const board = { fen: '8/1R2k3/R7/8/8/8/8/7K b - - 1 1' }
+    const ok = dayWith([{ type: 'spot', prompt: 'x', board, targets: ['d8', 'e8', 'f8'], explain: 'x', verify: { kind: 'legalMoves', square: 'e7' } }])
+    expect(run(ok).code).toBe(0)
+    const wrong = dayWith([{ type: 'spot', prompt: 'x', board, targets: ['d8', 'e8'], explain: 'x', verify: { kind: 'legalMoves', square: 'e7' } }])
+    const r = run(wrong)
+    expect(r.code).toBe(1)
+    expect(r.out).toContain('do not match')
+  })
+
   it('rejects an unlockAll that is not true or false', () => {
     const dir = dayWith([{ type: 'read', title: 't', body: 'b' }])
     writeFileSync(join(dir, 'config.json'), JSON.stringify({ startDate: '2026-10-26T00:00:00+03:00', challengeName: 'x', unlockAll: 'yes' }))

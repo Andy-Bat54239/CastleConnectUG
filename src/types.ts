@@ -84,8 +84,11 @@ export interface FindMoveCard {
 }
 
 export interface SpotVerify {
-  /** Targets must be exactly: the pieces giving check / the enemy pieces the piece on `square` attacks / the undefended pieces of `color`. */
-  kind: 'checkers' | 'attackedBy' | 'loose'
+  /**
+   * Targets must be exactly: the pieces giving check / the enemy pieces the piece on `square` attacks /
+   * the undefended pieces of `color` / the squares the piece on `square` can legally move to.
+   */
+  kind: 'checkers' | 'attackedBy' | 'loose' | 'legalMoves'
   square?: Square
   color?: 'w' | 'b'
 }

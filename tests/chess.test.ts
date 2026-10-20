@@ -1,6 +1,6 @@
 import { Chess } from 'chess.js'
 import { describe, expect, it } from 'vitest'
-import { checkers, hasMateInOne, loosePieces, mateAvoidingMoves, matingMoves, attacksOf, stripSan } from '../src/lib/chessUtil'
+import { canForceMate, checkers, forcedMateMoves, hasMateInOne, lineIsForcedMate, loosePieces, mateAvoidingMoves, matingMoves, attacksOf, stripSan } from '../src/lib/chessUtil'
 import { answersByMethod, classifyAnswer, isSafe } from '../src/lib/verify'
 import { indexOf, placement, turnOf } from '../src/lib/fen'
 
@@ -79,5 +79,40 @@ describe('answering an attack', () => {
     // knight attacked by a bishop, but defended by a pawn: trading 3 for 3 is fine
     const c = new Chess('6k1/5ppp/8/8/6b1/5N2/5PP1/6K1 w - - 0 1')
     expect(isSafe(c, 'f3')).toBe(true)
+  })
+})
+
+describe('forced mates', () => {
+  // Two rooks against a king: Ra6 guards the 6th rank, Rb1 is ready to check on the 7th.
+  const LADDER = '8/4k3/R7/8/8/8/8/1R5K w - - 0 1'
+
+  it('finds the only first move that forces mate in two', () => {
+    expect(forcedMateMoves(new Chess(LADDER), 2)).toEqual(['Rb7+'])
+    expect(canForceMate(new Chess(LADDER), 2)).toBe(true)
+    expect(canForceMate(new Chess(LADDER), 1)).toBe(false)
+  })
+
+  it('accepts a line that really is forced, whichever back-rank square the king picks', () => {
+    for (const king of ['Kd8', 'Ke8', 'Kf8']) expect(lineIsForcedMate(LADDER, ['Rb7+', king, 'Ra8#'])).toBeNull()
+  })
+
+  it('rejects a mating line the defender can dodge', () => {
+    // With the king on d7 instead, Rb7+ Kc8 escapes: Ke8 / Ra8# only works if Black cooperates.
+    const dodgeable = '8/3k4/R7/8/8/8/8/1R5K w - - 0 1'
+    expect(lineIsForcedMate(dodgeable, ['Rb7+', 'Ke8', 'Ra8#'])).toContain('not a forced mate')
+  })
+
+  it('does not count stalemate as winning', () => {
+    const trap = new Chess('7k/5K2/8/8/8/8/8/6Q1 w - - 0 1')
+    expect(forcedMateMoves(trap, 1)).not.toContain('Qg6')
+    expect(new Chess('7k/5K2/6Q1/8/8/8/8/8 b - - 0 1').isStalemate()).toBe(true)
+  })
+
+  it('finds the quiet queen move that forces mate in two', () => {
+    expect(forcedMateMoves(new Chess('4k3/8/6K1/8/8/2Q5/8/8 w - - 0 1'), 2)).toEqual(['Qc7'])
+  })
+
+  it('finds the rook waiting move that forces mate in two', () => {
+    expect(forcedMateMoves(new Chess('4k3/8/3K4/8/8/8/8/R7 w - - 0 1'), 2)).toEqual(['Rf1'])
   })
 })
