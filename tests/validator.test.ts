@@ -227,6 +227,27 @@ describe('content validator', () => {
     expect(read({ materialDiff: 0 }).out).toContain('material minus')
   })
 
+  it('proves doubled, backward and passed pawns, outposts, and the final position of a line', () => {
+    const fen = '4k3/8/8/4p3/2P1P3/3P4/8/4K3 w - - 0 1'
+    const read = (assert: unknown) => run(dayWith([{ type: 'read', title: 't', body: 'b', board: { fen, assert } }]))
+    expect(read({ backward: ['d3'], passed: ['c4'], outposts: { w: ['d5'], b: ['d4'] } }).code).toBe(0)
+    expect(read({ backward: ['c4'] }).out).toContain('is not backward')
+    expect(read({ doubled: ['c4'] }).out).toContain('is not doubled')
+    expect(read({ outposts: { w: ['e6'] } }).out).toContain('is not an outpost')
+    // final: the whole line is played, then the position is checked
+    const line = (final: unknown) => run(dayWith([{ type: 'findMove', prompt: 'x', explain: 'x', fen: '4k3/8/5p2/8/8/8/8/3BK3 w - - 0 1', solution: ['Bh5+', 'Ke7', 'Bg4'], final }]))
+    expect(line({ attackedFrom: { g4: ['c8'] } }).code).toBe(0)
+    expect(line({ attackedFrom: { g4: ['a1'] } }).code).toBe(1)
+  })
+
+  it('checks tap-the-pawn cards for doubled and backward pawns and outposts', () => {
+    const board = { fen: '4k3/8/8/4p3/2P1P3/3P4/8/4K3 w - - 0 1' }
+    const spot = (kind: string, color: string, targets: string[]) => dayWith([{ type: 'spot', prompt: 'x', board, targets, explain: 'x', verify: { kind, color } }])
+    expect(run(spot('backwardPawns', 'w', ['d3'])).code).toBe(0)
+    expect(run(spot('outpostSquares', 'w', ['b5', 'd5', 'f5'])).code).toBe(0)
+    expect(run(spot('doubledPawns', 'w', ['c4'])).code).toBe(1) // White has no doubled pawn here
+  })
+
   it('checks tap-the-defender cards', () => {
     const board = { fen: 'r4rk1/pp3ppp/5n2/3p4/8/2N5/PP3PPP/3R2K1 w - - 0 1' }
     const spot = (targets: string[], square = 'd5') => dayWith([{ type: 'spot', prompt: 'x', board, targets, explain: 'x', verify: { kind: 'defenders', square } }])

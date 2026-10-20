@@ -24,7 +24,7 @@ import {
 } from '../src/lib/chessUtil'
 import { estimateMinutes } from '../src/lib/estimate'
 import { answersByMethod, classifyAnswer, isSafe } from '../src/lib/verify'
-import { alignment, developedPieces, forkSquares, isolatedPawns, materialDiff, moveGain, movesOfPiece, openFiles, perpetualMoves, pinnedPieces, positionKey, spaceCount, stalemateTrapMoves, winningMoves } from '../src/lib/tactics'
+import { alignment, backwardPawns, developedPieces, doubledPawns, forkSquares, isolatedPawns, outpostSquares, passedPawns, materialDiff, moveGain, movesOfPiece, openFiles, perpetualMoves, pinnedPieces, positionKey, spaceCount, stalemateTrapMoves, winningMoves } from '../src/lib/tactics'
 
 // BG_CONTENT_DIR lets the tests point the validator at a scratch folder.
 const ROOT = process.env.BG_CONTENT_DIR ? resolve(process.env.BG_CONTENT_DIR) + '/' : new URL('../content/', import.meta.url).pathname
@@ -112,7 +112,7 @@ function sameSet(a: string[], b: string[]): boolean {
 }
 
 function checkAssert(chess: Chess, a: BoardAssert, highlight: string[], label: string) {
-  const known = ['status', 'attackCount', 'highlightIsAttacksOf', 'undefended', 'defended', 'attacked', 'attackedFrom', 'lines', 'counts', 'isolated', 'openFiles', 'space', 'developed', 'materialDiff']
+  const known = ['status', 'attackCount', 'highlightIsAttacksOf', 'undefended', 'defended', 'attacked', 'attackedFrom', 'lines', 'counts', 'isolated', 'openFiles', 'space', 'developed', 'materialDiff', 'doubled', 'backward', 'passed', 'outposts']
   onlyKeys(a as Obj, known)
   if (a.status) {
     const actual = chess.isCheckmate()
@@ -158,6 +158,18 @@ function checkAssert(chess: Chess, a: BoardAssert, highlight: string[], label: s
     const p = chess.get(sq as never)
     if (!p || p.type !== 'p') err(`${label}: isolated square ${sq} does not hold a pawn`)
     else if (!isolatedPawns(chess, p.color).includes(sq)) err(`${label}: the pawn on ${sq} is not isolated (a friendly pawn stands on a neighbouring file)`)
+  }
+  for (const [name, list, find] of [['doubled', a.doubled, doubledPawns], ['backward', a.backward, backwardPawns], ['passed', a.passed, passedPawns]] as const) {
+    for (const sq of list ?? []) {
+      const p = chess.get(sq as never)
+      if (!p || p.type !== 'p') err(`${label}: ${name} square ${sq} does not hold a pawn`)
+      else if (!find(chess, p.color).includes(sq)) err(`${label}: the pawn on ${sq} is not ${name}`)
+    }
+  }
+  for (const side of ['w', 'b'] as const) {
+    for (const sq of a.outposts?.[side] ?? []) {
+      if (!outpostSquares(chess, side).includes(sq)) err(`${label}: ${sq} is not an outpost for ${side === 'w' ? 'White' : 'Black'} (an enemy pawn can attack it, or none of its own pawns protects it)`)
+    }
   }
   if (a.openFiles && !sameSet(openFiles(chess), a.openFiles)) err(`${label}: the open files are ${openFiles(chess).join(' ') || 'none'}, not ${a.openFiles.join(' ') || 'none'}`)
   for (const side of ['w', 'b'] as const) {
@@ -337,7 +349,7 @@ function givesCheck(san: string): boolean {
 }
 
 function checkFindMove(c: Obj) {
-  onlyKeys(c, ['type', 'prompt', 'fen', 'goal', 'solution', 'accept', 'hint', 'explain', 'highlight', 'arrows', 'verify', 'after', 'wins', 'ends'])
+  onlyKeys(c, ['type', 'prompt', 'fen', 'goal', 'solution', 'accept', 'hint', 'explain', 'highlight', 'arrows', 'verify', 'after', 'final', 'wins', 'ends'])
   need(c, 'prompt', 'string')
   need(c, 'explain', 'string')
   const goal = (c.goal ?? 'san') as string
@@ -377,7 +389,11 @@ function checkFindMove(c: Obj) {
   } else {
     const line = c.solution
     if (!Array.isArray(line) || line.length % 2 === 0) err('"solution" must list moves alternating yours, reply, yours... so it needs an odd number of moves')
-    if (playLine(fen, line, 'solution')) checkForced(fen, line as string[], 'solution')
+    const end = playLine(fen, line, 'solution')
+    if (end) {
+      checkForced(fen, line as string[], 'solution')
+      if (isObj(c.final)) checkAssert(end, c.final as BoardAssert, [], 'solution (final position)')
+    }
   }
 
   const accept = (c.accept ?? []) as unknown[]
@@ -451,6 +467,14 @@ function checkSpot(c: Obj) {
     const wanted = v.kind === 'mateSquares' ? moves.filter((m) => m.san.endsWith('#')) : moves.filter((m) => /[+#]/.test(m.san))
     actual = [...new Set(wanted.map((m) => m.to as string))]
     if (!actual.length) return err(`the piece on ${v.square} has no move that ${v.kind === 'mateSquares' ? 'gives checkmate' : 'gives check'}`)
+  } else if (v.kind === 'doubledPawns' || v.kind === 'backwardPawns') {
+    if (v.color !== 'w' && v.color !== 'b') return err('verify.color must be "w" or "b"')
+    actual = v.kind === 'doubledPawns' ? doubledPawns(chess, v.color) : backwardPawns(chess, v.color)
+    if (!actual.length) return err(`${v.color === 'w' ? 'White' : 'Black'} has no ${v.kind === 'doubledPawns' ? 'doubled' : 'backward'} pawn here`)
+  } else if (v.kind === 'outpostSquares') {
+    if (v.color !== 'w' && v.color !== 'b') return err('verify.color must be "w" or "b"')
+    actual = outpostSquares(chess, v.color)
+    if (!actual.length) return err(`${v.color === 'w' ? 'White' : 'Black'} has no outpost square here`)
   } else if (v.kind === 'defenders') {
     if (!v.square || !chess.get(v.square as never)) return err('verify.square must hold the piece whose defenders are listed')
     actual = defendersOf(chess, v.square)
@@ -479,13 +503,14 @@ function checkPuzzleSet(c: Obj) {
   ps.forEach((p, i) => {
     const label = `puzzle ${i + 1}`
     if (!isObj(p)) return err(`${label}: not an object`)
-    onlyKeys(p, ['fen', 'solution', 'rating', 'lichessId', 'hint', 'explain', 'after', 'wins', 'ends'])
+    onlyKeys(p, ['fen', 'solution', 'rating', 'lichessId', 'hint', 'explain', 'after', 'final', 'wins', 'ends'])
     if (!Array.isArray(p.solution) || p.solution.length % 2 === 0) err(`${label}: solution must alternate yours, reply, yours... (odd length)`)
     const end = playLine(p.fen as string, p.solution, label)
     muted = true // playLine already reported a bad position
     const start = loadFen(p.fen, label)
     muted = false
     if (end && start) {
+      if (isObj(p.final)) checkAssert(end, p.final as BoardAssert, [], `${label} (final position)`)
       const sol = p.solution as string[]
       const last = sol[sol.length - 1] ?? ''
       if (last.endsWith('#') && end.isCheckmate()) checkForced(p.fen as string, sol, label)

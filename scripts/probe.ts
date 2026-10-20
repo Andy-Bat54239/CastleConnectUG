@@ -9,7 +9,7 @@
 import { Chess } from 'chess.js'
 import { attacksOf, attackersOf, checkers, defendersOf, forcedMateMoves, loosePieces, mateAvoidingMoves, matingMoves } from '../src/lib/chessUtil'
 import { hangingPieces } from '../src/lib/verify'
-import { alignment, developedPieces, forkSquares, isolatedPawns, materialDiff, mobility, openFiles, pinnedPieces, spaceCount, winningMoves } from '../src/lib/tactics'
+import { alignment, backwardPawns, developedPieces, doubledPawns, forkSquares, isolatedPawns, outpostSquares, passedPawns, materialDiff, mobility, openFiles, pinnedPieces, spaceCount, winningMoves } from '../src/lib/tactics'
 
 const argv = process.argv.slice(2)
 const winsAt = argv.indexOf('--wins')
@@ -36,6 +36,10 @@ console.log('loose white   :', loosePieces(c, 'w').join(' ') || 'none')
 console.log('loose black   :', loosePieces(c, 'b').join(' ') || 'none')
 console.log('hanging white :', hangingPieces(c, 'w').join(' ') || 'none')
 console.log('hanging black :', hangingPieces(c, 'b').join(' ') || 'none')
+console.log('doubled pawns : white', doubledPawns(c, 'w').join(' ') || 'none', '| black', doubledPawns(c, 'b').join(' ') || 'none')
+console.log('backward pawns: white', backwardPawns(c, 'w').join(' ') || 'none', '| black', backwardPawns(c, 'b').join(' ') || 'none')
+console.log('passed pawns : white', passedPawns(c, 'w').join(' ') || 'none', '| black', passedPawns(c, 'b').join(' ') || 'none')
+console.log('outposts     : white', outpostSquares(c, 'w').join(' ') || 'none', '| black', outpostSquares(c, 'b').join(' ') || 'none')
 console.log('isolated pawns: white', isolatedPawns(c, 'w').join(' ') || 'none', '| black', isolatedPawns(c, 'b').join(' ') || 'none')
 console.log('material (white minus black):', materialDiff(c), '| developed knights and bishops: white', developedPieces(c, 'w'), '| black', developedPieces(c, 'b'))
 console.log('open files    :', openFiles(c).join(' ') || 'none', '| space (squares attacked on their half): white', spaceCount(c, 'w'), '| black', spaceCount(c, 'b'), '| legal moves: white', mobility(c, 'w'), '| black', mobility(c, 'b'))

@@ -114,7 +114,8 @@ pieces that piece attacks), `loose` + `color` (the pieces with no defender), `le
 `forkSquares` + `square` (squares that piece could move to and attack two or more enemy pieces, not
 counting pawns), `pinned` + `color` (the pieces pinned to their own king) and `checkSquares` + `square`
 (the squares that piece can legally move to and give check from), `mateSquares` + `square` (the same, but
-checkmate) `isolatedPawns` + `color` (that side's isolated pawns) and `defenders` + `square` (the pieces defending the piece on that square). For these two the piece can belong to either side, so a card can ask "where would Black's queen
+checkmate) `isolatedPawns` + `color` (that side's isolated pawns) and `defenders` + `square` (the pieces defending the piece on that square), `doubledPawns`, `backwardPawns` and
+`outpostSquares`, each with a `color`. For these two the piece can belong to either side, so a card can ask "where would Black's queen
 mate?" while White is to move.
 
 ### `puzzleSet`: 2 to 6 short puzzles
@@ -148,6 +149,11 @@ Structure and counting facts, also proven:
 - `space`: `{ "w": 9, "b": 5 }`: how many squares on the **other** side of the board (ranks 5-8 for White, 1-4 for Black)
   each side attacks. This is a simple way to count space, not a full evaluation, so say "attacks" in the lesson.
 
+- `doubled`, `backward`, `passed`: lists of pawn squares that must be doubled (two pawns on a file), backward (behind
+  their neighbours, with the square in front attacked by an enemy pawn) or passed (no enemy pawn ahead on their file or a
+  neighbouring file).
+- `outposts`: `{ "w": ["d5"] }`: squares on the side's fifth or sixth rank (third or fourth for Black) that no enemy pawn can
+  ever attack and one of its own pawns protects.
 - `developed`: `{ "w": 2, "b": 0 }`: knights and bishops each side has moved off their starting squares.
 - `materialDiff`: `-2`: White's material minus Black's (pawn 1, knight and bishop 3, rook 5, queen 9), so -2 means White is
   two pawns down. Together these show what a gambit pays and what it buys.
@@ -171,6 +177,12 @@ Claims about forks, pins, skewers and won material are checked by search, so a l
   **skewer** the more valuable one. Both victims must be the same colour, in one line, with nothing between.
 - `npm run probe -- "<fen>" --wins 3` lists every first move that wins at least 3 points. With a square
   (`... b5`) it also lists that piece's fork squares and the pins and skewers it makes.
+
+## Claims about where a line ends
+
+`"after"` checks the position after your **first** move. `"final"` (same checks) is run after the **whole** stored line,
+which is how a card can say "after Bxf6 gxf6, Black's pawns are doubled":
+`"final": { "doubled": ["f6", "f7"] }`. It works on `findMove` cards and puzzles.
 
 ## Draws are proven too
 

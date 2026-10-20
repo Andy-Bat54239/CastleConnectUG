@@ -33,6 +33,14 @@ export interface BoardAssert {
   developed?: { w?: number; b?: number }
   /** White's material minus Black's (pawn 1, minor piece 3, rook 5, queen 9): -2 means White is two pawns down. */
   materialDiff?: number
+  /** Pawns that share a file with a pawn of their own colour. */
+  doubled?: Square[]
+  /** Pawns that are backward: behind their neighbours, with the square in front attacked by an enemy pawn. */
+  backward?: Square[]
+  /** Pawns with no enemy pawn in front of them on their own or a neighbouring file. */
+  passed?: Square[]
+  /** Squares that must be outposts for the side named (white: w, black: b): beyond the enemy pawns' reach and protected by a pawn. */
+  outposts?: { w?: Square[]; b?: Square[] }
 }
 
 /** A rook, bishop or queen (`attacker`) sees `front`, with `back` behind it on the same line. */
@@ -104,6 +112,8 @@ export interface FindMoveCard {
   accept?: string[]
   /** Claims about the position right after your first move (for example that the piece you moved forks two others). */
   after?: BoardAssert
+  /** Claims about the position after the whole stored line has been played. */
+  final?: BoardAssert
   /** Points of material this wins by force against best defence (a fork that wins a rook is 5). The validator proves it. */
   wins?: number
   /** The line saves the game: a forced perpetual check, or a one-move stalemate trap. The validator proves it. */
@@ -121,9 +131,9 @@ export interface SpotVerify {
    * the undefended pieces of `color` / the squares the piece on `square` can legally move to / the squares the
    * piece on `square` could move to and attack two or more enemy pieces (fork squares) / the pieces of `color`
    * pinned to their own king / the squares the piece on `square` can legally move to and give check from / the same
-   * but checkmate (the piece may belong to either side, whoever is to move) / the isolated pawns of `color` / the friendly pieces that defend the piece on `square`.
+   * but checkmate (the piece may belong to either side, whoever is to move) / the isolated pawns of `color` / the friendly pieces that defend the piece on `square` / the doubled or backward pawns of `color` / the outpost squares of `color`.
    */
-  kind: 'checkers' | 'attackedBy' | 'loose' | 'legalMoves' | 'forkSquares' | 'pinned' | 'checkSquares' | 'mateSquares' | 'isolatedPawns' | 'defenders'
+  kind: 'checkers' | 'attackedBy' | 'loose' | 'legalMoves' | 'forkSquares' | 'pinned' | 'checkSquares' | 'mateSquares' | 'isolatedPawns' | 'defenders' | 'doubledPawns' | 'backwardPawns' | 'outpostSquares'
   square?: Square
   color?: 'w' | 'b'
 }
@@ -149,6 +159,8 @@ export interface Puzzle {
   hint?: string
   /** Claims about the position right after the first move. */
   after?: BoardAssert
+  /** Claims about the position after the whole stored line has been played. */
+  final?: BoardAssert
   /** Points of material won by force (proved by the validator; the first move must be the only one that wins that much). */
   wins?: number
   /** The line saves the game: a forced perpetual check, or a one-move stalemate trap. The validator proves it. */

@@ -1,6 +1,6 @@
 import { Chess } from 'chess.js'
 import { describe, expect, it } from 'vitest'
-import { alignment, developedPieces, forkSquares, isolatedPawns, materialDiff, moveGain, openFiles, perpetualMoves, pinnedPieces, spaceCount, stalemateTrapMoves, winningMoves } from '../src/lib/tactics'
+import { alignment, backwardPawns, developedPieces, doubledPawns, forkSquares, isolatedPawns, materialDiff, outpostSquares, passedPawns, moveGain, openFiles, perpetualMoves, pinnedPieces, spaceCount, stalemateTrapMoves, winningMoves } from '../src/lib/tactics'
 
 const KNIGHT_FORK = '6k1/3q1p1p/8/8/4N3/8/PPP2PPP/6K1 w - - 0 1' // Nf6+ forks king and queen
 const DECOY = '6k1/pp3ppp/2q1b3/5N2/8/8/PP3P1P/6K1 w - - 0 1' // Ne7+ wins; Nd4 attacks the queen but gives no check
@@ -105,5 +105,26 @@ describe('gambit facts', () => {
   it('measures material from White\'s side whoever is to move', () => {
     expect(materialDiff(danish)).toBe(-2)
     expect(materialDiff(new Chess())).toBe(0)
+  })
+})
+
+describe('pawn structure facts', () => {
+  const chain = new Chess('4k3/8/8/4p3/2P1P3/3P4/8/4K3 w - - 0 1') // White d3 sits behind c4 and e4, and e5 controls d4
+  it('finds a backward pawn', () => {
+    expect(backwardPawns(chain, 'w')).toEqual(['d3'])
+    expect(backwardPawns(chain, 'b')).toEqual([]) // e5 is isolated, not backward
+  })
+  it('finds passed pawns', () => {
+    expect(passedPawns(chain, 'w')).toEqual(['c4'])
+    expect(passedPawns(chain, 'b')).toEqual([])
+  })
+  it('finds doubled pawns', () => {
+    expect(doubledPawns(new Chess('4k3/8/8/8/8/2P5/2P5/4K3 w - - 0 1'), 'w')).toEqual(['c3', 'c2'])
+    expect(doubledPawns(chain, 'w')).toEqual([])
+  })
+  it('finds outposts: beyond the enemy pawns and protected by a pawn', () => {
+    expect(outpostSquares(new Chess('4k3/pp3ppp/8/8/2P1P3/8/PP3PPP/4K3 w - - 0 1'), 'w')).toEqual(['d5'])
+    expect(outpostSquares(chain, 'b')).toEqual(['f4', 'd4'].sort().reverse().length ? outpostSquares(chain, 'b') : [])
+    expect(outpostSquares(chain, 'b').sort()).toEqual(['d4', 'f4'])
   })
 })

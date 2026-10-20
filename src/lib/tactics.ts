@@ -335,3 +335,59 @@ export function materialDiff(chess: Chess): number {
   const white = chess.turn() === 'w' ? staticEval(chess) : -staticEval(chess)
   return white
 }
+
+function pawnsOf(chess: Chess, color: 'w' | 'b'): Square[] {
+  return ALL_SQUARES.filter((sq) => {
+    const p = chess.get(sq as never)
+    return !!p && p.type === 'p' && p.color === color
+  })
+}
+
+/** Pawns of `color` that share a file with another pawn of the same colour. */
+export function doubledPawns(chess: Chess, color: 'w' | 'b'): Square[] {
+  const pawns = pawnsOf(chess, color)
+  return pawns.filter((sq) => pawns.filter((o) => FILE(o) === FILE(sq)).length >= 2)
+}
+
+/** Passed pawns of `color`: no enemy pawn in front of them on the same file or a neighbouring file. */
+export function passedPawns(chess: Chess, color: 'w' | 'b'): Square[] {
+  const enemy = pawnsOf(chess, color === 'w' ? 'b' : 'w')
+  return pawnsOf(chess, color).filter((sq) => !enemy.some((e) => Math.abs(FILE(e) - FILE(sq)) <= 1 && (color === 'w' ? RANK(e) > RANK(sq) : RANK(e) < RANK(sq))))
+}
+
+/**
+ * Backward pawns of `color`: a pawn with a friendly pawn on a neighbouring file, but none of those neighbours is level with it
+ * or behind it (so nothing can ever protect it), and the square in front of it is attacked by an enemy pawn (so it cannot advance safely).
+ */
+export function backwardPawns(chess: Chess, color: 'w' | 'b'): Square[] {
+  const mine = pawnsOf(chess, color)
+  const enemy = pawnsOf(chess, color === 'w' ? 'b' : 'w')
+  const dir = color === 'w' ? 1 : -1
+  return mine.filter((sq) => {
+    const neighbours = mine.filter((o) => Math.abs(FILE(o) - FILE(sq)) === 1)
+    if (!neighbours.length) return false // an isolated pawn is a different weakness
+    if (neighbours.some((o) => (RANK(o) - RANK(sq)) * dir <= 0)) return false // a neighbour can still support it
+    const stopRank = RANK(sq) + dir
+    // an enemy pawn attacks the stop square from the file beside it, one rank further on
+    return enemy.some((e) => Math.abs(FILE(e) - FILE(sq)) === 1 && RANK(e) === stopRank + dir)
+  })
+}
+
+/**
+ * Outpost squares for `color`: squares on its fifth or sixth rank (third or fourth for Black), not holding a pawn, that no enemy pawn
+ * can ever attack and that one of its own pawns protects.
+ */
+export function outpostSquares(chess: Chess, color: 'w' | 'b'): Square[] {
+  const mine = pawnsOf(chess, color)
+  const enemy = pawnsOf(chess, color === 'w' ? 'b' : 'w')
+  const dir = color === 'w' ? 1 : -1
+  return ALL_SQUARES.filter((sq) => {
+    const r = RANK(sq)
+    if (color === 'w' ? r < 4 || r > 5 : r < 2 || r > 3) return false
+    const there = chess.get(sq as never)
+    if (there && there.type === 'p') return false
+    // enemy pawns that are level with or beyond this square (from their point of view) on a neighbouring file can attack it
+    if (enemy.some((e) => Math.abs(FILE(e) - FILE(sq)) === 1 && (RANK(e) - r) * dir > 0)) return false
+    return mine.some((m) => Math.abs(FILE(m) - FILE(sq)) === 1 && RANK(m) === r - dir)
+  })
+}
