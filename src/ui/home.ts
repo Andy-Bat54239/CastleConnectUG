@@ -1,6 +1,6 @@
 import { course, curriculum, hasDay, TOTAL_DAYS } from '../lib/content'
 import * as store from '../lib/store'
-import { currentDay, dayOpen, formatDate, getNow, isPreview, parseStart, unlockAt } from '../lib/time'
+import { challengeStatus, dayOpen, DAY_MS, formatDate, getNow, isPreview, kampalaMidnight, parseStart, unlockAt } from '../lib/time'
 import { button, h } from './dom'
 
 const PARTS: [string, string][] = [
@@ -10,15 +10,48 @@ const PARTS: [string, string][] = [
   ['Share', 'One line in the WhatsApp group'],
 ]
 
+/**
+ * "Started earlier?": for a member whose browser forgot when they began, or who started on another phone. They pick the
+ * day they tapped Start and their days are counted from it. Changing this only cheats yourself, like the phone clock.
+ */
+function startedEarlier(root: HTMLElement, cohortMs: number, now: number): HTMLElement {
+  const today = kampalaMidnight(now)
+  const first = Math.max(cohortMs, today - TOTAL_DAYS * DAY_MS)
+  const select = h('select', { 'aria-label': 'The day you tapped Start' }, h('option', { value: '' }, 'Choose a day…'))
+  for (let t = first; t <= today; t += DAY_MS) select.append(h('option', { value: String(t) }, formatDate(t) + (t === today ? ' (today)' : '')))
+  const msg = h('p', { class: 'mute', role: 'status' })
+  const panel = h(
+    'div',
+    { class: 'earlier', hidden: '' },
+    h('p', null, 'Pick the day you first tapped Start. Your days will be counted from it.'),
+    select,
+    button('Use this day', 'btn alt sm', () => {
+      if (!select.value) {
+        msg.textContent = 'Choose a day first.'
+        return
+      }
+      store.setStartedAt(Number(select.value))
+      mountHome(root)
+    }),
+    msg,
+  )
+  const toggle = button('Started earlier? Tell us which day', 'link-btn', () => {
+    panel.toggleAttribute('hidden')
+  })
+  return h('div', null, toggle, panel)
+}
+
 export function mountHome(root: HTMLElement): void {
-  const startMs = parseStart(course.startDate)
+  const startMs = parseStart(course.startDate) // the shared start of the challenge, for the whole group
   const now = getNow()
   const unlockAll = !!course.unlockAll
-  const isOpenDay = (day: number) => dayOpen(day, { nowMs: now, startMs, unlockAll, preview: isPreview() })
-  // With a date-locked challenge "today" is the calendar day. With everything open there is no
-  // "today", so we point at the first lesson that is written and not finished yet.
+  const startedAt = store.getStartedAt()
+  const status = challengeStatus(now, startMs, startedAt, TOTAL_DAYS)
+  const isOpenDay = (day: number) => dayOpen(day, { nowMs: now, startMs, startedAt, unlockAll, preview: isPreview() })
+  // With a date-locked challenge "today" is the member's own day, counted from the day they tapped Start. With everything
+  // open there is no "today", so we point at the first lesson that is written and not finished yet.
   const next = curriculum.find((e) => hasDay(e.day) && !store.isCoreDone(e.day))?.day ?? 0
-  const today = unlockAll ? next : currentDay(now, startMs, TOTAL_DAYS)
+  const today = unlockAll ? next : status.day
   const done = store.doneCount()
 
   // The headline: what should I do right now?
@@ -40,13 +73,24 @@ export function mountHome(root: HTMLElement): void {
         h('p', { class: 'lead' }, 'More days are on the way. Go back through any lesson whenever you like.'),
       )
     }
-  } else if (today === 0) {
+  } else if (status.phase === 'before') {
     hero.append(
       h('p', { class: 'kicker' }, 'Starting soon'),
       h('h1', null, 'The Bridge Grind starts ' + formatDate(startMs)),
-      h('p', { class: 'lead' }, 'Fourteen days. About fifteen minutes a day. Day 1 opens at midnight, Kampala time. Have a look around until then.'),
+      h('p', { class: 'lead' }, 'Fourteen days. About fifteen minutes a day. Day 1 opens at midnight, Kampala time, and your days are counted from the day you tap Start. Have a look around until then.'),
     )
-  } else if (today > TOTAL_DAYS) {
+  } else if (status.phase === 'ready') {
+    hero.append(
+      h('p', { class: 'kicker' }, 'Ready when you are'),
+      h('h1', null, 'Start your 14 days'),
+      h('p', { class: 'lead' }, 'Day 1 begins when you tap Start. After that, a new day opens every midnight, Kampala time. About fifteen minutes a day: learn, solve, play, then share one line.'),
+      button('Start the challenge', 'btn', () => {
+        store.markStarted(getNow())
+        location.hash = '#/day/1'
+      }),
+      startedEarlier(root, startMs, now),
+    )
+  } else if (status.phase === 'over') {
     hero.append(
       h('p', { class: 'kicker' }, 'Challenge complete'),
       h('h1', null, `You finished ${done} of ${TOTAL_DAYS} days`),
@@ -84,7 +128,8 @@ export function mountHome(root: HTMLElement): void {
       tag = store.isDeeperDone(e.day) ? 'Done + deeper' : 'Done'
       tagCls += ' done'
     } else if (!open) {
-      tag = 'Opens ' + formatDate(unlockAt(startMs, e.day))
+      // Before the shared start every date follows the group's. After it, a member's dates begin when they tap Start.
+      tag = status.start !== null ? 'Opens ' + formatDate(unlockAt(status.start, e.day)) : status.phase === 'before' ? 'Opens ' + formatDate(unlockAt(startMs, e.day)) : 'Locked'
       tagCls += ' lock'
     } else if (!ready) {
       tag = 'Coming soon'
@@ -120,6 +165,7 @@ export function mountHome(root: HTMLElement): void {
 
   const warn = store.canSave() ? [] : [h('p', { class: 'banner warn', role: 'status' }, 'This browser will not remember your progress. Opening the link in Chrome usually fixes it.')]
   // On wide screens the hero and guide sit on the left and the days on the right (see styles.css).
-  const daysBlock = h('div', { class: 'home-days' }, h('h2', { class: 'section-title' }, 'The 14 days'), list)
+  const began = !unlockAll && status.start !== null ? [h('p', { class: 'mute' }, `Your Day 1 was ${formatDate(status.start)}. A new day opens every midnight, Kampala time.`)] : []
+  const daysBlock = h('div', { class: 'home-days' }, h('h2', { class: 'section-title' }, 'The 14 days'), ...began, list)
   root.replaceChildren(h('div', { class: 'home' }, hero, ...warn, dots, daysBlock, how, reset))
 }

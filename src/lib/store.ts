@@ -26,6 +26,8 @@ export interface DayProgress {
 export interface Progress {
   v: 1
   days: Record<string, DayProgress>
+  /** When the member tapped Start (ms since 1970). Their own Day 1 is counted from this day. */
+  startedAt?: number
 }
 
 const KEY = 'bg:v1'
@@ -104,6 +106,25 @@ export function isDeeperDone(day: number): boolean {
 
 export function doneCount(): number {
   return Object.values(load().days).filter((d) => d.coreDone).length
+}
+
+/** When the member tapped Start on this phone, or undefined if they have not. */
+export function getStartedAt(): number | undefined {
+  const s = load().startedAt
+  return typeof s === 'number' && Number.isFinite(s) ? s : undefined
+}
+
+/** Record the moment the member tapped Start. The first tap wins, so reopening the link never moves it. */
+export function markStarted(ms: number): void {
+  if (getStartedAt() !== undefined) return
+  load().startedAt = ms
+  persist()
+}
+
+/** "I started earlier": set the start by hand (for a member whose browser forgot, or who began on another phone). */
+export function setStartedAt(ms: number): void {
+  load().startedAt = ms
+  persist()
 }
 
 export function resetAll(): void {

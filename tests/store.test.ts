@@ -92,4 +92,34 @@ describe('progress store', () => {
     s.resetAll()
     expect(s.doneCount()).toBe(0)
   })
+
+  it('remembers when the member tapped Start, and the first tap wins', async () => {
+    const ls = fakeStorage()
+    vi.stubGlobal('localStorage', ls)
+    const a = await freshStore()
+    expect(a.getStartedAt()).toBeUndefined()
+    a.markStarted(1_000)
+    a.markStarted(9_000) // opening the link or tapping again never moves the start
+    expect(a.getStartedAt()).toBe(1_000)
+    const b = await freshStore() // closing and reopening the page
+    expect(b.getStartedAt()).toBe(1_000)
+  })
+
+  it('lets a member who started earlier set the day by hand, and clears it on reset', async () => {
+    vi.stubGlobal('localStorage', fakeStorage())
+    const s = await freshStore()
+    s.markStarted(5_000)
+    s.setStartedAt(2_000)
+    expect(s.getStartedAt()).toBe(2_000)
+    s.resetAll()
+    expect(s.getStartedAt()).toBeUndefined()
+  })
+
+  it('ignores a damaged start time', async () => {
+    const ls = fakeStorage()
+    ls.setItem('bg:v1', JSON.stringify({ v: 1, days: {}, startedAt: 'soon' }))
+    vi.stubGlobal('localStorage', ls)
+    const s = await freshStore()
+    expect(s.getStartedAt()).toBeUndefined()
+  })
 })

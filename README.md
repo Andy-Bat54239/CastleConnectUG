@@ -26,40 +26,43 @@ Add these to the address. They only affect the page you opened, so they are safe
 
 | Add to the link | What it does |
 | --- | --- |
-| `?preview=1` | Opens every day, ignoring the unlock dates. |
+| `?preview=1` | Opens every day for reading, ignoring the unlock dates and the Start button. |
 | `?now=2026-10-28T09:00:00%2B03:00` | Pretends it is that moment in Kampala. |
 | `#/review/3` | A read-through page for Day 3: every card, the right answers, and the explanations. Made for reviewing content without reading JSON. |
 
 Example: `https://your-site/?preview=1#/review/3`
 
-## Open all days, or lock them by date
+## How the days unlock
 
-`content/config.json` has a switch for this:
-
-```json
-{ "startDate": "2026-10-26T00:00:00+03:00", "challengeName": "Bridge Grind", "unlockAll": true }
-```
-
-- `"unlockAll": true` (the current setting): every day is open now, whatever the date. The home
-  screen points at the next unfinished lesson instead of "today". Days whose lessons are not written
-  yet show "Coming soon".
-- `"unlockAll": false` (or delete the line): the real challenge. Day 1 opens at midnight Kampala
-  time on `startDate` and one more day opens every 24 hours.
-
-Change it, commit and push, and Netlify redeploys. Use `true` or `false` without quotes; the
-validator rejects anything else.
-
-## Set the start date
-
-Edit `content/config.json`:
+`content/config.json` holds the settings:
 
 ```json
-{ "startDate": "2026-10-26T00:00:00+03:00", "challengeName": "Bridge Grind" }
+{ "startDate": "2026-10-22T00:00:00+03:00", "challengeName": "Bridge Grind", "unlockAll": false }
 ```
 
-Day 1 opens at midnight Kampala time on that date, and each later day opens 24 hours after the
-one before. The date **must end in `+03:00`**; the validator checks. (Kampala has no daylight
-saving, so a fixed offset is exact.) The sample date `2026-10-26` is a placeholder. Joel to decide.
+- **`startDate` is the group's shared start.** It must end in `+03:00` (Kampala has no daylight saving, so a fixed offset
+  is exact), and it should be midnight. Before this date the home screen says when the challenge starts and every day is
+  locked.
+- **Each member's Day 1 begins when they tap "Start the challenge".** Day 1 is the Kampala calendar day of the tap, and
+  every following day opens at midnight, Kampala time, so tapping at 23:55 means Day 2 opens five minutes later. Someone
+  who taps Start on the first day (22 Oct) is on the same day as the group. Someone who taps on 25 Oct gets their own
+  14 days from 25 Oct. A tap before `startDate` cannot happen, because there is no Start button yet.
+- **Where the start is kept.** On the member's own phone, next to their progress (`startedAt` in local storage). The
+  first tap wins, and opening the link again never moves it. "Reset my progress on this phone" clears it too.
+- **If a phone forgets.** A member whose browser was cleared, who switched phones or who opens the link in a different
+  browser will see the Start button again. Under it, "Started earlier? Tell us which day" lets them pick the day they
+  started, and their days are counted from that. (In a browser that blocks storage, the start cannot be remembered
+  between visits, so the same link is how they pick it each time. The page already warns about such browsers.)
+- **Changing the phone's clock** only cheats the person who does it, as before.
+- `"unlockAll": true` opens every day at once, whatever the date, and the Start button is not needed. Use it for trying
+  things out. `false` (or deleting the line) is the real challenge. Use `true` or `false` without quotes; the validator
+  rejects anything else.
+
+Change the file, commit and push, and Netlify redeploys. Everyone's own start stays on their phone, so changing
+`startDate` later only affects members who have not started yet, and anyone whose start would fall before the new date.
+
+To try it yourself: `?now=2026-10-22T09:00:00%2B03:00` pretends it is that moment (tap Start, and your Day 1 is that day),
+`?preview=1` opens every day for reading, and "Reset my progress on this phone" at the bottom of the home page starts again.
 
 ## Edit or add lessons
 
@@ -180,7 +183,8 @@ link **from inside WhatsApp**:
 - [ ] On a laptop and a tablet: the layout fills the screen sensibly and dragging and clicking pieces with a mouse both work.
 - [ ] The sun/moon button switches modes, and the choice is still there after closing WhatsApp and reopening the link.
 - [ ] "Add to home screen" and offline reopening (Chrome only; WhatsApp's browser may not offer it).
-- [ ] The unlock dates show the right day around midnight Kampala time.
+- [ ] Tap "Start the challenge": Day 1 opens, and Day 2 shows "Opens" with tomorrow's date. Close WhatsApp and reopen the link: the start is remembered.
+- [ ] Open the link in a second browser (or after clearing data): the Start button comes back, and "Started earlier? Tell us which day" sets the day.
 
 ## Licences
 

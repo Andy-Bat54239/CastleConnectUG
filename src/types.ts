@@ -213,7 +213,10 @@ export interface CourseIndexEntry {
 }
 
 export interface CourseConfig {
-  /** Midnight (Kampala time) at the start of Day 1, as an ISO string with +03:00. */
+  /**
+   * The shared start of the challenge: midnight (Kampala time) at the start of Day 1 for the whole group, as an ISO string
+   * with +03:00. A member's own Day 1 is the day they tap Start, but never before this date.
+   */
   startDate: string
   /** Name shown in the share message. */
   challengeName: string

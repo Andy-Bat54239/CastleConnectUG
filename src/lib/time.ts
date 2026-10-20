@@ -25,9 +25,30 @@ export function isOpen(nowMs: number, startMs: number, day: number): boolean {
   return nowMs >= unlockAt(startMs, day)
 }
 
+/** Midnight, Kampala time, at the start of the Kampala day that contains `ms`. */
+export function kampalaMidnight(ms: number): number {
+  return Math.floor((ms + OFFSET_MS) / DAY_MS) * DAY_MS - OFFSET_MS
+}
+
+/**
+ * When this member's Day 1 begins, or null if they have not tapped Start yet.
+ *
+ * `cohortMs` is the shared start of the challenge (midnight Kampala). Day 1 begins at midnight, Kampala time, on the day the
+ * member tapped Start, but never before the shared start, so everyone who starts on the first day is on the same day as the
+ * group, and anyone who starts later gets their own 14 days. A tap time that is in the future (a wrong phone clock, or a
+ * preview link) counts as now, so a member can never be locked out until a date that has not come.
+ */
+export function personalStart(cohortMs: number, startedAt: number | undefined | null, nowMs: number): number | null {
+  if (typeof startedAt !== 'number' || !Number.isFinite(startedAt)) return null
+  return Math.max(cohortMs, kampalaMidnight(Math.min(startedAt, nowMs)))
+}
+
 export interface OpenRules {
   nowMs: number
+  /** The shared start of the challenge: midnight Kampala time at the start of Day 1 for the whole group. */
   startMs: number
+  /** When the member tapped Start (ms since 1970), if they have. */
+  startedAt?: number | null
   /** Config switch: every day is open whatever the date. */
   unlockAll?: boolean
   /** The ?preview=1 link: every day is open for whoever opened that link. */
@@ -36,7 +57,36 @@ export interface OpenRules {
 
 /** Is this day open? The one place that answers, so the home screen and the lesson screen never disagree. */
 export function dayOpen(day: number, r: OpenRules): boolean {
-  return !!r.unlockAll || !!r.preview || isOpen(r.nowMs, r.startMs, day)
+  if (r.unlockAll || r.preview) return true
+  const start = personalStart(r.startMs, r.startedAt, r.nowMs)
+  return start !== null && isOpen(r.nowMs, start, day)
+}
+
+export type Phase =
+  /** The shared start has not come yet. */
+  | 'before'
+  /** The challenge has begun but this member has not tapped Start. */
+  | 'ready'
+  /** The member's 14 days are running: `day` is today's day number. */
+  | 'running'
+  /** The member's 14 days are over. */
+  | 'over'
+
+export interface Status {
+  phase: Phase
+  /** The member's own Day 1 (ms), once they have started. */
+  start: number | null
+  /** 0 until the member starts, 1..totalDays while running, totalDays + 1 when over. */
+  day: number
+}
+
+/** Where is this member in the challenge? Used by the home and lesson screens, so they always agree. */
+export function challengeStatus(nowMs: number, cohortMs: number, startedAt: number | undefined | null, totalDays: number): Status {
+  if (nowMs < cohortMs) return { phase: 'before', start: null, day: 0 }
+  const start = personalStart(cohortMs, startedAt, nowMs)
+  if (start === null) return { phase: 'ready', start: null, day: 0 }
+  const day = currentDay(nowMs, start, totalDays)
+  return { phase: day > totalDays ? 'over' : 'running', start, day }
 }
 
 /** 0 before the challenge starts, 1..totalDays during it, totalDays + 1 once it is over. */
