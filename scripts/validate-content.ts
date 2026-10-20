@@ -23,6 +23,7 @@ import {
   matingMoves,
 } from '../src/lib/chessUtil'
 import { estimateMinutes } from '../src/lib/estimate'
+import { kpkKeepingMoves, kpkKeySquares, kpkResult } from '../src/lib/kpk'
 import { answersByMethod, classifyAnswer, isSafe } from '../src/lib/verify'
 import { alignment, backwardPawns, developedPieces, doubledPawns, forkSquares, isolatedPawns, outpostSquares, passedPawns, materialDiff, moveGain, movesOfPiece, openFiles, perpetualMoves, pinnedPieces, positionKey, spaceCount, stalemateTrapMoves, winningMoves } from '../src/lib/tactics'
 
@@ -112,7 +113,7 @@ function sameSet(a: string[], b: string[]): boolean {
 }
 
 function checkAssert(chess: Chess, a: BoardAssert, highlight: string[], label: string) {
-  const known = ['status', 'attackCount', 'highlightIsAttacksOf', 'undefended', 'defended', 'attacked', 'attackedFrom', 'lines', 'counts', 'isolated', 'openFiles', 'space', 'developed', 'materialDiff', 'doubled', 'backward', 'passed', 'outposts']
+  const known = ['status', 'attackCount', 'highlightIsAttacksOf', 'undefended', 'defended', 'attacked', 'attackedFrom', 'lines', 'counts', 'isolated', 'openFiles', 'space', 'developed', 'materialDiff', 'doubled', 'backward', 'passed', 'outposts', 'endgame']
   onlyKeys(a as Obj, known)
   if (a.status) {
     const actual = chess.isCheckmate()
@@ -170,6 +171,11 @@ function checkAssert(chess: Chess, a: BoardAssert, highlight: string[], label: s
     for (const sq of a.outposts?.[side] ?? []) {
       if (!outpostSquares(chess, side).includes(sq)) err(`${label}: ${sq} is not an outpost for ${side === 'w' ? 'White' : 'Black'} (an enemy pawn can attack it, or none of its own pawns protects it)`)
     }
+  }
+  if (a.endgame) {
+    const r = kpkResult(chess)
+    if (r === null) err(`${label}: "endgame" needs a position with just two kings and one pawn`)
+    else if (r !== a.endgame) err(`${label}: this king and pawn ending is a ${r} with best play, not a ${a.endgame}`)
   }
   if (a.openFiles && !sameSet(openFiles(chess), a.openFiles)) err(`${label}: the open files are ${openFiles(chess).join(' ') || 'none'}, not ${a.openFiles.join(' ') || 'none'}`)
   for (const side of ['w', 'b'] as const) {
@@ -348,8 +354,25 @@ function givesCheck(san: string): boolean {
   return san.endsWith('+')
 }
 
+
+/** King and pawn against king: the stored move (plus `accept`) must be exactly the moves that keep the win, or the draw. */
+function checkKeeps(fen: string, first: string, accept: string[], keeps: unknown, label: string) {
+  if (keeps !== 'win' && keeps !== 'draw') return err(`${label}: "keeps" must be "win" or "draw"`)
+  const chess = loadFen(fen, label)
+  if (!chess) return
+  const keep = kpkKeepingMoves(chess)
+  if (keep === null) return err(`${label}: "keeps" needs a position with just two kings and one pawn`)
+  let pawnColor: 'w' | 'b' = 'w'
+  for (const row of chess.board()) for (const p of row) if (p && p.type === 'p') pawnColor = p.color
+  if ((keeps === 'win') !== (chess.turn() === pawnColor)) return err(`${label}: "keeps: ${keeps}" does not fit this position (the side with the pawn keeps a win, the defender keeps a draw)`)
+  const given = [first, ...accept]
+  for (const g of given) if (!keep.includes(g)) err(`${label}: ${g} does not keep the ${keeps}`)
+  const others = keep.filter((m) => !given.includes(m))
+  if (others.length) err(`${label}: other moves also keep the ${keeps}: ${others.join(', ')}. Use a position with one answer (or list them in "accept")`)
+}
+
 function checkFindMove(c: Obj) {
-  onlyKeys(c, ['type', 'prompt', 'fen', 'goal', 'solution', 'accept', 'hint', 'explain', 'highlight', 'arrows', 'verify', 'after', 'final', 'wins', 'ends'])
+  onlyKeys(c, ['type', 'prompt', 'fen', 'goal', 'solution', 'accept', 'hint', 'explain', 'highlight', 'arrows', 'verify', 'after', 'final', 'wins', 'ends', 'keeps'])
   need(c, 'prompt', 'string')
   need(c, 'explain', 'string')
   const goal = (c.goal ?? 'san') as string
@@ -413,6 +436,7 @@ function checkFindMove(c: Obj) {
   if (goal === 'san' && Array.isArray(c.solution) && typeof c.solution[0] === 'string') {
     checkTactic(fen, c.solution[0], accept.map(String), c, 'solution')
     if (c.ends !== undefined) checkEnds(fen, c.solution, accept.map(String), c.ends, 'solution')
+    if (c.keeps !== undefined) checkKeeps(fen, c.solution[0], accept.map(String), c.keeps, 'solution')
   }
 
   if (isObj(c.verify) && goal === 'san') {
@@ -467,6 +491,14 @@ function checkSpot(c: Obj) {
     const wanted = v.kind === 'mateSquares' ? moves.filter((m) => m.san.endsWith('#')) : moves.filter((m) => /[+#]/.test(m.san))
     actual = [...new Set(wanted.map((m) => m.to as string))]
     if (!actual.length) return err(`the piece on ${v.square} has no move that ${v.kind === 'mateSquares' ? 'gives checkmate' : 'gives check'}`)
+  } else if (v.kind === 'keySquares') {
+    let pawn = ''
+    let pawnColor: 'w' | 'b' = 'w'
+    for (const row of chess.board()) for (const p of row) if (p && p.type === 'p') { pawn = p.square; pawnColor = p.color }
+    if (!pawn || chess.board().flat().filter((p) => p && p.type === 'p').length !== 1) return err('keySquares needs a board with exactly one pawn')
+    const flipSq = (s: string) => s[0] + String(9 - Number(s[1]))
+    actual = pawnColor === 'w' ? kpkKeySquares(pawn as never) : kpkKeySquares(flipSq(pawn) as never).map((s) => flipSq(s))
+    if (!actual.length) return err(`the pawn on ${pawn} has no key square`)
   } else if (v.kind === 'doubledPawns' || v.kind === 'backwardPawns') {
     if (v.color !== 'w' && v.color !== 'b') return err('verify.color must be "w" or "b"')
     actual = v.kind === 'doubledPawns' ? doubledPawns(chess, v.color) : backwardPawns(chess, v.color)
@@ -503,7 +535,7 @@ function checkPuzzleSet(c: Obj) {
   ps.forEach((p, i) => {
     const label = `puzzle ${i + 1}`
     if (!isObj(p)) return err(`${label}: not an object`)
-    onlyKeys(p, ['fen', 'solution', 'rating', 'lichessId', 'hint', 'explain', 'after', 'final', 'wins', 'ends'])
+    onlyKeys(p, ['fen', 'solution', 'rating', 'lichessId', 'hint', 'explain', 'after', 'final', 'wins', 'ends', 'keeps'])
     if (!Array.isArray(p.solution) || p.solution.length % 2 === 0) err(`${label}: solution must alternate yours, reply, yours... (odd length)`)
     const end = playLine(p.fen as string, p.solution, label)
     muted = true // playLine already reported a bad position
@@ -519,6 +551,7 @@ function checkPuzzleSet(c: Obj) {
       const first = (p.solution as string[])[0]
       if (p.after !== undefined || p.wins !== undefined) checkTactic(p.fen as string, first, [], p, label)
       if (p.ends !== undefined) checkEnds(p.fen as string, p.solution, [], p.ends, label)
+      if (p.keeps !== undefined) checkKeeps(p.fen as string, first, [], p.keeps, label)
       if (first?.endsWith('#')) {
         const mates = matingMoves(start)
         if (mates.length > 1) console.log(`  · ${where} ${label}: ${mates.length} mating moves (${mates.join(', ')}); all are accepted`)

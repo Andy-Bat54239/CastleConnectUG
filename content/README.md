@@ -184,6 +184,21 @@ Claims about forks, pins, skewers and won material are checked by search, so a l
 which is how a card can say "after Bxf6 gxf6, Black's pawns are doubled":
 `"final": { "doubled": ["f6", "f7"] }`. It works on `findMove` cards and puzzles.
 
+## King and pawn endings are solved
+
+Positions with just two kings and **one pawn** are solved completely (`src/lib/kpk.ts`; an independent rebuild with chess.js
+matches it exactly), so the opposition, key squares, the rule of the square and rook pawns can be proven:
+
+- `assert.endgame`: `"win"` or `"draw"`: the side with the pawn wins, or cannot win, with best play, with the side to move as
+  written in the FEN. For example `4k3/8/4K3/4P3/8/8/8/8 w` (Ke6, Pe5 against Ke8) is a win either way.
+- `"keeps": "win"` (the side with the pawn is to move) or `"keeps": "draw"` (the defender is to move) on a `findMove` card or
+  puzzle: your move (plus `accept`) must be **exactly** the moves that keep the result. So "take the opposition" has one answer.
+- spot `verify: { "kind": "keySquares" }`: the squares where the king of the pawn's side wins whoever moves (three squares in
+  front of a pawn on the fifth rank).
+- `npm run probe` prints the result and the moves that keep it.
+
+A "win" means the pawn promotes to a queen or rook that is not lost at once and does not stalemate. Black pawns work too.
+
 ## Draws are proven too
 
 For lessons about saving a lost game, a `findMove` card or a puzzle can carry `"ends"`:

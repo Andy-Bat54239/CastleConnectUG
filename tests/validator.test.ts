@@ -248,6 +248,25 @@ describe('content validator', () => {
     expect(run(spot('doubledPawns', 'w', ['c4'])).code).toBe(1) // White has no doubled pawn here
   })
 
+  it('proves king and pawn endings: the result, the one move that keeps it, and the key squares', () => {
+    const read = (fen: string, endgame: string) => run(dayWith([{ type: 'read', title: 't', body: 'b', board: { fen, assert: { endgame } } }]))
+    expect(read('4k3/8/4K3/4P3/8/8/8/8 b - - 0 1', 'win').code).toBe(0)
+    const wrong = read('8/4k3/8/4K3/4P3/8/8/8 w - - 0 1', 'win') // White to move here only draws
+    expect(wrong.code).toBe(1)
+    expect(wrong.out).toContain('is a draw with best play')
+    expect(read('4k3/8/8/8/8/8/4P3/4K1N1 w - - 0 1', 'win').out).toContain('just two kings and one pawn')
+    const card = (c: Record<string, unknown>) => dayWith([{ type: 'findMove', prompt: 'x', explain: 'x', ...c }])
+    const opposition = { fen: '8/4k3/8/3K4/4P3/8/8/8 w - - 0 1', solution: ['Ke5'], keeps: 'win' }
+    expect(run(card(opposition)).code).toBe(0)
+    const loose = run(card({ ...opposition, solution: ['Kd6'] }))
+    expect(loose.code).toBe(1)
+    expect(loose.out).toContain('does not keep the win')
+    expect(run(card({ ...opposition, keeps: 'draw' })).out).toContain('does not fit this position')
+    const keys = (targets: string[]) => dayWith([{ type: 'spot', prompt: 'x', board: { fen: '8/8/8/4P3/8/8/8/K1k5 w - - 0 1' }, targets, explain: 'x', verify: { kind: 'keySquares' } }])
+    expect(run(keys(['d6', 'e6', 'f6'])).code).toBe(0)
+    expect(run(keys(['d6', 'e6'])).code).toBe(1)
+  })
+
   it('checks tap-the-defender cards', () => {
     const board = { fen: 'r4rk1/pp3ppp/5n2/3p4/8/2N5/PP3PPP/3R2K1 w - - 0 1' }
     const spot = (targets: string[], square = 'd5') => dayWith([{ type: 'spot', prompt: 'x', board, targets, explain: 'x', verify: { kind: 'defenders', square } }])

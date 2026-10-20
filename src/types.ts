@@ -39,6 +39,8 @@ export interface BoardAssert {
   backward?: Square[]
   /** Pawns with no enemy pawn in front of them on their own or a neighbouring file. */
   passed?: Square[]
+  /** King and pawn against king only: the side with the pawn wins ('win') or cannot win ('draw') with best play. Proven by the solver. */
+  endgame?: 'win' | 'draw'
   /** Squares that must be outposts for the side named (white: w, black: b): beyond the enemy pawns' reach and protected by a pawn. */
   outposts?: { w?: Square[]; b?: Square[] }
 }
@@ -114,6 +116,8 @@ export interface FindMoveCard {
   after?: BoardAssert
   /** Claims about the position after the whole stored line has been played. */
   final?: BoardAssert
+  /** King and pawn against king: the move (and `accept`) must be exactly the moves that keep the win (side with the pawn) or the draw (defender). */
+  keeps?: 'win' | 'draw'
   /** Points of material this wins by force against best defence (a fork that wins a rook is 5). The validator proves it. */
   wins?: number
   /** The line saves the game: a forced perpetual check, or a one-move stalemate trap. The validator proves it. */
@@ -131,9 +135,9 @@ export interface SpotVerify {
    * the undefended pieces of `color` / the squares the piece on `square` can legally move to / the squares the
    * piece on `square` could move to and attack two or more enemy pieces (fork squares) / the pieces of `color`
    * pinned to their own king / the squares the piece on `square` can legally move to and give check from / the same
-   * but checkmate (the piece may belong to either side, whoever is to move) / the isolated pawns of `color` / the friendly pieces that defend the piece on `square` / the doubled or backward pawns of `color` / the outpost squares of `color`.
+   * but checkmate (the piece may belong to either side, whoever is to move) / the isolated pawns of `color` / the friendly pieces that defend the piece on `square` / the doubled or backward pawns of `color` / the outpost squares of `color` / the key squares of the pawn on the board (king and pawn endings).
    */
-  kind: 'checkers' | 'attackedBy' | 'loose' | 'legalMoves' | 'forkSquares' | 'pinned' | 'checkSquares' | 'mateSquares' | 'isolatedPawns' | 'defenders' | 'doubledPawns' | 'backwardPawns' | 'outpostSquares'
+  kind: 'checkers' | 'attackedBy' | 'loose' | 'legalMoves' | 'forkSquares' | 'pinned' | 'checkSquares' | 'mateSquares' | 'isolatedPawns' | 'defenders' | 'doubledPawns' | 'backwardPawns' | 'outpostSquares' | 'keySquares'
   square?: Square
   color?: 'w' | 'b'
 }
@@ -161,6 +165,8 @@ export interface Puzzle {
   after?: BoardAssert
   /** Claims about the position after the whole stored line has been played. */
   final?: BoardAssert
+  /** King and pawn against king: the first move must keep the win (side with the pawn) or the draw (defender), and be the only such move. */
+  keeps?: 'win' | 'draw'
   /** Points of material won by force (proved by the validator; the first move must be the only one that wins that much). */
   wins?: number
   /** The line saves the game: a forced perpetual check, or a one-move stalemate trap. The validator proves it. */
