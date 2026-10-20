@@ -1,6 +1,6 @@
 import { Chess } from 'chess.js'
 import { describe, expect, it } from 'vitest'
-import { alignment, forkSquares, moveGain, pinnedPieces, winningMoves } from '../src/lib/tactics'
+import { alignment, forkSquares, moveGain, perpetualMoves, pinnedPieces, stalemateTrapMoves, winningMoves } from '../src/lib/tactics'
 
 const KNIGHT_FORK = '6k1/3q1p1p/8/8/4N3/8/PPP2PPP/6K1 w - - 0 1' // Nf6+ forks king and queen
 const DECOY = '6k1/pp3ppp/2q1b3/5N2/8/8/PP3P1P/6K1 w - - 0 1' // Ne7+ wins; Nd4 attacks the queen but gives no check
@@ -59,5 +59,20 @@ describe('pins and skewers', () => {
     expect(alignment(new Chess(PIN), 'b5', 'c6', 'a8')).toBeNull() // not on one line
     expect(alignment(new Chess('4k3/1p3ppp/2n5/1B6/3P4/8/PPP2PPP/4K3 b - - 0 1'), 'd4', 'c6', 'e8')).toBeNull() // a pawn does not pin
     expect(alignment(new Chess('4k3/1p1p1ppp/2n5/1B6/3P4/8/PPP2PPP/4K3 b - - 0 1'), 'b5', 'c6', 'e8')).toBeNull() // d7 pawn blocks the line
+  })
+})
+
+describe('draw resources', () => {
+  it('finds the one perpetual check', () => {
+    expect(perpetualMoves(new Chess('r5k1/p1p5/4N3/8/8/3Q4/q7/7K w - - 0 1'))).toEqual(['Qg6+'])
+  })
+  it('finds no perpetual where the opponent can escape the checks', () => {
+    expect(perpetualMoves(new Chess('6k1/5ppp/8/8/8/8/5PPP/3Q2K1 w - - 0 1'))).toEqual([])
+  })
+  it('finds the stalemate trap', () => {
+    expect(stalemateTrapMoves(new Chess('k3r3/8/1Q6/8/8/2B5/5PPP/7K b - - 0 1'))).toEqual(['Re1+'])
+  })
+  it('does not call a move a trap when the opponent has a choice', () => {
+    expect(stalemateTrapMoves(new Chess('k3r3/8/1Q6/8/8/2B5/6PP/7K b - - 0 1'))).toEqual([])
   })
 })

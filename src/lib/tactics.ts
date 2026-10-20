@@ -214,3 +214,64 @@ export function movesOfPiece(chess: Chess, square: Square) {
     return null
   }
 }
+
+/** A position as far as repetition is concerned: where everything stands and whose move it is (not the move counters). */
+export function positionKey(chess: Chess): string {
+  return chess.fen().split(' ').slice(0, 4).join(' ')
+}
+
+function givesCheck(san: string): boolean {
+  return san.endsWith('+')
+}
+
+/** After our checking move: is there a way to keep checking until a position repeats, with the opponent's only legal move every time? */
+function checksCycle(afterOurMove: Chess, seen: Set<string>, checksLeft: number): boolean {
+  const replies = afterOurMove.moves()
+  if (replies.length !== 1) return false // they have a choice (or nothing legal): not a forced cycle
+  afterOurMove.move(replies[0])
+  let found = false
+  for (const m of afterOurMove.moves()) {
+    if (!givesCheck(m)) continue
+    afterOurMove.move(m)
+    const key = positionKey(afterOurMove)
+    if (seen.has(key)) found = true
+    else if (checksLeft > 0) found = checksCycle(afterOurMove, new Set(seen).add(key), checksLeft - 1)
+    afterOurMove.undo()
+    if (found) break
+  }
+  afterOurMove.undo()
+  return found
+}
+
+/**
+ * First moves (SAN) with which the side to move can force a perpetual check: a run of checks in which the
+ * opponent's reply is always their only legal move, until a position repeats. Used to prove "this is a draw by repetition".
+ */
+export function perpetualMoves(chess: Chess, maxChecks = 4): string[] {
+  const out: string[] = []
+  for (const m of chess.moves()) {
+    if (!givesCheck(m)) continue
+    const c = new Chess(chess.fen())
+    c.move(m)
+    if (checksCycle(c, new Set([positionKey(c)]), maxChecks - 1)) out.push(m)
+  }
+  return out
+}
+
+/**
+ * First moves (SAN) after which the opponent has exactly one legal move, and playing it leaves the first player
+ * stalemated: the classic "sacrifice to draw". Used to prove a stalemate trick really works.
+ */
+export function stalemateTrapMoves(chess: Chess): string[] {
+  const me = chess.turn()
+  const out: string[] = []
+  for (const m of chess.moves()) {
+    const c = new Chess(chess.fen())
+    c.move(m)
+    const replies = c.moves()
+    if (replies.length !== 1) continue
+    c.move(replies[0])
+    if (c.isStalemate() && c.turn() === me) out.push(m)
+  }
+  return out
+}

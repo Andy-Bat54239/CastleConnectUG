@@ -23,7 +23,7 @@ import {
 } from '../src/lib/chessUtil'
 import { estimateMinutes } from '../src/lib/estimate'
 import { answersByMethod, classifyAnswer, isSafe } from '../src/lib/verify'
-import { alignment, forkSquares, moveGain, movesOfPiece, pinnedPieces, winningMoves } from '../src/lib/tactics'
+import { alignment, forkSquares, moveGain, movesOfPiece, perpetualMoves, pinnedPieces, positionKey, stalemateTrapMoves, winningMoves } from '../src/lib/tactics'
 
 // BG_CONTENT_DIR lets the tests point the validator at a scratch folder.
 const ROOT = process.env.BG_CONTENT_DIR ? resolve(process.env.BG_CONTENT_DIR) + '/' : new URL('../content/', import.meta.url).pathname
@@ -257,8 +257,61 @@ function checkTactic(fen: string, first: string, accept: string[], c: { after?: 
   if (others.length) err(`${label}: other moves also win at least ${c.wins} points: ${others.join(', ')}. Use a position where only your move wins (or list them in "accept")`)
 }
 
+
+/**
+ * A line that claims to save the game: "perpetual" (a run of checks the opponent cannot avoid, until a position
+ * repeats) or "stalemateTrap" (one move, after which their only reply stalemates us). Proved, and no other first
+ * move may do the same unless listed in "accept".
+ */
+function checkEnds(fen: string, line: unknown, accept: string[], ends: unknown, label: string) {
+  if (ends !== 'perpetual' && ends !== 'stalemateTrap') return err(`${label}: "ends" must be "perpetual" or "stalemateTrap"`)
+  if (!Array.isArray(line) || !line.every((m) => typeof m === 'string')) return
+  const sol = line as string[]
+  const chess = loadFen(fen, label)
+  if (!chess) return
+  const first = sol[0]
+  const given = [first, ...accept]
+  if (ends === 'stalemateTrap') {
+    if (sol.length !== 1) err(`${label}: a stalemate trap is one move (the opponent's forced reply is not stored), but the solution has ${sol.length}`)
+    const good = stalemateTrapMoves(chess)
+    for (const g of given) if (!good.includes(g)) err(`${label}: ${g} is not a stalemate trap (they must have exactly one legal reply, and it must leave you stalemated)`)
+    const others = good.filter((m) => !given.includes(m))
+    if (others.length) err(`${label}: other moves are stalemate traps too: ${others.join(', ')}. Use a position with one trap (or list them in "accept")`)
+    return
+  }
+  // perpetual: every move of ours checks, every reply is the only legal one, and the last position has appeared before
+  const keys = new Set<string>()
+  let repeated = false
+  for (let i = 0; i < sol.length; i++) {
+    try {
+      chess.move(sol[i])
+    } catch {
+      return // an illegal move is reported by the line check
+    }
+    if (i % 2 === 0) {
+      if (!givesCheck(sol[i])) err(`${label}: move ${i + 1} "${sol[i]}" is not a check, so this is not a perpetual check`)
+      const key = positionKey(chess)
+      if (keys.has(key)) repeated = true
+      keys.add(key)
+    } else if (new Chess(chess.fen()).moves().length === 0) err(`${label}: the game ends after move ${i + 1}`)
+    if (i % 2 === 0 && i + 1 < sol.length) {
+      const replies = chess.moves()
+      if (replies.length !== 1) err(`${label}: after "${sol[i]}" the opponent has ${replies.length} legal replies, so they could escape the checks`)
+    }
+  }
+  if (!repeated) err(`${label}: the line does not come back to a position it has already been in, so it does not show a repetition`)
+  const good = perpetualMoves(loadFen(fen, label) as Chess)
+  for (const g of given) if (!good.includes(g)) err(`${label}: ${g} does not force a perpetual check`)
+  const others = good.filter((m) => !given.includes(m))
+  if (others.length) err(`${label}: other first moves also force a perpetual check: ${others.join(', ')}. Use a position with one answer (or list them in "accept")`)
+}
+
+function givesCheck(san: string): boolean {
+  return san.endsWith('+')
+}
+
 function checkFindMove(c: Obj) {
-  onlyKeys(c, ['type', 'prompt', 'fen', 'goal', 'solution', 'accept', 'hint', 'explain', 'highlight', 'arrows', 'verify', 'after', 'wins'])
+  onlyKeys(c, ['type', 'prompt', 'fen', 'goal', 'solution', 'accept', 'hint', 'explain', 'highlight', 'arrows', 'verify', 'after', 'wins', 'ends'])
   need(c, 'prompt', 'string')
   need(c, 'explain', 'string')
   const goal = (c.goal ?? 'san') as string
@@ -317,6 +370,7 @@ function checkFindMove(c: Obj) {
 
   if (goal === 'san' && Array.isArray(c.solution) && typeof c.solution[0] === 'string') {
     checkTactic(fen, c.solution[0], accept.map(String), c, 'solution')
+    if (c.ends !== undefined) checkEnds(fen, c.solution, accept.map(String), c.ends, 'solution')
   }
 
   if (isObj(c.verify) && goal === 'san') {
@@ -391,7 +445,7 @@ function checkPuzzleSet(c: Obj) {
   ps.forEach((p, i) => {
     const label = `puzzle ${i + 1}`
     if (!isObj(p)) return err(`${label}: not an object`)
-    onlyKeys(p, ['fen', 'solution', 'rating', 'lichessId', 'hint', 'explain', 'after', 'wins'])
+    onlyKeys(p, ['fen', 'solution', 'rating', 'lichessId', 'hint', 'explain', 'after', 'wins', 'ends'])
     if (!Array.isArray(p.solution) || p.solution.length % 2 === 0) err(`${label}: solution must alternate yours, reply, yours... (odd length)`)
     const end = playLine(p.fen as string, p.solution, label)
     muted = true // playLine already reported a bad position
@@ -405,6 +459,7 @@ function checkPuzzleSet(c: Obj) {
       if (!last.endsWith('#') && end.isCheckmate()) err(`${label}: the last move is checkmate but is written without #`)
       const first = (p.solution as string[])[0]
       if (p.after !== undefined || p.wins !== undefined) checkTactic(p.fen as string, first, [], p, label)
+      if (p.ends !== undefined) checkEnds(p.fen as string, p.solution, [], p.ends, label)
       if (first?.endsWith('#')) {
         const mates = matingMoves(start)
         if (mates.length > 1) console.log(`  · ${where} ${label}: ${mates.length} mating moves (${mates.join(', ')}); all are accepted`)

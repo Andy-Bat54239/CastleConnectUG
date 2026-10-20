@@ -158,6 +158,18 @@ Claims about forks, pins, skewers and won material are checked by search, so a l
 - `npm run probe -- "<fen>" --wins 3` lists every first move that wins at least 3 points. With a square
   (`... b5`) it also lists that piece's fork squares and the pins and skewers it makes.
 
+## Draws are proven too
+
+For lessons about saving a lost game, a `findMove` card or a puzzle can carry `"ends"`:
+
+- `"ends": "perpetual"`: the solution is a run of checks, ending when a position repeats. Every one of your moves
+  must be a check, and every reply must be the opponent's **only** legal move, so they cannot escape. No other first
+  move may also force a perpetual (or list it in `accept`).
+- `"ends": "stalemateTrap"`: the solution is one move, after which the opponent has exactly one legal reply and
+  playing it leaves **you** stalemated. Only one such move may exist.
+
+`npm run probe` does not list these yet, but the validator error names every other move that would also work.
+
 ## Mates are proven, not just played
 
 When a stored line ends in `#` (a `solution` or a puzzle), the validator does not only check that the

@@ -189,6 +189,24 @@ describe('content validator', () => {
     expect(run(none).code).toBe(1)
   })
 
+  it('proves perpetual checks and stalemate traps', () => {
+    const perp = { fen: 'r5k1/p1p5/4N3/8/8/3Q4/q7/7K w - - 0 1', solution: ['Qg6+', 'Kh8', 'Qh6+', 'Kg8', 'Qg6+'], ends: 'perpetual' }
+    const card = (c: Record<string, unknown>) => dayWith([{ type: 'findMove', prompt: 'x', explain: 'x', ...c }])
+    expect(run(card(perp)).code).toBe(0)
+    // not a repetition yet: the line stops before the position comes round again
+    const short = run(card({ ...perp, solution: ['Qg6+', 'Kh8', 'Qh6+'] }))
+    expect(short.code).toBe(1)
+    expect(short.out).toContain('does not come back to a position')
+    // a first move that is a check but gives the opponent a choice of replies is not a perpetual
+    const loose = run(card({ ...perp, solution: ['Qd8+', 'Rxd8', 'Nxd8'], ends: 'perpetual' }))
+    expect(loose.code).toBe(1)
+    const trap = { fen: 'k3r3/8/1Q6/8/8/2B5/5PPP/7K b - - 0 1', solution: ['Re1+'], ends: 'stalemateTrap' }
+    expect(run(card(trap)).code).toBe(0)
+    const notTrap = run(card({ ...trap, solution: ['Rd8'] }))
+    expect(notTrap.code).toBe(1)
+    expect(notTrap.out).toContain('is not a stalemate trap')
+  })
+
   it('rejects an unlockAll that is not true or false', () => {
     const dir = dayWith([{ type: 'read', title: 't', body: 'b' }])
     writeFileSync(join(dir, 'config.json'), JSON.stringify({ startDate: '2026-10-26T00:00:00+03:00', challengeName: 'x', unlockAll: 'yes' }))

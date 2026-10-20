@@ -94,6 +94,8 @@ export interface FindMoveCard {
   after?: BoardAssert
   /** Points of material this wins by force against best defence (a fork that wins a rook is 5). The validator proves it. */
   wins?: number
+  /** The line saves the game: a forced perpetual check, or a one-move stalemate trap. The validator proves it. */
+  ends?: 'perpetual' | 'stalemateTrap'
   hint?: string
   explain: string
   highlight?: Square[]
@@ -137,6 +139,8 @@ export interface Puzzle {
   after?: BoardAssert
   /** Points of material won by force (proved by the validator; the first move must be the only one that wins that much). */
   wins?: number
+  /** The line saves the game: a forced perpetual check, or a one-move stalemate trap. The validator proves it. */
+  ends?: 'perpetual' | 'stalemateTrap'
   /** Shown after the puzzle is solved. */
   explain?: string
 }
