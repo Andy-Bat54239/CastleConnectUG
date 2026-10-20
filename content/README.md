@@ -154,6 +154,10 @@ Structure and counting facts, also proven:
   neighbouring file).
 - `outposts`: `{ "w": ["d5"] }`: squares on the side's fifth or sixth rank (third or fourth for Black) that no enemy pawn can
   ever attack and one of its own pawns protects.
+- `bishopPawns`: `{ "c1": { "same": 6, "other": 2 } }`: for the bishop on c1, how many of its own side's pawns stand on
+  squares of its colour (`same`) and on the other colour (`other`). A spot card with `verify: { "kind": "badBishops",
+  "color": "w" }` expects exactly the bishops with at least two more own pawns on their colour than on the other
+  (the lesson should say "mostly", because this counts pawns and does not judge whether a pawn is blocked).
 - `developed`: `{ "w": 2, "b": 0 }`: knights and bishops each side has moved off their starting squares.
 - `materialDiff`: `-2`: White's material minus Black's (pawn 1, knight and bishop 3, rook 5, queen 9), so -2 means White is
   two pawns down. Together these show what a gambit pays and what it buys.
@@ -169,6 +173,9 @@ Claims about forks, pins, skewers and won material are checked by search, so a l
   force (pawn 1, knight/bishop 3, rook 5, queen 9), against the opponent's best defence (their reply, your
   answer, then every capture followed). **No other move may win that much** (or list it in `accept`), so
   there is one clear answer. Give positions some pawns, or the search will see a dead draw.
+- `"takes": "d8"` on a `findMove` card: the answer (and `accept`) must be exactly the legal moves that capture the enemy
+  piece on d8. Use it for "trade them" cards, with `"after": { "counts": { "d8": { "attackers": 2, "defenders": 0 } } }`
+  to show the piece will be taken back (so it really is a trade).
 - `"after": { ... }` checks the position **after your first move**, using the same checks as a board
   `assert`. For a fork: `"after": { "attackedFrom": { "f6": ["g8", "d7"] } }` means the piece now on f6
   attacks g8 and d7.

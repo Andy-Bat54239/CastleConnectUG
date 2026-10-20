@@ -25,7 +25,7 @@ import {
 import { estimateMinutes } from '../src/lib/estimate'
 import { kpkKeepingMoves, kpkKeySquares, kpkResult } from '../src/lib/kpk'
 import { answersByMethod, classifyAnswer, isSafe } from '../src/lib/verify'
-import { alignment, backwardPawns, developedPieces, doubledPawns, forkSquares, isolatedPawns, outpostSquares, passedPawns, materialDiff, moveGain, movesOfPiece, openFiles, perpetualMoves, pinnedPieces, positionKey, spaceCount, stalemateTrapMoves, winningMoves } from '../src/lib/tactics'
+import { alignment, backwardPawns, badBishops, bishopPawnCounts, developedPieces, doubledPawns, forkSquares, isolatedPawns, outpostSquares, passedPawns, materialDiff, moveGain, movesOfPiece, openFiles, perpetualMoves, pinnedPieces, positionKey, spaceCount, stalemateTrapMoves, winningMoves } from '../src/lib/tactics'
 
 // BG_CONTENT_DIR lets the tests point the validator at a scratch folder.
 const ROOT = process.env.BG_CONTENT_DIR ? resolve(process.env.BG_CONTENT_DIR) + '/' : new URL('../content/', import.meta.url).pathname
@@ -113,7 +113,7 @@ function sameSet(a: string[], b: string[]): boolean {
 }
 
 function checkAssert(chess: Chess, a: BoardAssert, highlight: string[], label: string) {
-  const known = ['status', 'attackCount', 'highlightIsAttacksOf', 'undefended', 'defended', 'attacked', 'attackedFrom', 'lines', 'counts', 'isolated', 'openFiles', 'space', 'developed', 'materialDiff', 'doubled', 'backward', 'passed', 'outposts', 'endgame']
+  const known = ['status', 'attackCount', 'highlightIsAttacksOf', 'undefended', 'defended', 'attacked', 'attackedFrom', 'lines', 'counts', 'isolated', 'openFiles', 'space', 'developed', 'materialDiff', 'doubled', 'backward', 'passed', 'outposts', 'endgame', 'bishopPawns']
   onlyKeys(a as Obj, known)
   if (a.status) {
     const actual = chess.isCheckmate()
@@ -171,6 +171,11 @@ function checkAssert(chess: Chess, a: BoardAssert, highlight: string[], label: s
     for (const sq of a.outposts?.[side] ?? []) {
       if (!outpostSquares(chess, side).includes(sq)) err(`${label}: ${sq} is not an outpost for ${side === 'w' ? 'White' : 'Black'} (an enemy pawn can attack it, or none of its own pawns protects it)`)
     }
+  }
+  for (const [sq, want] of Object.entries(a.bishopPawns ?? {})) {
+    const got = bishopPawnCounts(chess, sq)
+    if (!got) err(`${label}: bishopPawns square ${sq} does not hold a bishop`)
+    else if (got.same !== want.same || got.other !== want.other) err(`${label}: the bishop on ${sq} has ${got.same} of its own pawns on its colour and ${got.other} on the other colour, not ${want.same} and ${want.other}`)
   }
   if (a.endgame) {
     const r = kpkResult(chess)
@@ -371,8 +376,23 @@ function checkKeeps(fen: string, first: string, accept: string[], keeps: unknown
   if (others.length) err(`${label}: other moves also keep the ${keeps}: ${others.join(', ')}. Use a position with one answer (or list them in "accept")`)
 }
 
+/** `takes`: the answer (with `accept`) must be exactly the legal moves that capture the enemy piece on this square. */
+function checkTakes(fen: string, first: string, accept: string[], takes: unknown, label: string) {
+  if (typeof takes !== 'string' || !isFileRank(takes)) return err(`${label}: "takes" must be a square such as "d8"`)
+  const chess = loadFen(fen, label)
+  if (!chess) return
+  const target = chess.get(takes as never)
+  if (!target) return err(`${label}: "takes" square ${takes} is empty`)
+  if (target.color === chess.turn()) return err(`${label}: "takes" square ${takes} holds the mover's own piece`)
+  const captures = chess.moves({ verbose: true }).filter((m) => m.to === takes && m.captured).map((m) => m.san)
+  const given = [first, ...accept]
+  for (const g of given) if (!captures.includes(g)) err(`${label}: ${g} does not capture the piece on ${takes}`)
+  const others = captures.filter((m) => !given.includes(m))
+  if (others.length) err(`${label}: other moves also capture the piece on ${takes}: ${others.join(', ')}. List them in "accept"`)
+}
+
 function checkFindMove(c: Obj) {
-  onlyKeys(c, ['type', 'prompt', 'fen', 'goal', 'solution', 'accept', 'hint', 'explain', 'highlight', 'arrows', 'verify', 'after', 'final', 'wins', 'ends', 'keeps'])
+  onlyKeys(c, ['type', 'prompt', 'fen', 'goal', 'solution', 'accept', 'hint', 'explain', 'highlight', 'arrows', 'verify', 'after', 'final', 'wins', 'ends', 'keeps', 'takes'])
   need(c, 'prompt', 'string')
   need(c, 'explain', 'string')
   const goal = (c.goal ?? 'san') as string
@@ -437,6 +457,7 @@ function checkFindMove(c: Obj) {
     checkTactic(fen, c.solution[0], accept.map(String), c, 'solution')
     if (c.ends !== undefined) checkEnds(fen, c.solution, accept.map(String), c.ends, 'solution')
     if (c.keeps !== undefined) checkKeeps(fen, c.solution[0], accept.map(String), c.keeps, 'solution')
+    if (c.takes !== undefined) checkTakes(fen, c.solution[0], accept.map(String), c.takes, 'solution')
   }
 
   if (isObj(c.verify) && goal === 'san') {
@@ -503,6 +524,10 @@ function checkSpot(c: Obj) {
     if (v.color !== 'w' && v.color !== 'b') return err('verify.color must be "w" or "b"')
     actual = v.kind === 'doubledPawns' ? doubledPawns(chess, v.color) : backwardPawns(chess, v.color)
     if (!actual.length) return err(`${v.color === 'w' ? 'White' : 'Black'} has no ${v.kind === 'doubledPawns' ? 'doubled' : 'backward'} pawn here`)
+  } else if (v.kind === 'badBishops') {
+    if (v.color !== 'w' && v.color !== 'b') return err('verify.color must be "w" or "b"')
+    actual = badBishops(chess, v.color)
+    if (!actual.length) return err(`${v.color === 'w' ? 'White' : 'Black'} has no bad bishop here`)
   } else if (v.kind === 'outpostSquares') {
     if (v.color !== 'w' && v.color !== 'b') return err('verify.color must be "w" or "b"')
     actual = outpostSquares(chess, v.color)

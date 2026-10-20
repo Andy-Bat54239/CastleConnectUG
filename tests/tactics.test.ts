@@ -1,6 +1,6 @@
 import { Chess } from 'chess.js'
 import { describe, expect, it } from 'vitest'
-import { alignment, backwardPawns, developedPieces, doubledPawns, forkSquares, isolatedPawns, materialDiff, outpostSquares, passedPawns, moveGain, openFiles, perpetualMoves, pinnedPieces, spaceCount, stalemateTrapMoves, winningMoves } from '../src/lib/tactics'
+import { alignment, backwardPawns, badBishops, bishopPawnCounts, developedPieces, doubledPawns, forkSquares, isolatedPawns, materialDiff, outpostSquares, passedPawns, moveGain, openFiles, perpetualMoves, pinnedPieces, spaceCount, stalemateTrapMoves, winningMoves } from '../src/lib/tactics'
 
 const KNIGHT_FORK = '6k1/3q1p1p/8/8/4N3/8/PPP2PPP/6K1 w - - 0 1' // Nf6+ forks king and queen
 const DECOY = '6k1/pp3ppp/2q1b3/5N2/8/8/PP3P1P/6K1 w - - 0 1' // Ne7+ wins; Nd4 attacks the queen but gives no check
@@ -121,6 +121,14 @@ describe('pawn structure facts', () => {
   it('finds doubled pawns', () => {
     expect(doubledPawns(new Chess('4k3/8/8/8/8/2P5/2P5/4K3 w - - 0 1'), 'w')).toEqual(['c3', 'c2'])
     expect(doubledPawns(chain, 'w')).toEqual([])
+  })
+  it('counts a bishop\'s own pawns by colour and names the bad bishops', () => {
+    const c = new Chess('4k3/8/8/8/8/2P1P3/1PPP1PPP/2B1KB2 w - - 0 1')
+    expect(bishopPawnCounts(c, 'c1')).toEqual({ same: 6, other: 2 }) // c1 is a dark square: b2 c3 d2 e3 f2... are dark
+    expect(bishopPawnCounts(c, 'f1')).toEqual({ same: 2, other: 6 })
+    expect(bishopPawnCounts(c, 'e1')).toBeNull() // the king, not a bishop
+    expect(badBishops(c, 'w')).toEqual(['c1'])
+    expect(badBishops(c, 'b')).toEqual([])
   })
   it('finds outposts: beyond the enemy pawns and protected by a pawn', () => {
     expect(outpostSquares(new Chess('4k3/pp3ppp/8/8/2P1P3/8/PP3PPP/4K3 w - - 0 1'), 'w')).toEqual(['d5'])

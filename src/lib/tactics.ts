@@ -336,6 +336,31 @@ export function materialDiff(chess: Chess): number {
   return white
 }
 
+const isLightSquare = (sq: Square) => (FILE(sq) + RANK(sq)) % 2 === 1
+
+/** For the bishop on `square`: how many of its own side's pawns stand on squares of the bishop's colour, and how many on the other colour. Null if there is no bishop there. */
+export function bishopPawnCounts(chess: Chess, square: Square): { same: number; other: number } | null {
+  const bishop = chess.get(square as never)
+  if (!bishop || bishop.type !== 'b') return null
+  let same = 0
+  let other = 0
+  for (const sq of pawnsOf(chess, bishop.color)) {
+    if (isLightSquare(sq) === isLightSquare(square)) same++
+    else other++
+  }
+  return { same, other }
+}
+
+/** Bad bishops of `color`: at least two more of its own pawns stand on its colour than on the other colour. */
+export function badBishops(chess: Chess, color: 'w' | 'b'): Square[] {
+  return ALL_SQUARES.filter((sq) => {
+    const p = chess.get(sq as never)
+    if (!p || p.type !== 'b' || p.color !== color) return false
+    const n = bishopPawnCounts(chess, sq)
+    return !!n && n.same - n.other >= 2
+  })
+}
+
 function pawnsOf(chess: Chess, color: 'w' | 'b'): Square[] {
   return ALL_SQUARES.filter((sq) => {
     const p = chess.get(sq as never)

@@ -41,6 +41,8 @@ export interface BoardAssert {
   passed?: Square[]
   /** King and pawn against king only: the side with the pawn wins ('win') or cannot win ('draw') with best play. Proven by the solver. */
   endgame?: 'win' | 'draw'
+  /** For the bishop on each key square: how many of its own side's pawns stand on squares of its colour (`same`) and on the other colour (`other`). */
+  bishopPawns?: Record<Square, { same: number; other: number }>
   /** Squares that must be outposts for the side named (white: w, black: b): beyond the enemy pawns' reach and protected by a pawn. */
   outposts?: { w?: Square[]; b?: Square[] }
 }
@@ -122,6 +124,8 @@ export interface FindMoveCard {
   wins?: number
   /** The line saves the game: a forced perpetual check, or a one-move stalemate trap. The validator proves it. */
   ends?: 'perpetual' | 'stalemateTrap'
+  /** Square of an enemy piece: the answer (with `accept`) must be exactly the legal moves that capture it. Used for trades. */
+  takes?: Square
   hint?: string
   explain: string
   highlight?: Square[]
@@ -135,9 +139,9 @@ export interface SpotVerify {
    * the undefended pieces of `color` / the squares the piece on `square` can legally move to / the squares the
    * piece on `square` could move to and attack two or more enemy pieces (fork squares) / the pieces of `color`
    * pinned to their own king / the squares the piece on `square` can legally move to and give check from / the same
-   * but checkmate (the piece may belong to either side, whoever is to move) / the isolated pawns of `color` / the friendly pieces that defend the piece on `square` / the doubled or backward pawns of `color` / the outpost squares of `color` / the key squares of the pawn on the board (king and pawn endings).
+   * but checkmate (the piece may belong to either side, whoever is to move) / the isolated pawns of `color` / the friendly pieces that defend the piece on `square` / the doubled or backward pawns of `color` / the outpost squares of `color` / the key squares of the pawn on the board (king and pawn endings) / the bad bishops of `color` (at least two more of its own pawns on its colour than on the other).
    */
-  kind: 'checkers' | 'attackedBy' | 'loose' | 'legalMoves' | 'forkSquares' | 'pinned' | 'checkSquares' | 'mateSquares' | 'isolatedPawns' | 'defenders' | 'doubledPawns' | 'backwardPawns' | 'outpostSquares' | 'keySquares'
+  kind: 'checkers' | 'attackedBy' | 'loose' | 'legalMoves' | 'forkSquares' | 'pinned' | 'checkSquares' | 'mateSquares' | 'isolatedPawns' | 'defenders' | 'doubledPawns' | 'backwardPawns' | 'outpostSquares' | 'keySquares' | 'badBishops'
   square?: Square
   color?: 'w' | 'b'
 }

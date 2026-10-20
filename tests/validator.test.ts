@@ -248,6 +248,28 @@ describe('content validator', () => {
     expect(run(spot('doubledPawns', 'w', ['c4'])).code).toBe(1) // White has no doubled pawn here
   })
 
+  it('proves how many of a bishop\'s own pawns stand on its colour, and finds the bad bishop', () => {
+    const fen = '4k3/8/8/8/8/2P1P3/1PPP1PPP/2B1KB2 w - - 0 1'
+    const read = (assert: unknown) => run(dayWith([{ type: 'read', title: 't', body: 'b', board: { fen, assert } }]))
+    expect(read({ bishopPawns: { c1: { same: 6, other: 2 }, f1: { same: 2, other: 6 } } }).code).toBe(0)
+    expect(read({ bishopPawns: { c1: { same: 5, other: 3 } } }).out).toContain('not 5 and 3')
+    expect(read({ bishopPawns: { e1: { same: 0, other: 0 } } }).out).toContain('does not hold a bishop')
+    const spot = (color: string, targets: string[]) => dayWith([{ type: 'spot', prompt: 'x', board: { fen }, targets, explain: 'x', verify: { kind: 'badBishops', color } }])
+    expect(run(spot('w', ['c1'])).code).toBe(0)
+    expect(run(spot('w', ['f1'])).code).toBe(1)
+    expect(run(spot('b', ['c1'])).code).toBe(1) // Black has no bishop here
+  })
+
+  it('checks that a "trade" card names every move that takes the piece', () => {
+    const fen = '3qr1k1/ppp2ppp/2n5/8/8/2N2N2/PPP2PPP/3QR1K1 w - - 0 1'
+    const card = (c: Record<string, unknown>) => dayWith([{ type: 'findMove', prompt: 'x', explain: 'x', fen, solution: ['Qxd8'], ...c }])
+    expect(run(card({ takes: 'd8', after: { counts: { d8: { attackers: 2, defenders: 0 } } } })).code).toBe(0)
+    expect(run(card({ takes: 'e8' })).out).toContain('does not capture the piece on e8') // Qxd8 is not a capture on e8
+    expect(run(card({ takes: 'e8', solution: ['Rxe8+'], accept: ['Qxd8'] })).code).toBe(1)
+    expect(run(card({ takes: 'a1' })).out).toContain('is empty')
+    expect(run(card({ takes: 'd1' })).out).toContain("mover's own piece")
+  })
+
   it('proves king and pawn endings: the result, the one move that keeps it, and the key squares', () => {
     const read = (fen: string, endgame: string) => run(dayWith([{ type: 'read', title: 't', body: 'b', board: { fen, assert: { endgame } } }]))
     expect(read('4k3/8/4K3/4P3/8/8/8/8 b - - 0 1', 'win').code).toBe(0)

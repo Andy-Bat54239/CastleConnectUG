@@ -10,7 +10,7 @@ import { Chess } from 'chess.js'
 import { attacksOf, attackersOf, checkers, defendersOf, forcedMateMoves, loosePieces, mateAvoidingMoves, matingMoves } from '../src/lib/chessUtil'
 import { hangingPieces } from '../src/lib/verify'
 import { kpkKeepingMoves, kpkResult } from '../src/lib/kpk'
-import { alignment, backwardPawns, developedPieces, doubledPawns, forkSquares, isolatedPawns, outpostSquares, passedPawns, materialDiff, mobility, openFiles, pinnedPieces, spaceCount, winningMoves } from '../src/lib/tactics'
+import { alignment, backwardPawns, badBishops, bishopPawnCounts, developedPieces, doubledPawns, forkSquares, isolatedPawns, outpostSquares, passedPawns, materialDiff, mobility, openFiles, pinnedPieces, spaceCount, winningMoves } from '../src/lib/tactics'
 
 const argv = process.argv.slice(2)
 const winsAt = argv.indexOf('--wins')
@@ -40,6 +40,16 @@ console.log('hanging black :', hangingPieces(c, 'b').join(' ') || 'none')
 console.log('doubled pawns : white', doubledPawns(c, 'w').join(' ') || 'none', '| black', doubledPawns(c, 'b').join(' ') || 'none')
 console.log('backward pawns: white', backwardPawns(c, 'w').join(' ') || 'none', '| black', backwardPawns(c, 'b').join(' ') || 'none')
 console.log('passed pawns : white', passedPawns(c, 'w').join(' ') || 'none', '| black', passedPawns(c, 'b').join(' ') || 'none')
+const bishopLine = c
+  .board()
+  .flat()
+  .filter((p) => p && p.type === 'b')
+  .map((p) => {
+    const n = bishopPawnCounts(c, p!.square)
+    return `${p!.color === 'w' ? 'White' : 'Black'} ${p!.square}: ${n?.same} own pawns on its colour, ${n?.other} on the other${badBishops(c, p!.color).includes(p!.square) ? ' (bad)' : ''}`
+  })
+  .join(' | ')
+if (bishopLine) console.log('bishops      :', bishopLine)
 console.log('outposts     : white', outpostSquares(c, 'w').join(' ') || 'none', '| black', outpostSquares(c, 'b').join(' ') || 'none')
 console.log('isolated pawns: white', isolatedPawns(c, 'w').join(' ') || 'none', '| black', isolatedPawns(c, 'b').join(' ') || 'none')
 console.log('material (white minus black):', materialDiff(c), '| developed knights and bishops: white', developedPieces(c, 'w'), '| black', developedPieces(c, 'b'))
