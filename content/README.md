@@ -148,7 +148,11 @@ Structure and counting facts, also proven:
 - `space`: `{ "w": 9, "b": 5 }`: how many squares on the **other** side of the board (ranks 5-8 for White, 1-4 for Black)
   each side attacks. This is a simple way to count space, not a full evaluation, so say "attacks" in the lesson.
 
-`npm run probe` prints all of these (isolated pawns, open files, space, and each side's legal moves).
+- `developed`: `{ "w": 2, "b": 0 }`: knights and bishops each side has moved off their starting squares.
+- `materialDiff`: `-2`: White's material minus Black's (pawn 1, knight and bishop 3, rook 5, queen 9), so -2 means White is
+  two pawns down. Together these show what a gambit pays and what it buys.
+
+`npm run probe` prints all of these (isolated pawns, open files, space, material, development, and each side's legal moves).
 
 ## Tactics are proven too
 

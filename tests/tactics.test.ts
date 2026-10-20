@@ -1,6 +1,6 @@
 import { Chess } from 'chess.js'
 import { describe, expect, it } from 'vitest'
-import { alignment, forkSquares, isolatedPawns, moveGain, openFiles, perpetualMoves, pinnedPieces, spaceCount, stalemateTrapMoves, winningMoves } from '../src/lib/tactics'
+import { alignment, developedPieces, forkSquares, isolatedPawns, materialDiff, moveGain, openFiles, perpetualMoves, pinnedPieces, spaceCount, stalemateTrapMoves, winningMoves } from '../src/lib/tactics'
 
 const KNIGHT_FORK = '6k1/3q1p1p/8/8/4N3/8/PPP2PPP/6K1 w - - 0 1' // Nf6+ forks king and queen
 const DECOY = '6k1/pp3ppp/2q1b3/5N2/8/8/PP3P1P/6K1 w - - 0 1' // Ne7+ wins; Nd4 attacks the queen but gives no check
@@ -91,5 +91,19 @@ describe('structure facts', () => {
     const c = new Chess('rnbq1rk1/pp3pbp/3p1np1/2pP4/4P3/2N2N2/PP2BPPP/R1BQ1RK1 w - - 0 1')
     expect(spaceCount(c, 'w')).toBe(9)
     expect(spaceCount(c, 'b')).toBe(5)
+  })
+})
+
+describe('gambit facts', () => {
+  // the Danish Gambit after 1.e4 e5 2.d4 exd4 3.c3 dxc3 4.Bc4 cxb2 5.Bxb2: two pawns down, two bishops out
+  const danish = new Chess('rnbqkbnr/pppp1ppp/8/8/2B1P3/8/PB3PPP/RN1QK1NR b KQkq - 0 5')
+  it('counts developed knights and bishops', () => {
+    expect(developedPieces(danish, 'w')).toBe(2)
+    expect(developedPieces(danish, 'b')).toBe(0)
+    expect(developedPieces(new Chess(), 'w')).toBe(0)
+  })
+  it('measures material from White\'s side whoever is to move', () => {
+    expect(materialDiff(danish)).toBe(-2)
+    expect(materialDiff(new Chess())).toBe(0)
   })
 })

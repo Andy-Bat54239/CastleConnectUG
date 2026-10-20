@@ -24,7 +24,7 @@ import {
 } from '../src/lib/chessUtil'
 import { estimateMinutes } from '../src/lib/estimate'
 import { answersByMethod, classifyAnswer, isSafe } from '../src/lib/verify'
-import { alignment, forkSquares, isolatedPawns, moveGain, movesOfPiece, openFiles, perpetualMoves, pinnedPieces, positionKey, spaceCount, stalemateTrapMoves, winningMoves } from '../src/lib/tactics'
+import { alignment, developedPieces, forkSquares, isolatedPawns, materialDiff, moveGain, movesOfPiece, openFiles, perpetualMoves, pinnedPieces, positionKey, spaceCount, stalemateTrapMoves, winningMoves } from '../src/lib/tactics'
 
 // BG_CONTENT_DIR lets the tests point the validator at a scratch folder.
 const ROOT = process.env.BG_CONTENT_DIR ? resolve(process.env.BG_CONTENT_DIR) + '/' : new URL('../content/', import.meta.url).pathname
@@ -112,7 +112,7 @@ function sameSet(a: string[], b: string[]): boolean {
 }
 
 function checkAssert(chess: Chess, a: BoardAssert, highlight: string[], label: string) {
-  const known = ['status', 'attackCount', 'highlightIsAttacksOf', 'undefended', 'defended', 'attacked', 'attackedFrom', 'lines', 'counts', 'isolated', 'openFiles', 'space']
+  const known = ['status', 'attackCount', 'highlightIsAttacksOf', 'undefended', 'defended', 'attacked', 'attackedFrom', 'lines', 'counts', 'isolated', 'openFiles', 'space', 'developed', 'materialDiff']
   onlyKeys(a as Obj, known)
   if (a.status) {
     const actual = chess.isCheckmate()
@@ -160,6 +160,11 @@ function checkAssert(chess: Chess, a: BoardAssert, highlight: string[], label: s
     else if (!isolatedPawns(chess, p.color).includes(sq)) err(`${label}: the pawn on ${sq} is not isolated (a friendly pawn stands on a neighbouring file)`)
   }
   if (a.openFiles && !sameSet(openFiles(chess), a.openFiles)) err(`${label}: the open files are ${openFiles(chess).join(' ') || 'none'}, not ${a.openFiles.join(' ') || 'none'}`)
+  for (const side of ['w', 'b'] as const) {
+    const want = a.developed?.[side]
+    if (want !== undefined && developedPieces(chess, side) !== want) err(`${label}: ${side === 'w' ? 'White' : 'Black'} has developed ${developedPieces(chess, side)} knights and bishops, not ${want}`)
+  }
+  if (a.materialDiff !== undefined && materialDiff(chess) !== a.materialDiff) err(`${label}: White's material minus Black's is ${materialDiff(chess)}, not ${a.materialDiff}`)
   for (const side of ['w', 'b'] as const) {
     const want = a.space?.[side]
     if (want !== undefined && spaceCount(chess, side) !== want) err(`${label}: ${side === 'w' ? 'White' : 'Black'} attacks ${spaceCount(chess, side)} squares on the other side of the board, not ${want}`)

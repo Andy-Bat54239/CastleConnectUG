@@ -29,6 +29,10 @@ export interface BoardAssert {
   openFiles?: string[]
   /** Squares each side attacks on the opponent's half of the board (ranks 5-8 for White, 1-4 for Black). */
   space?: { w?: number; b?: number }
+  /** How many knights and bishops each side has moved off their starting squares. */
+  developed?: { w?: number; b?: number }
+  /** White's material minus Black's (pawn 1, minor piece 3, rook 5, queen 9): -2 means White is two pawns down. */
+  materialDiff?: number
 }
 
 /** A rook, bishop or queen (`attacker`) sees `front`, with `back` behind it on the same line. */

@@ -9,7 +9,7 @@
 import { Chess } from 'chess.js'
 import { attacksOf, attackersOf, checkers, defendersOf, forcedMateMoves, loosePieces, mateAvoidingMoves, matingMoves } from '../src/lib/chessUtil'
 import { hangingPieces } from '../src/lib/verify'
-import { alignment, forkSquares, isolatedPawns, mobility, openFiles, pinnedPieces, spaceCount, winningMoves } from '../src/lib/tactics'
+import { alignment, developedPieces, forkSquares, isolatedPawns, materialDiff, mobility, openFiles, pinnedPieces, spaceCount, winningMoves } from '../src/lib/tactics'
 
 const argv = process.argv.slice(2)
 const winsAt = argv.indexOf('--wins')
@@ -37,6 +37,7 @@ console.log('loose black   :', loosePieces(c, 'b').join(' ') || 'none')
 console.log('hanging white :', hangingPieces(c, 'w').join(' ') || 'none')
 console.log('hanging black :', hangingPieces(c, 'b').join(' ') || 'none')
 console.log('isolated pawns: white', isolatedPawns(c, 'w').join(' ') || 'none', '| black', isolatedPawns(c, 'b').join(' ') || 'none')
+console.log('material (white minus black):', materialDiff(c), '| developed knights and bishops: white', developedPieces(c, 'w'), '| black', developedPieces(c, 'b'))
 console.log('open files    :', openFiles(c).join(' ') || 'none', '| space (squares attacked on their half): white', spaceCount(c, 'w'), '| black', spaceCount(c, 'b'), '| legal moves: white', mobility(c, 'w'), '| black', mobility(c, 'b'))
 if (square) {
   console.log(`${square} attacks    :`, attacksOf(c, square).join(' ') || 'nothing')

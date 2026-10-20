@@ -219,6 +219,14 @@ describe('content validator', () => {
     expect(read({ space: { b: 99 } }).out).toContain('squares on the other side of the board')
   })
 
+  it('proves development and material on a board', () => {
+    const fen = 'rnbqkbnr/pppp1ppp/8/8/2B1P3/8/PB3PPP/RN1QK1NR b KQkq - 0 5'
+    const read = (assert: unknown) => run(dayWith([{ type: 'read', title: 't', body: 'b', board: { fen, assert } }]))
+    expect(read({ developed: { w: 2, b: 0 }, materialDiff: -2 }).code).toBe(0)
+    expect(read({ developed: { w: 3 } }).out).toContain('has developed 2 knights and bishops')
+    expect(read({ materialDiff: 0 }).out).toContain('material minus')
+  })
+
   it('checks tap-the-isolated-pawn cards', () => {
     const board = { fen: 'r4rk1/ppp3pp/4p3/8/3P4/8/PPP2PPP/R4RK1 w - - 0 1' }
     const spot = (targets: string[]) => dayWith([{ type: 'spot', prompt: 'x', board, targets, explain: 'x', verify: { kind: 'isolatedPawns', color: 'b' } }])

@@ -320,3 +320,18 @@ export function mobility(chess: Chess, color: 'w' | 'b'): number | null {
     return null
   }
 }
+
+/** Knights and bishops that have left their starting squares: a simple count of development. */
+export function developedPieces(chess: Chess, color: 'w' | 'b'): number {
+  const home = color === 'w' ? ['b1', 'g1', 'c1', 'f1'] : ['b8', 'g8', 'c8', 'f8']
+  return home.filter((sq) => {
+    const p = chess.get(sq as never)
+    return !(p && p.color === color && (p.type === 'n' || p.type === 'b'))
+  }).length
+}
+
+/** White's material minus Black's (pawn 1, knight and bishop 3, rook 5, queen 9). */
+export function materialDiff(chess: Chess): number {
+  const white = chess.turn() === 'w' ? staticEval(chess) : -staticEval(chess)
+  return white
+}
