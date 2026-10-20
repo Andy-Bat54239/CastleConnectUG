@@ -131,6 +131,48 @@ describe('content validator', () => {
     expect(r.out).toContain('do not match')
   })
 
+  it('rejects a "wins" claim the search cannot prove', () => {
+    const card = { type: 'findMove', prompt: 'x', fen: '6k1/3q1p1p/8/8/4N3/8/PPP2PPP/6K1 w - - 0 1', solution: ['Nf6+'], explain: 'x' }
+    expect(run(dayWith([{ ...card, wins: 9 }])).code).toBe(0)
+    const r = run(dayWith([{ ...card, wins: 20 }]))
+    expect(r.code).toBe(1)
+    expect(r.out).toContain('supposed to win 20 points')
+  })
+
+  it('rejects a "wins" claim when other moves win just as much', () => {
+    // the pinned knight hangs, so almost every move wins it: the lesson cannot claim one special move
+    const r = run(dayWith([{ type: 'findMove', prompt: 'x', fen: '4k3/5ppp/2n5/1B6/3P4/8/PPP2PPP/4K3 w - - 0 1', solution: ['d5'], wins: 3, explain: 'x' }]))
+    expect(r.code).toBe(1)
+    expect(r.out).toContain('other moves also win')
+  })
+
+  it('checks a fork claim: the moved piece must really attack both targets', () => {
+    const base = { type: 'findMove', prompt: 'x', fen: '6k1/3q1p1p/8/8/4N3/8/PPP2PPP/6K1 w - - 0 1', solution: ['Nf6+'], explain: 'x' }
+    expect(run(dayWith([{ ...base, after: { attackedFrom: { f6: ['g8', 'd7'] } } }])).code).toBe(0)
+    const r = run(dayWith([{ ...base, after: { attackedFrom: { f6: ['g8', 'a1'] } } }]))
+    expect(r.code).toBe(1)
+    expect(r.out).toContain('does not attack a1')
+  })
+
+  it('checks pin and skewer claims', () => {
+    const board = (kind: string) => ({ fen: '4k3/1p3ppp/2n5/1B6/3P4/8/PPP2PPP/4K3 b - - 0 1', assert: { lines: [{ kind, attacker: 'b5', front: 'c6', back: 'e8' }] } })
+    expect(run(dayWith([{ type: 'read', title: 't', body: 'b', board: board('pin') }])).code).toBe(0)
+    const r = run(dayWith([{ type: 'read', title: 't', body: 'b', board: board('skewer') }]))
+    expect(r.code).toBe(1)
+    expect(r.out).toContain('is a pin, not a skewer')
+  })
+
+  it('checks fork-square and pinned-piece tap cards', () => {
+    const forkBoard = { fen: '6k1/pp4pp/8/1n5n/8/5R2/PP4PP/6K1 w - - 0 1' }
+    const ok = dayWith([{ type: 'spot', prompt: 'x', board: forkBoard, targets: ['f5'], explain: 'x', verify: { kind: 'forkSquares', square: 'f3' } }])
+    expect(run(ok).code).toBe(0)
+    const bad = run(dayWith([{ type: 'spot', prompt: 'x', board: forkBoard, targets: ['f6'], explain: 'x', verify: { kind: 'forkSquares', square: 'f3' } }]))
+    expect(bad.code).toBe(1)
+    const pinBoard = { fen: '4k3/1p3ppp/2n5/1B6/3P4/8/PPP2PPP/4K3 b - - 0 1' }
+    expect(run(dayWith([{ type: 'spot', prompt: 'x', board: pinBoard, targets: ['c6'], explain: 'x', verify: { kind: 'pinned', color: 'b' } }])).code).toBe(0)
+    expect(run(dayWith([{ type: 'spot', prompt: 'x', board: pinBoard, targets: ['f7'], explain: 'x', verify: { kind: 'pinned', color: 'b' } }])).code).toBe(1)
+  })
+
   it('rejects an unlockAll that is not true or false', () => {
     const dir = dayWith([{ type: 'read', title: 't', body: 'b' }])
     writeFileSync(join(dir, 'config.json'), JSON.stringify({ startDate: '2026-10-26T00:00:00+03:00', challengeName: 'x', unlockAll: 'yes' }))

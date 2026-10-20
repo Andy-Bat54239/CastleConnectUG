@@ -2,7 +2,7 @@ import type { Plugin } from 'vite'
 import { defineConfig } from 'vitest/config'
 import { readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
 import { createHash } from 'node:crypto'
-import { injectSocialTags, siteUrlFromEnv } from './scripts/social'
+import { injectSocialTags, siteUrlFromEnv } from './scripts/social.ts'
 import { join, relative } from 'node:path'
 
 /**

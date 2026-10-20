@@ -110,7 +110,9 @@ Members get a hint after one miss and a **Show me** button after two, so nobody 
 `verify` is optional but strongly recommended. It makes the validator prove the claim:
 `checkers` (targets are exactly the pieces giving check), `attackedBy` + `square` (the enemy
 pieces that piece attacks), `loose` + `color` (the pieces with no defender), `legalMoves` + `square`
-(the squares the piece on that square can legally move to, for example a king's escape squares).
+(the squares the piece on that square can legally move to, for example a king's escape squares),
+`forkSquares` + `square` (squares that piece could move to and attack two or more enemy pieces, not
+counting pawns) and `pinned` + `color` (the pieces pinned to their own king).
 
 ### `puzzleSet`: 2 to 6 short puzzles
 
@@ -134,6 +136,24 @@ position, so a sentence like "this knight attacks eight squares" cannot be wrong
 ```
 Available: `status` (`checkmate`, `stalemate`, `check`, `normal`, `insufficient`), `attackCount`,
 `highlightIsAttacksOf`, `undefended`, `defended`, `attacked`.
+
+## Tactics are proven too
+
+Claims about forks, pins, skewers and won material are checked by search, so a lesson cannot say
+"this wins a rook" when it does not.
+
+- `"wins": 5` on a `findMove` card or a puzzle: the first move must win at least 5 points of material by
+  force (pawn 1, knight/bishop 3, rook 5, queen 9), against the opponent's best defence (their reply, your
+  answer, then every capture followed). **No other move may win that much** (or list it in `accept`), so
+  there is one clear answer. Give positions some pawns, or the search will see a dead draw.
+- `"after": { ... }` checks the position **after your first move**, using the same checks as a board
+  `assert`. For a fork: `"after": { "attackedFrom": { "f6": ["g8", "d7"] } }` means the piece now on f6
+  attacks g8 and d7.
+- `assert.lines` (on a board or in `after`): `{ "kind": "pin" | "skewer", "attacker": "b5", "front": "c6",
+  "back": "e8" }`. The attacker is a bishop, rook or queen. A **pin** has the less valuable piece in front, a
+  **skewer** the more valuable one. Both victims must be the same colour, in one line, with nothing between.
+- `npm run probe -- "<fen>" --wins 3` lists every first move that wins at least 3 points. With a square
+  (`... b5`) it also lists that piece's fork squares and the pins and skewers it makes.
 
 ## Mates are proven, not just played
 

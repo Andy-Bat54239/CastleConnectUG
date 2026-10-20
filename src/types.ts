@@ -17,6 +17,20 @@ export interface BoardAssert {
   defended?: Square[]
   /** Pieces on these squares must be attacked by the opponent. */
   attacked?: Square[]
+  /** The piece on each key square attacks every listed square. This is how a fork is checked: { "c7": ["e8", "a8"] }. */
+  attackedFrom?: Record<Square, Square[]>
+  /** Pins and skewers that must really exist in the position. */
+  lines?: LineClaim[]
+}
+
+/** A rook, bishop or queen (`attacker`) sees `front`, with `back` behind it on the same line. */
+export interface LineClaim {
+  /** "pin": the front piece is worth less than the one behind, so it should not move.
+   *  "skewer": the front piece is worth more, so it must move and the piece behind falls. */
+  kind: 'pin' | 'skewer'
+  attacker: Square
+  front: Square
+  back: Square
 }
 
 export interface BoardSpec {
@@ -76,6 +90,10 @@ export interface FindMoveCard {
   solution?: string[]
   /** Other first moves that are just as good (SAN). */
   accept?: string[]
+  /** Claims about the position right after your first move (for example that the piece you moved forks two others). */
+  after?: BoardAssert
+  /** Points of material this wins by force against best defence (a fork that wins a rook is 5). The validator proves it. */
+  wins?: number
   hint?: string
   explain: string
   highlight?: Square[]
@@ -86,9 +104,11 @@ export interface FindMoveCard {
 export interface SpotVerify {
   /**
    * Targets must be exactly: the pieces giving check / the enemy pieces the piece on `square` attacks /
-   * the undefended pieces of `color` / the squares the piece on `square` can legally move to.
+   * the undefended pieces of `color` / the squares the piece on `square` can legally move to / the squares the
+   * piece on `square` could move to and attack two or more enemy pieces (fork squares) / the pieces of `color`
+   * pinned to their own king.
    */
-  kind: 'checkers' | 'attackedBy' | 'loose' | 'legalMoves'
+  kind: 'checkers' | 'attackedBy' | 'loose' | 'legalMoves' | 'forkSquares' | 'pinned'
   square?: Square
   color?: 'w' | 'b'
 }
@@ -112,6 +132,10 @@ export interface Puzzle {
   rating?: number
   lichessId?: string
   hint?: string
+  /** Claims about the position right after the first move. */
+  after?: BoardAssert
+  /** Points of material won by force (proved by the validator; the first move must be the only one that wins that much). */
+  wins?: number
   /** Shown after the puzzle is solved. */
   explain?: string
 }
