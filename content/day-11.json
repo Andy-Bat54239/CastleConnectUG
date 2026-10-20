@@ -1,0 +1,358 @@
+{
+  "day": 11,
+  "title": "Tactics level-up",
+  "level": "1000-1300",
+  "blurb": "Two ideas win a lot of games: take away the piece that is doing the defending, and look for an in-between move before you recapture. Then learn to use sacrifices and to calculate to the end.",
+  "deeperTitle": "Deflection, attraction, sacrifices; calculating several moves",
+  "share": {
+    "prompt": "One thing I learned today…"
+  },
+  "core": [
+    {
+      "type": "read",
+      "title": "Two ways to win material",
+      "body": [
+        "Many tactics use the same two ideas. **Remove the defender**: a piece protected only once falls when you take or chase its protector.",
+        "And the **in-between move**: when your opponent captures, do not recapture on autopilot. Look for something stronger first."
+      ]
+    },
+    {
+      "type": "read",
+      "title": "Remove the defender",
+      "body": [
+        "A piece that is protected only once is only as safe as its protector. Here the rook attacks the bishop on c5, and the knight on a6 is its **only** defender.",
+        "Take the defender, and the bishop is yours."
+      ],
+      "board": {
+        "fen": "6k1/ppp2ppp/n7/2b5/8/8/BPR1BPPP/6K1 w - - 0 1",
+        "arrows": [
+          [
+            "c2",
+            "c5"
+          ],
+          [
+            "a6",
+            "c5"
+          ]
+        ],
+        "caption": "The bishop on c5 is attacked once and defended once, by the knight on a6.",
+        "assert": {
+          "counts": {
+            "c5": {
+              "attackers": 1,
+              "defenders": 1
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "spot",
+      "prompt": "Tap the piece that defends the black bishop on c5.",
+      "board": {
+        "fen": "6k1/ppp2ppp/n7/2b5/8/8/BPR1BPPP/6K1 w - - 0 1"
+      },
+      "targets": [
+        "a6"
+      ],
+      "verify": {
+        "kind": "defenders",
+        "square": "c5"
+      },
+      "explain": "The knight on **a6** is the only defender. That makes it the target."
+    },
+    {
+      "type": "findMove",
+      "prompt": "Win the bishop on c5 by removing its defender.",
+      "fen": "6k1/ppp2ppp/n7/2b5/8/8/BPR1BPPP/6K1 w - - 0 1",
+      "solution": [
+        "Bxa6"
+      ],
+      "wins": 3,
+      "hint": "Which of your pieces can take the knight on a6?",
+      "explain": "**Bxa6** takes the defender. If Black recaptures on a6, **Rxc5** wins the bishop. Either way you come out a piece ahead."
+    },
+    {
+      "type": "findMove",
+      "prompt": "The bishop on d5 is attacked by your queen. What is holding it up? Remove it.",
+      "fen": "6k1/p1p2ppp/7b/Q2b4/5n2/3N4/PPP2PPP/6K1 w - - 0 1",
+      "solution": [
+        "Nxf4"
+      ],
+      "wins": 3,
+      "hint": "Look at what defends the bishop on d5.",
+      "explain": "The knight on f4 is the bishop’s only defender. **Nxf4** takes it, and the bishop on d5 falls next."
+    },
+    {
+      "type": "read",
+      "title": "The in-between move",
+      "body": [
+        "Your opponent captures one of your pieces. The obvious reply is to take back. But first ask: **is there a check, a bigger capture or a threat I can play right now?**",
+        "The in-between move (**zwischenzug**) comes first, and the recapture can wait."
+      ]
+    },
+    {
+      "type": "findMove",
+      "prompt": "Black’s bishop has just taken your bishop on d3. Do not take back. Find the better move.",
+      "fen": "6k1/ppp2ppp/4N3/2r5/8/3b4/PPP2PPP/6K1 w - - 0 1",
+      "solution": [
+        "Nxc5"
+      ],
+      "wins": 5,
+      "hint": "What does your knight attack? Something worth more than a bishop.",
+      "explain": "**Nxc5** takes the rook first. If you recapture with **cxd3**, the c-file opens and Black plays **…Rc1#**."
+    },
+    {
+      "type": "findMove",
+      "prompt": "Black’s bishop has just taken on g3. Do not recapture. You can end the game.",
+      "fen": "6k1/p1p2ppp/8/r7/8/6b1/PPP2PPP/1R2R1K1 w - - 0 1",
+      "goal": "mate",
+      "hint": "Black’s king has no escape squares. Which rook can check on the back rank?",
+      "explain": "**Re8#**. The pawns on f7, g7 and h7 box the king in, and nothing can take the rook. Always look for a check before you recapture."
+    },
+    {
+      "type": "puzzleSet",
+      "title": "Remove the defender",
+      "theme": "removeDefender",
+      "ratingMin": 1000,
+      "ratingMax": 1300,
+      "intro": "Find the defender, and take it away. White and Black.",
+      "puzzles": [
+        {
+          "fen": "6k1/ppp2ppp/2b5/1n6/BN6/8/1PP2PPP/4R1K1 w - - 0 1",
+          "solution": [
+            "Nxc6"
+          ],
+          "wins": 3,
+          "hint": "The knight on b5 is protected by the bishop on c6.",
+          "explain": "The bishop on c6 protects the knight on b5 **and** the back rank. **Nxc6** takes it. If Black recaptures with the b-pawn, **Re8#** is checkmate; otherwise you stay a piece ahead."
+        },
+        {
+          "fen": "6k1/ppp2ppp/5b2/4n3/8/5RQ1/PPP2PPP/6K1 w - - 0 1",
+          "solution": [
+            "Rxf6"
+          ],
+          "wins": 3,
+          "after": {
+            "lines": [
+              {
+                "kind": "pin",
+                "attacker": "g3",
+                "front": "g7",
+                "back": "g8"
+              }
+            ]
+          },
+          "hint": "What is holding up the knight on e5? And can the g7 pawn take back?",
+          "explain": "The bishop on f6 defends the knight. **Rxf6** takes it, and the pawn on g7 cannot take back because your queen pins it to the king. You win a piece and the knight on e5 is still attacked."
+        },
+        {
+          "fen": "6k1/bpr1bppp/8/8/2B5/N7/PPP2PPP/6K1 b - - 0 1",
+          "solution": [
+            "Bxa3"
+          ],
+          "wins": 3,
+          "hint": "You are Black now. Which piece defends the bishop that your rook attacks?",
+          "explain": "The same idea from Black’s side: take the only defender, and the bishop falls."
+        }
+      ]
+    },
+    {
+      "type": "puzzleSet",
+      "title": "In-between moves",
+      "theme": "zwischenzug",
+      "ratingMin": 1000,
+      "ratingMax": 1300,
+      "intro": "Black has just captured. Do not take back until you have looked for something stronger.",
+      "puzzles": [
+        {
+          "fen": "6k1/1pp2ppp/3r4/2B5/8/1b6/PPP2PPP/6K1 w - - 0 1",
+          "solution": [
+            "Bxd6"
+          ],
+          "wins": 5,
+          "hint": "Your bishop attacks something bigger than the bishop that just took.",
+          "explain": "**Bxd6** takes the rook first. The automatic recapture on b3 would lose the game."
+        },
+        {
+          "fen": "6k1/1qp2ppp/6r1/8/1Q1b4/8/P1P2PPP/5BK1 w - - 0 1",
+          "solution": [
+            "Qxb7"
+          ],
+          "wins": 9,
+          "hint": "Your queen and the black queen are facing each other.",
+          "explain": "**Qxb7** takes the queen before anything else. The recapture on d4 can wait."
+        },
+        {
+          "fen": "r5k1/1pp1rppp/1p5r/2B5/6N1/8/PPP2PPP/6K1 w - - 0 1",
+          "solution": [
+            "Nxh6+"
+          ],
+          "wins": 5,
+          "hint": "A check that also takes something.",
+          "explain": "**Nxh6+** takes a rook with check. The automatic recapture on b6 would lose."
+        }
+      ]
+    }
+  ],
+  "deeper": [
+    {
+      "type": "read",
+      "title": "Deflection and attraction",
+      "body": [
+        "**Deflection** pulls a defender away from its job. **Attraction** (a decoy) lures a piece, often the king, onto a bad square.",
+        "Both usually start with a sacrifice, and they only work if the forcing line ends in checkmate or in winning more than you gave."
+      ]
+    },
+    {
+      "type": "findMove",
+      "prompt": "Black’s queen guards the back rank. Lure her away and finish the game: checkmate in two.",
+      "fen": "q5k1/pp3ppp/1rQ5/8/8/2R5/PP3PPP/6K1 w - - 0 1",
+      "solution": [
+        "Qc8+",
+        "Qxc8",
+        "Rxc8#"
+      ],
+      "hint": "Give up your queen with check, so that their queen has to take on c8.",
+      "explain": "**Qc8+** attracts the queen to c8, and the rook takes it with checkmate: **Rxc8#**. Your queen was attacked by the rook on b6, but a check comes first."
+    },
+    {
+      "type": "findMove",
+      "prompt": "Checkmate in three. Give up your queen, then a rook will finish. Which queen move starts it?",
+      "fen": "3r2k1/pp3ppp/8/8/5R2/1QN5/PPP2PPP/6K1 w - - 0 1",
+      "solution": [
+        "Qxf7+",
+        "Kh8",
+        "Qf8+",
+        "Rxf8",
+        "Rxf8#"
+      ],
+      "hint": "The rook on d8 guards the back rank. How can you force it away?",
+      "explain": "**Qxf7+** (protected by the rook on f4) drives the king to h8. **Qf8+** deflects the rook from d8, and **Rxf8#** is checkmate."
+    },
+    {
+      "type": "choice",
+      "prompt": "When is a sacrifice a good idea?",
+      "options": [
+        "When the forcing line ends in checkmate, or wins more than it cost",
+        "Whenever it looks exciting",
+        "Whenever you are losing"
+      ],
+      "answer": 0,
+      "explain": "A sacrifice is a calculation, not a gamble. Follow every check, capture and threat to the end. If you cannot see the end, do not sacrifice."
+    },
+    {
+      "type": "read",
+      "title": "Calculating several moves",
+      "body": [
+        "List your **candidate moves**: checks first, then captures, then threats. For each one, follow the forcing replies to the end of the line.",
+        "If a line ends in mate or in a clear win, play it. If you cannot see the end, choose a safer move."
+      ]
+    },
+    {
+      "type": "findMove",
+      "prompt": "Checkmate in two. Your rook can capture with check. Find the capture.",
+      "fen": "2r3k1/5ppp/1q6/8/8/1Q6/5PPP/2R3K1 w - - 0 1",
+      "solution": [
+        "Rxc8+",
+        "Qd8",
+        "Rxd8#"
+      ],
+      "hint": "Check first. Their queen will have to block on d8.",
+      "explain": "**Rxc8+** is check, and the only way to stop it is **…Qd8**, which blocks on d8 and is taken with checkmate: **Rxd8#**. You calculated every defence: there was only one."
+    },
+    {
+      "type": "puzzleSet",
+      "title": "Sacrifices and decoys",
+      "theme": "sacrifice",
+      "ratingMin": 1000,
+      "ratingMax": 1300,
+      "intro": "You are Black in all three, so the board is flipped. Lure the piece away, then mate.",
+      "puzzles": [
+        {
+          "fen": "6k1/pp3ppp/2r5/8/8/1Rq5/PP3PPP/Q5K1 b - - 0 1",
+          "solution": [
+            "Qc1+",
+            "Qxc1",
+            "Rxc1#"
+          ],
+          "hint": "Give up your queen with check, so that their queen has to take.",
+          "explain": "The queen sacrifice **attracts** their queen to the back rank, and the rook mates."
+        },
+        {
+          "fen": "6k1/ppp2ppp/1qn5/5r2/8/8/PP3PPP/3R2K1 b - - 0 1",
+          "solution": [
+            "Qxf2+",
+            "Kh1",
+            "Qf1+",
+            "Rxf1",
+            "Rxf1#"
+          ],
+          "hint": "The rook guards the back rank. Force it away.",
+          "explain": "The queen sacrifice drives the king into the corner, then deflects the rook from the back rank."
+        },
+        {
+          "fen": "2r3k1/5ppp/1q6/8/8/1Q6/5PPP/2R3K1 b - - 0 1",
+          "solution": [
+            "Rxc1+",
+            "Qd1",
+            "Rxd1#"
+          ],
+          "hint": "Check with a capture. Their queen must block.",
+          "explain": "Their queen is forced to block on the back rank, and the rook takes it with mate."
+        }
+      ]
+    },
+    {
+      "type": "puzzleSet",
+      "title": "Checks first",
+      "theme": "mateIn2",
+      "ratingMin": 600,
+      "ratingMax": 1000,
+      "intro": "List your checks, then pick the one that leaves Black the fewest replies. Each of these is checkmate in two.",
+      "puzzles": [
+        {
+          "fen": "6k1/1pp2ppp/8/Qb1N4/8/8/P4PPP/6KR w - - 0 1",
+          "solution": [
+            "Qa8+",
+            "Be8",
+            "Qxe8#"
+          ],
+          "hint": "A queen check on the back rank. Where can Black block?",
+          "explain": "**Qa8+** forces the bishop to block on e8, and **Qxe8#** takes it with checkmate."
+        },
+        {
+          "fen": "6k1/1pbQ1ppp/3q2B1/8/8/2B5/P4PPP/6K1 w - - 0 1",
+          "solution": [
+            "Qxf7+",
+            "Kh8",
+            "Qxg7#"
+          ],
+          "hint": "Take with check. Where does the king have to go?",
+          "explain": "**Qxf7+** drives the king to h8. Then **Qxg7#** is checkmate, because the bishop on c3 protects the queen."
+        },
+        {
+          "fen": "6k1/pp3ppp/8/5n2/3Q4/3N4/P1q2PPP/6K1 b - - 0 1",
+          "solution": [
+            "Qd1+",
+            "Ne1",
+            "Qxe1#"
+          ],
+          "hint": "You are Black. Check on the back rank, and see what the knight must do.",
+          "explain": "**Qd1+** forces the knight to block on e1, and **Qxe1#** is checkmate."
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "prompt": "In what order should you look at candidate moves?",
+      "options": [
+        "Checks first, then captures, then threats",
+        "Quiet moves first, forcing moves last",
+        "Whatever looks nicest"
+      ],
+      "answer": 0,
+      "explain": "Forcing moves leave your opponent the fewest replies, so you can calculate them to the end. That is the checklist from Day 6."
+    }
+  ]
+}
