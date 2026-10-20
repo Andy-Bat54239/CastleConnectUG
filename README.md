@@ -74,7 +74,7 @@ illegal move, a false "checkmate" claim or a mistyped field.
 | --- | --- | --- |
 | Site | Vite + TypeScript, no UI framework | Tiny output; nothing to learn to maintain it. |
 | Chess rules | [chess.js](https://github.com/jhlywa/chess.js) (BSD-2) | Move legality, checkmate detection. Permissive licence. |
-| Board and pieces | Own code and own SVG artwork | No GPL board library; no third-party artwork licence. |
+| Board and pieces | Own board code; piece artwork supplied by Castle Connect, traced to SVG (`src/ui/pieces.ts`) | No GPL board library. The piece set is the one Castle Connect supplied; confirm you hold the rights to it. |
 | Routing | `#/day/3` style hash links | Works on any static host and inside WhatsApp's browser, no server rules. |
 | Moving pieces | Drag a piece, or tap it and tap where it goes | Both work on every device (one code path: pointer events). A press that barely moves is a tap; one that travels is a drag, with a ghost piece that rides above a finger so it is not hidden. Only squares holding a piece stop page scrolling, and only on boards where dragging is on. Escape cancels a drag. |
 | Progress | `localStorage`, wrapped in try/catch, in-memory fallback | In-app browsers sometimes block storage; the app warns instead of breaking. |

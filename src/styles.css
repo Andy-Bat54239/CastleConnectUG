@@ -768,14 +768,10 @@ textarea[readonly] {
   display: block;
   pointer-events: none;
 }
-.pc-w {
-  --pc-fill: #ffffff;
-  --pc-line: #10281f;
-}
+.pc-w,
 .pc-b {
-  --pc-fill: #26322d;
-  --pc-line: #efe7cb;
-  --pc-sw: 1.15;
+  --pc-paper: #ffffff; /* the white inside the outlined pieces, and the cut-outs of the solid ones */
+  --pc-ink: #040404; /* the logo black */
 }
 .sq.hl {
   box-shadow: inset 0 0 0 100px rgba(224, 172, 64, 0.5);

@@ -152,7 +152,7 @@ export function createBoard(opts: BoardOptions): Board {
       cell.className = cls.join(' ')
       if (letter) {
         const side = letter === letter.toUpperCase() ? 'w' : 'b'
-        cell.innerHTML = `<svg class="pc pc-${side}" viewBox="0 0 45 45" aria-hidden="true"><use href="#pc-${letter.toLowerCase()}"/></svg>`
+        cell.innerHTML = `<svg class="pc pc-${side}" viewBox="0 0 45 45" aria-hidden="true"><use href="#pc-${side}${letter.toLowerCase()}"/></svg>`
         described.push(`${pieceName(letter)} ${name}`)
       } else if (cell.firstChild) {
         cell.textContent = ''
