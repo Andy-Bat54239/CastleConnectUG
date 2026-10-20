@@ -497,19 +497,32 @@ a:focus-visible {
   border-top: 1px solid var(--line);
 }
 
-/* When the host overlays a badge in the bottom-right corner (see src/lib/hostBadge.ts), lift the lesson's
-   Back/Next row clear of it, and leave room under the content so nothing ends up hidden behind the row. */
-.host-badge .lesson-foot {
-  padding-bottom: calc(74px + env(safe-area-inset-bottom, 0px));
+/* A host badge floats in the bottom-right corner (Netlify's free plan; see src/lib/hostBadge.ts) and
+   the page notices it by adding .host-badge. Two layouts keep it off the Back/Next buttons:
+   - phones: the row is nearly full width, so lift it above the badge and leave room under the content;
+   - tablets and computers: Back and Next are far apart, so the buttons stay at the bottom and the row
+     just stops short of the badge's corner. */
+@media (max-width: 719.98px) {
+  .host-badge .lesson-foot {
+    padding-bottom: calc(74px + env(safe-area-inset-bottom, 0px));
+  }
+  .host-badge .stage {
+    padding-bottom: 188px;
+  }
+  .host-badge .fb-slot {
+    scroll-margin-bottom: 200px;
+  }
+  .host-badge main {
+    padding-bottom: 120px;
+  }
 }
-.host-badge .stage {
-  padding-bottom: 188px;
-}
-.host-badge .fb-slot {
-  scroll-margin-bottom: 200px;
-}
-.host-badge main {
-  padding-bottom: 120px;
+@media (min-width: 720px) {
+  .host-badge .lesson-foot {
+    /* The badge is about 190px wide. On a wide window the row already sits inside the page's margin, so
+       only the part of the badge that reaches into the row needs room (the max() below works that out). */
+    padding-right: calc(var(--pad) + 190px);
+    padding-right: max(var(--pad), 200px - max(0px, (100vw - var(--wrap)) / 2));
+  }
 }
 
 /* Cards */

@@ -4,7 +4,8 @@
  * an isolated frame, so our styles cannot move it). It is right where the lesson's Next button is.
  *
  * Switching the badge off in Netlify's settings is the clean fix. This detects the badge anyway, so
- * the lesson can lift its Back/Next row clear of the corner and a button is never covered.
+ * the lesson can keep its Back/Next row clear of the corner (lifted on phones, stopping short of the
+ * corner on larger screens) and a button is never covered.
  */
 export function hostBadgeShown(doc: Pick<Document, 'querySelector'>): boolean {
   return !!doc.querySelector('script[src*="/.netlify/scripts/hud"]')
