@@ -1,0 +1,405 @@
+{
+  "day": 9,
+  "title": "Building a first repertoire",
+  "level": "800-1200",
+  "blurb": "Pick a small set of openings and learn them well: the London System as White, the Caro-Kann and …d5 as Black. Then learn the traps in them, and when to keep the tension.",
+  "deeperTitle": "Common traps, and keeping the tension",
+  "share": {
+    "prompt": "One thing I learned today…"
+  },
+  "core": [
+    {
+      "type": "read",
+      "title": "A repertoire is a small plan",
+      "body": [
+        "A **repertoire** is the few openings you always play. Learn the same ideas well instead of many lines badly.",
+        "Here is a first one: the **London System** as White, the **Caro-Kann** against 1.e4, and **…d5** against 1.d4. All three are solid, easy to learn, and light on theory."
+      ]
+    },
+    {
+      "type": "choice",
+      "prompt": "How big should your first repertoire be?",
+      "options": [
+        "One set-up as White, one answer to 1.e4 and one answer to 1.d4",
+        "Twenty openings, so you are ready for everything",
+        "Only the first move. Decide the rest in the game"
+      ],
+      "answer": 0,
+      "explain": "Three small choices cover every game. You will see the same positions again and again, and that is how you get good at them."
+    },
+    {
+      "type": "read",
+      "title": "White: the London System",
+      "body": [
+        "The London is a **set-up**, not a list of moves: pawns on d4, e3 and c3, a bishop on f4, knights on f3 and d2, and a bishop on d3. You can play it against almost anything.",
+        "The bishop goes out **before** the pawn move e3."
+      ],
+      "board": {
+        "fen": "rnbqkb1r/ppp2ppp/4pn2/3p4/3P1B2/4PN2/PPP2PPP/RN1QKB1R b KQkq - 1 4",
+        "arrows": [
+          [
+            "f4",
+            "c7"
+          ]
+        ],
+        "caption": "The bishop on f4 stays outside the pawn chain and eyes c7.",
+        "assert": {
+          "attackedFrom": {
+            "f4": [
+              "c7"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "type": "choice",
+      "prompt": "White played e3 before bringing the bishop out. How many squares does the bishop on c1 attack now?",
+      "board": {
+        "fen": "rnbqkbnr/ppp1pppp/8/3p4/3P4/4P3/PPP2PPP/RNBQKBNR b KQkq - 0 2",
+        "assert": {
+          "attackCount": {
+            "c1": 3
+          }
+        }
+      },
+      "options": [
+        "3",
+        "6",
+        "9"
+      ],
+      "answer": 0,
+      "explain": "Only b2, d2 and e3, all right behind its own pawns. The pawn on e3 locked the bishop in. That is why the London plays **Bf4** first."
+    },
+    {
+      "type": "findMove",
+      "prompt": "Play the London set-up: d4, then Bf4, then e3, then Nf3. Black replies by itself.",
+      "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+      "solution": [
+        "d4",
+        "d5",
+        "Bf4",
+        "Nf6",
+        "e3",
+        "e6",
+        "Nf3"
+      ],
+      "hint": "Centre pawn, bishop out, then the pawn that closes the diagonal, then the knight.",
+      "explain": "That is the heart of the London. Next you add **c3**, **Nbd2** and **Bd3**, and castle. The same moves work against most Black set-ups."
+    },
+    {
+      "type": "spot",
+      "prompt": "Black’s bishop on d6 attacks your bishop on f4. Tap the square where your bishop should go.",
+      "board": {
+        "fen": "rnbqk2r/ppp2ppp/3bpn2/3p4/3P1B2/4PN2/PPP2PPP/RN1QKB1R w KQkq - 2 5",
+        "arrows": [
+          [
+            "d6",
+            "f4"
+          ]
+        ]
+      },
+      "targets": [
+        "g3",
+        "d6"
+      ],
+      "explain": "**Bg3** keeps the bishop, and if Black takes on g3 you recapture with the h-pawn. **Bxd6** trades it, which is fine too. Never leave the bishop on f4 to be taken for nothing."
+    },
+    {
+      "type": "findMove",
+      "prompt": "Finish the London set-up: Nbd2, c3, Bd3, and castle. Black replies by itself.",
+      "fen": "rnbq1rk1/ppp2ppp/3bpn2/3p4/3P4/4PNB1/PPP2PPP/RN1QKB1R w KQ - 4 6",
+      "solution": [
+        "Nbd2",
+        "c5",
+        "c3",
+        "Nc6",
+        "Bd3",
+        "b6",
+        "O-O"
+      ],
+      "hint": "Knight to d2, pawn to c3, bishop to d3, then castle.",
+      "explain": "Now every piece has a job: **c3** and **e3** hold the centre, the knights guard the middle, **Bd3** aims at the king, and the king is safe. You reach this against many Black set-ups."
+    },
+    {
+      "type": "findMove",
+      "prompt": "You are Black. Play the Caro-Kann: c6, then d5, take on e4, and bring the bishop out to f5.",
+      "fen": "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1",
+      "solution": [
+        "c6",
+        "d4",
+        "d5",
+        "Nc3",
+        "dxe4",
+        "Nxe4",
+        "Bf5"
+      ],
+      "hint": "Support the d5 push with a pawn move first.",
+      "explain": "**…c6** prepares **…d5**. After the trade on e4, the bishop jumps out to **f5** before you play …e6."
+    },
+    {
+      "type": "choice",
+      "prompt": "In the Caro-Kann the d-pawn has left d7. How many squares does the bishop on c8 attack here?",
+      "board": {
+        "fen": "rnbqkbnr/pp2pppp/2p5/3p4/3PP3/8/PPP2PPP/RNBQKBNR w KQkq - 0 3",
+        "assert": {
+          "attackCount": {
+            "c8": 6
+          }
+        }
+      },
+      "options": [
+        "2",
+        "6",
+        "8"
+      ],
+      "answer": 1,
+      "explain": "b7 (its own pawn), d7, e6, f5, g4 and h3. The diagonal is open, so the bishop can go outside the pawns. Compare the hemmed-in bishop on Day 8: it saw only 3."
+    },
+    {
+      "type": "spot",
+      "prompt": "Black has just taken on e4 and White recaptured. Tap the square where the c8 bishop belongs.",
+      "board": {
+        "fen": "rnbqkbnr/pp2pppp/2p5/8/3PN3/8/PPP2PPP/R1BQKBNR b KQkq - 0 4"
+      },
+      "targets": [
+        "f5"
+      ],
+      "explain": "**f5** is the classic square: the bishop looks at the whole diagonal, and it is outside the pawn chain, so …e6 will not shut it in."
+    },
+    {
+      "type": "findMove",
+      "prompt": "White tries the Advance: 3.e5. Bring the bishop out before you close the pawn chain.",
+      "fen": "rnbqkbnr/pp2pppp/2p5/3pP3/3P4/8/PPP2PPP/RNBQKBNR b KQkq - 0 3",
+      "solution": [
+        "Bf5"
+      ],
+      "hint": "Same idea as before: the c8 bishop goes outside the pawns.",
+      "explain": "**Bf5** again. After 3.e5 the pawn chain is locked, so the bishop must be outside it **before** you play …e6. The idea is the same in every Caro-Kann."
+    },
+    {
+      "type": "findMove",
+      "prompt": "You are Black against 1.d4. Play d5, Nf6, e6, and challenge White’s bishop with Bd6.",
+      "fen": "rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq - 0 1",
+      "solution": [
+        "d5",
+        "Bf4",
+        "Nf6",
+        "e3",
+        "e6",
+        "Nf3",
+        "Bd6"
+      ],
+      "hint": "Copy White’s centre first. Then knight, pawn, bishop.",
+      "explain": "The same set-up works against the London and most other 1.d4 openings. **…Bd6** offers to trade White’s best bishop."
+    },
+    {
+      "type": "read",
+      "title": "Your repertoire on one page",
+      "body": [
+        "**White:** 1.d4, then Bf4, e3, Nf3, c3, Nbd2, Bd3 and castle.",
+        "**Black against 1.e4:** 1…c6, 2…d5, and bring the bishop out before …e6.",
+        "**Black against 1.d4:** 1…d5, …Nf6, …e6, …Bd6, and castle.",
+        "Write it down and keep it by your board."
+      ]
+    },
+    {
+      "type": "puzzleSet",
+      "title": "Punish the mistake",
+      "theme": "openingMistake",
+      "ratingMin": 800,
+      "ratingMax": 1200,
+      "intro": "Both are mistakes you will see against your openings. Find the move that wins material.",
+      "puzzles": [
+        {
+          "fen": "rnbqkb1r/ppp1pppp/8/3p3n/3P1B2/4P3/PPP2PPP/RN1QKBNR w KQkq - 1 4",
+          "solution": [
+            "Qxh5"
+          ],
+          "wins": 3,
+          "hint": "After e3 your queen can see a long way. What is on h5?",
+          "explain": "**3.e3** opened the diagonal from d1 to h5. Black’s …Nh5 hoped to take your bishop, but it left the knight hanging: **Qxh5** wins it."
+        },
+        {
+          "fen": "r1bq1rk1/pp1n1ppp/3bpn2/2pp4/3P4/2P1PNB1/PP1N1PPP/R2QKB1R w KQ - 1 8",
+          "solution": [
+            "Bxd6"
+          ],
+          "wins": 3,
+          "hint": "Which black piece lost its defender?",
+          "explain": "The bishop on d6 was defended only by the queen along the d-file. **…Nbd7** stepped in the way, so **Bxd6** wins a piece."
+        }
+      ]
+    }
+  ],
+  "deeper": [
+    {
+      "type": "read",
+      "title": "Traps are mistakes waiting to happen",
+      "body": [
+        "A **trap** is a natural-looking move that loses. Most come from the same two mistakes: leaving a piece undefended, or missing a threat that looks harmless.",
+        "Know the traps in **your own** openings. They protect you, and sometimes they win you a game."
+      ]
+    },
+    {
+      "type": "findMove",
+      "prompt": "You are Black in the Caro-Kann. White’s queen has just gone to e2. White threatens a smothered checkmate. Find a move that stops it.",
+      "fen": "r1bqkbnr/pp1npppp/2p5/8/3PN3/8/PPP1QPPP/R1B1KBNR b KQkq - 2 5",
+      "goal": "avoidMate",
+      "hint": "The queen pins the pawn on e7, so a knight check on d6 cannot be taken. Give your king a square, or stop the knight.",
+      "explain": "White threatens **Nd6#**: the pawn on e7 is pinned to the king, and the king is boxed in by its own pieces. **…e6**, **…Nb6**, **…Ndf6** and **…Qc7** all stop it. Most other moves, including the natural-looking **…Ngf6**, walk straight into it."
+    },
+    {
+      "type": "findMove",
+      "prompt": "Black has just played Ngf6. Finish the game.",
+      "fen": "r1bqkb1r/pp1npppp/2p2n2/8/3PN3/8/PPP1QPPP/R1B1KBNR w KQkq - 3 6",
+      "goal": "mate",
+      "hint": "A knight check that cannot be taken, because the pawn is pinned.",
+      "explain": "**Nd6#**. The queen on e2 pins the e7 pawn, so it cannot take the knight, and Black’s own pieces cover every square the king could use."
+    },
+    {
+      "type": "read",
+      "title": "Keeping the tension",
+      "body": [
+        "Two pawns **attack each other** when each could take the other. That is **tension**. You do not have to capture. Often the side that captures first helps the other: a file opens, or the recapture is better.",
+        "Count first. If your pawn is defended enough, let your opponent decide."
+      ],
+      "board": {
+        "fen": "rnbq1rk1/pp3ppp/3bpn2/2pp4/3P4/4PNB1/PPPN1PPP/R2QKB1R w KQ - 0 7",
+        "arrows": [
+          [
+            "c5",
+            "d4"
+          ],
+          [
+            "d4",
+            "c5"
+          ]
+        ],
+        "caption": "The pawns on c5 and d4 attack each other.",
+        "assert": {
+          "attackedFrom": {
+            "c5": [
+              "d4"
+            ],
+            "d4": [
+              "c5"
+            ]
+          },
+          "counts": {
+            "d4": {
+              "attackers": 1,
+              "defenders": 2
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "choice",
+      "prompt": "Black’s c5 attacks your d4 pawn. It is attacked once and defended twice. What is the best plan?",
+      "board": {
+        "fen": "rnbq1rk1/pp3ppp/3bpn2/2pp4/3P4/4PNB1/PPPN1PPP/R2QKB1R w KQ - 0 7",
+        "assert": {
+          "counts": {
+            "d4": {
+              "attackers": 1,
+              "defenders": 2
+            }
+          }
+        }
+      },
+      "options": [
+        "Keep the tension and play c3 to support d4",
+        "Take on c5 at once",
+        "Push the pawn to d5"
+      ],
+      "answer": 0,
+      "explain": "The pawn is safe, so there is no need to take. **c3** adds a third defender and builds your set-up. Taking on c5 gives up your central pawn and lets Black recapture and develop at the same time."
+    },
+    {
+      "type": "puzzleSet",
+      "title": "Mistakes in your openings",
+      "theme": "openingMistake",
+      "ratingMin": 800,
+      "ratingMax": 1200,
+      "intro": "Early queen moves are the most common mistake. Take what is on offer.",
+      "puzzles": [
+        {
+          "fen": "rnb1kbnr/ppp1pppp/3q4/3p4/3P1B2/8/PPP1PPPP/RN1QKBNR w KQkq - 2 3",
+          "solution": [
+            "Bxd6"
+          ],
+          "wins": 6,
+          "hint": "Your bishop on f4 sees the black queen.",
+          "explain": "The London bishop attacks d6 along its diagonal. **Bxd6** wins the queen for a bishop."
+        },
+        {
+          "fen": "rnb1kbnr/pp2pppp/2pq4/8/3PN3/8/PPP2PPP/R1BQKBNR w KQkq - 1 5",
+          "solution": [
+            "Nxd6+"
+          ],
+          "wins": 6,
+          "hint": "A knight check that takes something.",
+          "explain": "The knight on e4 attacks d6. **Nxd6+** takes the queen with check."
+        },
+        {
+          "fen": "rn1qkbnr/pp2pppp/2p5/3p1b2/3PP3/2N5/PPP2PPP/R1BQKBNR w KQkq - 2 4",
+          "solution": [
+            "exf5"
+          ],
+          "wins": 3,
+          "hint": "Black’s bishop is not defended.",
+          "explain": "Black brought the bishop out before taking on e4, and it is attacked by the e4 pawn. In the Caro-Kann the bishop goes to f5 **after** …dxe4."
+        }
+      ]
+    },
+    {
+      "type": "puzzleSet",
+      "title": "Famous opening traps",
+      "theme": "opening traps",
+      "ratingMin": 600,
+      "ratingMax": 1000,
+      "intro": "A king stuck in the middle is in danger. These are the traps that punish it. The second one is a classic.",
+      "puzzles": [
+        {
+          "fen": "r1b1kbnr/pppp1Npp/8/8/3nq3/8/PPPPBP1P/RNBQKR2 b Qkq - 1 7",
+          "solution": [
+            "Nf3#"
+          ],
+          "hint": "The white king cannot move. Check from a knight cannot be blocked.",
+          "explain": "White's own pieces boxed the king in, and a knight's check cannot be blocked."
+        },
+        {
+          "fen": "rn1qkbnr/ppp2p1p/3p2p1/4N3/2B1P3/2N5/PPPP1PPP/R1BbK2R w KQkq - 0 6",
+          "solution": [
+            "Bxf7+",
+            "Ke7",
+            "Nd5#"
+          ],
+          "hint": "Black has just taken your queen. Start with a check.",
+          "explain": "This is **Légal's mate**. White gave up the queen so that Black's king would have to step into a net made of minor pieces."
+        }
+      ]
+    },
+    {
+      "type": "findMove",
+      "prompt": "You are Black. White threatens Qxf7 checkmate. Stop it.",
+      "fen": "r1bqkbnr/pppp1ppp/2n5/4p2Q/2B1P3/8/PPPP1PPP/RNB1K1NR b KQkq - 3 3",
+      "goal": "avoidMate",
+      "hint": "Defend f7, or chase the queen away.",
+      "explain": "The simplest answers are **Qe7** or **Nh6**, which defend f7, or **g6**, which kicks the queen. Nf6 looks active, but it leaves f7 hanging."
+    },
+    {
+      "type": "choice",
+      "prompt": "Before every move in the opening, what should you ask?",
+      "options": [
+        "Checks, captures and attacks, for me and for my opponent",
+        "Which trap can I set?",
+        "How fast can I castle?"
+      ],
+      "answer": 0,
+      "explain": "The checklist from Day 6 protects you from traps and finds them for you. Most traps are only a check, a capture or an attack that someone missed."
+    }
+  ]
+}
