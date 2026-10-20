@@ -153,4 +153,9 @@ export interface CourseConfig {
   challengeName: string
   /** Where the "join the Sunday KO" style links would go. Optional. */
   groupNote?: string
+  /**
+   * When true, every day is open regardless of the date (for trying things out, or before the real
+   * start). Set it to false, or remove it, for the real challenge so days unlock one per day.
+   */
+  unlockAll?: boolean
 }

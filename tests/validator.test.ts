@@ -106,6 +106,14 @@ describe('content validator', () => {
     expect(r.out).toContain('not in danger')
   })
 
+  it('rejects an unlockAll that is not true or false', () => {
+    const dir = dayWith([{ type: 'read', title: 't', body: 'b' }])
+    writeFileSync(join(dir, 'config.json'), JSON.stringify({ startDate: '2026-10-26T00:00:00+03:00', challengeName: 'x', unlockAll: 'yes' }))
+    const r = run(dir)
+    expect(r.code).toBe(1)
+    expect(r.out).toContain('unlockAll must be true or false')
+  })
+
   it('catches a mistyped field name', () => {
     const r = run(dayWith([{ type: 'findMove', prompt: 'x', fen: MATE_FEN, solutoin: ['Qg7#'], goal: 'mate', explain: 'x' }]))
     expect(r.code).toBe(1)

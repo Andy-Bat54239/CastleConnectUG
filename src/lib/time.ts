@@ -25,6 +25,20 @@ export function isOpen(nowMs: number, startMs: number, day: number): boolean {
   return nowMs >= unlockAt(startMs, day)
 }
 
+export interface OpenRules {
+  nowMs: number
+  startMs: number
+  /** Config switch: every day is open whatever the date. */
+  unlockAll?: boolean
+  /** The ?preview=1 link: every day is open for whoever opened that link. */
+  preview?: boolean
+}
+
+/** Is this day open? The one place that answers, so the home screen and the lesson screen never disagree. */
+export function dayOpen(day: number, r: OpenRules): boolean {
+  return !!r.unlockAll || !!r.preview || isOpen(r.nowMs, r.startMs, day)
+}
+
 /** 0 before the challenge starts, 1..totalDays during it, totalDays + 1 once it is over. */
 export function currentDay(nowMs: number, startMs: number, totalDays: number): number {
   if (nowMs < startMs) return 0

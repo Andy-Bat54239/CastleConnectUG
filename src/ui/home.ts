@@ -1,6 +1,6 @@
 import { course, curriculum, hasDay, TOTAL_DAYS } from '../lib/content'
 import * as store from '../lib/store'
-import { currentDay, formatDate, getNow, isOpen, isPreview, parseStart, unlockAt } from '../lib/time'
+import { currentDay, dayOpen, formatDate, getNow, isPreview, parseStart, unlockAt } from '../lib/time'
 import { button, h } from './dom'
 
 const PARTS: [string, string][] = [
@@ -13,13 +13,34 @@ const PARTS: [string, string][] = [
 export function mountHome(root: HTMLElement): void {
   const startMs = parseStart(course.startDate)
   const now = getNow()
-  const preview = isPreview()
-  const today = currentDay(now, startMs, TOTAL_DAYS)
+  const unlockAll = !!course.unlockAll
+  const isOpenDay = (day: number) => dayOpen(day, { nowMs: now, startMs, unlockAll, preview: isPreview() })
+  // With a date-locked challenge "today" is the calendar day. With everything open there is no
+  // "today", so we point at the first lesson that is written and not finished yet.
+  const next = curriculum.find((e) => hasDay(e.day) && !store.isCoreDone(e.day))?.day ?? 0
+  const today = unlockAll ? next : currentDay(now, startMs, TOTAL_DAYS)
   const done = store.doneCount()
 
   // The headline: what should I do right now?
   const hero = h('section', { class: 'hero' })
-  if (today === 0) {
+  if (unlockAll) {
+    if (today > 0) {
+      const entry = curriculum[today - 1]
+      const started = store.getDay(today).pos.core > 0
+      hero.append(
+        h('p', { class: 'kicker' }, `${started ? 'Pick up where you left off' : 'Up next'} · Day ${today} of ${TOTAL_DAYS}`),
+        h('h1', null, entry.title),
+        h('p', { class: 'lead' }, 'All the days are open, so go at your own pace. About fifteen minutes a day: learn, solve, play, then share one line.'),
+        button(started ? 'Continue the lesson' : 'Start the lesson', 'btn', () => (location.hash = `#/day/${today}`)),
+      )
+    } else {
+      hero.append(
+        h('p', { class: 'kicker' }, 'All caught up'),
+        h('h1', null, `You have finished ${done} lesson${done === 1 ? '' : 's'} so far`),
+        h('p', { class: 'lead' }, 'More days are on the way. Go back through any lesson whenever you like.'),
+      )
+    }
+  } else if (today === 0) {
     hero.append(
       h('p', { class: 'kicker' }, 'Starting soon'),
       h('h1', null, 'The Bridge Grind starts ' + formatDate(startMs)),
@@ -46,7 +67,7 @@ export function mountHome(root: HTMLElement): void {
     'div',
     { class: 'track', role: 'img', 'aria-label': `${done} of ${TOTAL_DAYS} days done` },
     ...curriculum.map((e) => {
-      const open = preview || isOpen(now, startMs, e.day)
+      const open = isOpenDay(e.day)
       const cls = 'pip' + (store.isCoreDone(e.day) ? ' done' : open ? ' open' : '') + (e.day === today ? ' now' : '')
       return h('span', { class: cls }, String(e.day))
     }),
@@ -54,7 +75,7 @@ export function mountHome(root: HTMLElement): void {
 
   const list = h('ol', { class: 'days' })
   for (const e of curriculum) {
-    const open = preview || isOpen(now, startMs, e.day)
+    const open = isOpenDay(e.day)
     const ready = hasDay(e.day)
     const coreDone = store.isCoreDone(e.day)
     let tag = ''
@@ -69,7 +90,7 @@ export function mountHome(root: HTMLElement): void {
       tag = 'Coming soon'
       tagCls += ' lock'
     } else {
-      tag = e.day === today ? 'Today' : 'Open'
+      tag = e.day === today ? (unlockAll ? 'Up next' : 'Today') : 'Open'
       tagCls += ' open'
     }
     const body = [

@@ -1,7 +1,7 @@
 import type { Card, DayContent } from '../types'
 import { course, loadDay } from '../lib/content'
 import * as store from '../lib/store'
-import { formatDate, getNow, isOpen, isPreview, parseStart, unlockAt } from '../lib/time'
+import { dayOpen, formatDate, getNow, isPreview, parseStart, unlockAt } from '../lib/time'
 import { buildMessage, shareText, waLink } from '../lib/share'
 import { renderCard, scoredKeys, type CardView } from './cards'
 import { button, h } from './dom'
@@ -37,7 +37,7 @@ export async function mountDay(root: HTMLElement, day: number, current: () => bo
   root.replaceChildren(h('p', { class: 'loading' }, 'Loading…'))
 
   const startMs = parseStart(course.startDate)
-  if (!isPreview() && !isOpen(getNow(), startMs, day)) {
+  if (!dayOpen(day, { nowMs: getNow(), startMs, unlockAll: course.unlockAll, preview: isPreview() })) {
     const at = unlockAt(startMs, day)
     root.replaceChildren(notice(`Day ${day} is not open yet`, `It opens on ${formatDate(at)} at midnight, Kampala time. Come back then.`, home))
     return

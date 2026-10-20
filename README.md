@@ -32,6 +32,23 @@ Add these to the address. They only affect the page you opened, so they are safe
 
 Example: `https://your-site/?preview=1#/review/3`
 
+## Open all days, or lock them by date
+
+`content/config.json` has a switch for this:
+
+```json
+{ "startDate": "2026-10-26T00:00:00+03:00", "challengeName": "Bridge Grind", "unlockAll": true }
+```
+
+- `"unlockAll": true` (the current setting): every day is open now, whatever the date. The home
+  screen points at the next unfinished lesson instead of "today". Days whose lessons are not written
+  yet show "Coming soon".
+- `"unlockAll": false` (or delete the line): the real challenge. Day 1 opens at midnight Kampala
+  time on `startDate` and one more day opens every 24 hours.
+
+Change it, commit and push, and Netlify redeploys. Use `true` or `false` without quotes; the
+validator rejects anything else.
+
 ## Set the start date
 
 Edit `content/config.json`:

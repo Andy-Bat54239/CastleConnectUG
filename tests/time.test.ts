@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { currentDay, formatDate, formatTime, getNow, isOpen, isPreview, parseStart, unlockAt } from '../src/lib/time'
+import { currentDay, dayOpen, formatDate, formatTime, getNow, isOpen, isPreview, parseStart, unlockAt } from '../src/lib/time'
 
 const START = parseStart('2026-10-26T00:00:00+03:00') // Monday, midnight in Kampala
 
@@ -28,6 +28,30 @@ describe('Kampala unlock times', () => {
     expect(currentDay(Date.parse('2026-10-26T09:00:00+03:00'), START, 14)).toBe(1)
     expect(currentDay(Date.parse('2026-11-08T23:59:00+03:00'), START, 14)).toBe(14)
     expect(currentDay(Date.parse('2026-11-09T00:00:00+03:00'), START, 14)).toBe(15)
+  })
+})
+
+describe('which days are open', () => {
+  const before = Date.parse('2026-10-20T12:00:00+03:00') // six days before the start
+  const during = Date.parse('2026-10-27T12:00:00+03:00') // day 2
+
+  it('locks future days by date, as in the real challenge', () => {
+    expect(dayOpen(1, { nowMs: before, startMs: START })).toBe(false)
+    expect(dayOpen(2, { nowMs: during, startMs: START })).toBe(true)
+    expect(dayOpen(3, { nowMs: during, startMs: START })).toBe(false)
+  })
+
+  it('opens every day when unlockAll is on, even before the start date', () => {
+    for (let d = 1; d <= 14; d++) expect(dayOpen(d, { nowMs: before, startMs: START, unlockAll: true })).toBe(true)
+  })
+
+  it('opens every day for a ?preview=1 link', () => {
+    expect(dayOpen(9, { nowMs: before, startMs: START, preview: true })).toBe(true)
+  })
+
+  it('goes back to locking by date when unlockAll is false or missing', () => {
+    expect(dayOpen(3, { nowMs: during, startMs: START, unlockAll: false })).toBe(false)
+    expect(dayOpen(3, { nowMs: during, startMs: START, unlockAll: undefined })).toBe(false)
   })
 })
 

@@ -369,6 +369,9 @@ if (!isStr(config.startDate) || Number.isNaN(Date.parse(config.startDate as stri
   err('startDate must look like 2026-10-26T00:00:00+03:00 (midnight Kampala time)')
 }
 if (isStr(config.startDate) && !String(config.startDate).includes('T00:00:00')) warn('startDate is not midnight; days open at that time of day')
+onlyKeys(config, ['startDate', 'challengeName', 'groupNote', 'unlockAll'])
+if (config.unlockAll !== undefined && typeof config.unlockAll !== 'boolean') err('unlockAll must be true or false (no quotes)')
+if (config.unlockAll === true) console.log('Note: unlockAll is on, so every day is open whatever the date. Set it to false for the real challenge.')
 
 const files = readdirSync(ROOT).filter((f) => /^day-\d\d\.json$/.test(f)).sort()
 console.log(`Checking ${files.length} day file(s)…`)
