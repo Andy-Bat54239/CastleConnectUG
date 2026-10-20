@@ -1,0 +1,462 @@
+{
+  "day": 10,
+  "title": "Gambits",
+  "level": "800-1200",
+  "blurb": "A gambit gives up a pawn for time. Learn how to play two classic gambits, how to defend against them without being greedy, and how to spot a poisoned pawn.",
+  "deeperTitle": "When not to accept; trap patterns",
+  "share": {
+    "prompt": "One thing I learned today…"
+  },
+  "core": [
+    {
+      "type": "read",
+      "title": "A gambit pays a pawn for time",
+      "body": [
+        "A **gambit** is an opening where you give up a pawn (or two) on purpose. You want something worth more: faster development, open lines, or an attack.",
+        "The price is material. What you buy is **time**."
+      ],
+      "board": {
+        "fen": "rnbqkbnr/pppp1ppp/8/8/2B1P3/8/PB3PPP/RN1QK1NR b KQkq - 0 5",
+        "caption": "The Danish Gambit: White is two pawns down, but two bishops are out and Black has developed nothing.",
+        "assert": {
+          "materialDiff": -2,
+          "developed": {
+            "w": 2,
+            "b": 0
+          }
+        }
+      }
+    },
+    {
+      "type": "choice",
+      "prompt": "In this position White is two pawns down. What did White get for them?",
+      "board": {
+        "fen": "rnbqkbnr/pppp1ppp/8/8/2B1P3/8/PB3PPP/RN1QK1NR b KQkq - 0 5",
+        "assert": {
+          "materialDiff": -2,
+          "developed": {
+            "w": 2,
+            "b": 0
+          }
+        }
+      },
+      "options": [
+        "Two bishops out and a lead in development",
+        "A safer king and a better pawn structure",
+        "Nothing: it is simply a mistake"
+      ],
+      "answer": 0,
+      "explain": "Count the pieces: White has two bishops out and Black has none. That lead in time is what the pawns bought."
+    },
+    {
+      "type": "findMove",
+      "prompt": "Play the Danish Gambit as White: e4, d4, c3, then Bc4 and take back on b2. Black replies by itself.",
+      "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+      "solution": [
+        "e4",
+        "e5",
+        "d4",
+        "exd4",
+        "c3",
+        "dxc3",
+        "Bc4",
+        "cxb2",
+        "Bxb2"
+      ],
+      "hint": "Open the centre with d4, offer the c-pawn, then bring the bishops out.",
+      "explain": "**d4** and **c3** offer two pawns. Black takes them, and **Bc4** and **Bxb2** bring both bishops out with tempo."
+    },
+    {
+      "type": "read",
+      "title": "Keep the initiative",
+      "body": [
+        "After the pawns are gone, **do not waste moves winning them back**. Develop the next piece, castle, and bring the queen and rooks in while Black is still behind.",
+        "Here both bishops aim at Black’s kingside. If Black loses time, the attack lands."
+      ],
+      "board": {
+        "fen": "rnbqkbnr/pppp1ppp/8/8/2B1P3/8/PB3PPP/RN1QK1NR b KQkq - 0 5",
+        "arrows": [
+          [
+            "b2",
+            "g7"
+          ],
+          [
+            "c4",
+            "f7"
+          ]
+        ],
+        "caption": "The bishops aim at g7 and f7.",
+        "assert": {
+          "attackedFrom": {
+            "b2": [
+              "g7"
+            ],
+            "c4": [
+              "f7"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "type": "choice",
+      "prompt": "You are Black, and White is offering pawns. What is the best plan?",
+      "options": [
+        "Develop, castle, and give a pawn back when it stops the attack",
+        "Take every pawn White offers and keep them all",
+        "Bring the queen out and attack at once"
+      ],
+      "answer": 0,
+      "explain": "Keep your king safe and your pieces out. Giving a pawn back is fine if it opens the game and stops the attack. Greed and early queen moves are how Black loses to gambits."
+    },
+    {
+      "type": "findMove",
+      "prompt": "You are Black. White has two bishops aimed at your kingside. Strike back in the centre.",
+      "fen": "rnbqkbnr/pppp1ppp/8/8/2B1P3/8/PB3PPP/RN1QK1NR b KQkq - 0 5",
+      "solution": [
+        "d5"
+      ],
+      "accept": [
+        "Nf6"
+      ],
+      "hint": "Challenge the pawn on e4, and block the bishop on c4.",
+      "explain": "**…d5** hits the centre and challenges the bishop on c4, giving a pawn back to open the game. **…Nf6** also develops and attacks e4. Do not grab more pawns or move the queen."
+    },
+    {
+      "type": "findMove",
+      "prompt": "Now a second gambit, the Evans Gambit: play e4, Nf3, Bc4, and then offer the b-pawn with b4.",
+      "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+      "solution": [
+        "e4",
+        "e5",
+        "Nf3",
+        "Nc6",
+        "Bc4",
+        "Bc5",
+        "b4"
+      ],
+      "hint": "It is the Italian Game plus one extra move.",
+      "explain": "**b4** attacks the bishop on c5. If Black takes, **c3** and **d4** build a big centre with tempo."
+    },
+    {
+      "type": "spot",
+      "prompt": "White has just played b4. Tap the black piece that the b4 pawn attacks.",
+      "board": {
+        "fen": "r1bqk1nr/pppp1ppp/2n5/2b1p3/1PB1P3/5N2/P1PP1PPP/RNBQK2R b KQkq - 0 4",
+        "arrows": [
+          [
+            "b4",
+            "c5"
+          ]
+        ]
+      },
+      "targets": [
+        "c5"
+      ],
+      "verify": {
+        "kind": "attackedBy",
+        "square": "b4"
+      },
+      "explain": "The pawn attacks the bishop on **c5**. That is the offer: if the bishop takes on b4, White gets time to build a centre."
+    },
+    {
+      "type": "choice",
+      "prompt": "After the Evans Gambit White is a pawn down. What does White get for it?",
+      "board": {
+        "fen": "r1bqk1nr/pppp1ppp/2n5/b3p3/2BPP3/2P2N2/P4PPP/RNBQK2R b KQkq - 0 6",
+        "assert": {
+          "materialDiff": -1,
+          "space": {
+            "w": 10,
+            "b": 5
+          }
+        }
+      },
+      "options": [
+        "A big centre with pawns on c3, d4 and e4, and more space",
+        "A safer king",
+        "Nothing at all"
+      ],
+      "answer": 0,
+      "explain": "White attacks 10 squares on Black’s half of the board and Black only 5. The pawn bought a strong centre and open lines for the bishops."
+    },
+    {
+      "type": "findMove",
+      "prompt": "You are Black. White offers the Evans Gambit. Take the pawn, move the bishop out of danger, and hold the centre.",
+      "fen": "r1bqk1nr/pppp1ppp/2n5/2b1p3/1PB1P3/5N2/P1PP1PPP/RNBQK2R b KQkq - 0 4",
+      "solution": [
+        "Bxb4",
+        "c3",
+        "Ba5",
+        "d4",
+        "d6"
+      ],
+      "hint": "After c3 your bishop is attacked. Keep it, and stop White’s centre.",
+      "explain": "**…Bxb4** takes the pawn, **…Ba5** keeps the bishop, and **…d6** supports the centre and gives White nothing to attack."
+    },
+    {
+      "type": "puzzleSet",
+      "title": "Careless checks and greedy moves",
+      "theme": "gambitMistake",
+      "ratingMin": 800,
+      "ratingMax": 1200,
+      "intro": "Black breaks a basic rule in each of these. Take what is on offer.",
+      "puzzles": [
+        {
+          "fen": "rnb1kbnr/pppp1ppp/8/8/4Pp1q/5N2/PPPP2PP/RNBQKB1R w KQkq - 2 4",
+          "solution": [
+            "Nxh4"
+          ],
+          "wins": 9,
+          "hint": "Before giving a check, ask what can capture the checking piece.",
+          "explain": "In the King’s Gambit, Black’s **…Qh4+** looks scary, but the knight on f3 attacks h4. **Nxh4** wins the queen."
+        },
+        {
+          "fen": "rnbqkb1r/pppp2pp/5n2/4pP1Q/8/8/PPPP1PPP/RNB1KBNR b KQkq - 2 4",
+          "solution": [
+            "Nxh5"
+          ],
+          "wins": 9,
+          "hint": "You are Black, and you are in check. Can anything take the checking piece?",
+          "explain": "White’s **Qh5+** is a check, but your knight on f6 attacks h5. **Nxh5** takes the queen. Never give a check that can simply be taken."
+        },
+        {
+          "fen": "r1b1kbnr/pppp1ppp/2n5/4p3/2B1P2q/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4",
+          "solution": [
+            "Nxh4"
+          ],
+          "wins": 9,
+          "hint": "The queen came out too early. Which of your pieces can reach her?",
+          "explain": "The knight on f3 guards h4, so the early queen move simply loses her. **Nxh4**."
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "prompt": "When is a gambit a good idea?",
+      "options": [
+        "When you know the lines well and your opponent may not",
+        "Always, because pawns do not matter",
+        "Never"
+      ],
+      "answer": 0,
+      "explain": "A gambit works when you know the plan and keep up the pressure. Pawns do matter, so do not play a gambit you have not learned."
+    }
+  ],
+  "deeper": [
+    {
+      "type": "read",
+      "title": "Not every pawn is free",
+      "body": [
+        "A pawn is **poisoned** when taking it costs you something bigger. The offer looks like a gift, but your king, your queen or a piece is in danger afterwards.",
+        "Before you take, ask the checklist: after I take, what can they **check, capture or attack**?"
+      ]
+    },
+    {
+      "type": "findMove",
+      "prompt": "Black took a pawn on c4 and tried to hold it with …b5. After a4 c6 axb5 cxb5, find White’s winning move.",
+      "fen": "rnbqkbnr/p3pppp/8/1p6/2pP4/4P3/1P3PPP/RNBQKBNR w KQkq - 0 6",
+      "solution": [
+        "Qf3"
+      ],
+      "wins": 3,
+      "hint": "Look at the long diagonal and at the f7 pawn. Which squares can one queen move attack at once?",
+      "explain": "**Qf3** attacks the rook on a8 and the pawn on f7 at the same time, and Black cannot defend both. Taking and then holding a gambit pawn with …b5 was the mistake."
+    },
+    {
+      "type": "choice",
+      "prompt": "Black has taken the pawn on c4. How many white pieces attack it, and how many black pieces defend it?",
+      "board": {
+        "fen": "rnbqkbnr/ppp1pppp/8/8/2pP4/4P3/PP3PPP/RNBQKBNR b KQkq - 0 3",
+        "arrows": [
+          [
+            "f1",
+            "c4"
+          ]
+        ],
+        "assert": {
+          "counts": {
+            "c4": {
+              "attackers": 1,
+              "defenders": 0
+            }
+          }
+        }
+      },
+      "options": [
+        "Attacked once, defended by nothing",
+        "Attacked once, defended once",
+        "Not attacked at all"
+      ],
+      "answer": 0,
+      "explain": "The bishop on f1 attacks the pawn and nothing defends it. Black cannot hold it by simple means, so the sensible plan is to develop and let White take it back."
+    },
+    {
+      "type": "findMove",
+      "prompt": "You are Black in the Queen’s Gambit. You took on c4, and White played e3. What is the safe plan?",
+      "fen": "rnbqkbnr/ppp1pppp/8/8/2pP4/4P3/PP3PPP/RNBQKBNR b KQkq - 0 3",
+      "solution": [
+        "Nf6"
+      ],
+      "accept": [
+        "e6"
+      ],
+      "hint": "Do not try to hold the pawn. Develop a piece.",
+      "explain": "**…Nf6** (or **…e6**) develops and lets White take the pawn back. Trying to keep it with …b5 runs into a4 and a lot of trouble."
+    },
+    {
+      "type": "read",
+      "title": "Trap patterns",
+      "body": [
+        "Three patterns catch people again and again. A **greedy pawn grab** that leaves a piece loose. A **queen check** that can be taken. A **pinned pawn** that cannot capture, as in the Caro-Kann trap on Day 9.",
+        "Most traps are only a check, a capture or an attack that someone missed."
+      ]
+    },
+    {
+      "type": "puzzleSet",
+      "title": "Poisoned pawns",
+      "theme": "poisoned pawn",
+      "ratingMin": 800,
+      "ratingMax": 1200,
+      "intro": "Each pawn here looked free. See what taking it costs.",
+      "puzzles": [
+        {
+          "fen": "rnbqkbnr/p3pppp/8/1p6/2pP4/4P3/1P3PPP/RNBQKBNR w KQkq - 0 6",
+          "solution": [
+            "Qf3"
+          ],
+          "wins": 3,
+          "hint": "One queen move, two targets.",
+          "explain": "**Qf3** hits a8 and f7. Black’s extra pawns are not worth a rook."
+        },
+        {
+          "fen": "rnbqkbnr/1p3ppp/4p3/2Pp4/1P6/8/P3PPPP/RNBQKBNR b KQkq - 0 6",
+          "solution": [
+            "Qf6"
+          ],
+          "wins": 3,
+          "hint": "You are Black. Look along the long diagonal and at the f2 pawn.",
+          "explain": "The same trap from Black’s side: **Qf6** hits a1 and f2 at once."
+        }
+      ]
+    },
+    {
+      "type": "puzzleSet",
+      "title": "Mistakes in your openings",
+      "theme": "openingMistake",
+      "ratingMin": 800,
+      "ratingMax": 1200,
+      "intro": "Early queen moves are the most common mistake. Take what is on offer.",
+      "puzzles": [
+        {
+          "fen": "rnb1kbnr/ppp1pppp/3q4/3p4/3P1B2/8/PPP1PPPP/RN1QKBNR w KQkq - 2 3",
+          "solution": [
+            "Bxd6"
+          ],
+          "wins": 6,
+          "hint": "Your bishop on f4 sees the black queen.",
+          "explain": "The London bishop attacks d6 along its diagonal. **Bxd6** wins the queen for a bishop."
+        },
+        {
+          "fen": "rnb1kbnr/pp2pppp/2pq4/8/3PN3/8/PPP2PPP/R1BQKBNR w KQkq - 1 5",
+          "solution": [
+            "Nxd6+"
+          ],
+          "wins": 6,
+          "hint": "A knight check that takes something.",
+          "explain": "The knight on e4 attacks d6. **Nxd6+** takes the queen with check."
+        },
+        {
+          "fen": "rn1qkbnr/pp2pppp/2p5/3p1b2/3PP3/2N5/PPP2PPP/R1BQKBNR w KQkq - 2 4",
+          "solution": [
+            "exf5"
+          ],
+          "wins": 3,
+          "hint": "Black’s bishop is not defended.",
+          "explain": "Black brought the bishop out before taking on e4, and it is attacked by the e4 pawn. In the Caro-Kann the bishop goes to f5 **after** …dxe4."
+        }
+      ]
+    },
+    {
+      "type": "puzzleSet",
+      "title": "Pins and skewers",
+      "theme": "pin and skewer",
+      "ratingMin": 500,
+      "ratingMax": 900,
+      "intro": "Three skewers and a pinned piece to win. Look for pieces that stand in a line.",
+      "puzzles": [
+        {
+          "fen": "q7/p4ppp/8/3k4/8/8/PP3P1P/3B2K1 w - - 0 1",
+          "solution": [
+            "Bf3+"
+          ],
+          "wins": 8,
+          "after": {
+            "lines": [
+              {
+                "kind": "skewer",
+                "attacker": "f3",
+                "front": "d5",
+                "back": "a8"
+              }
+            ]
+          },
+          "hint": "Check the king along the long diagonal. The queen is on the same line.",
+          "explain": "**Bf3+** checks the king, and the queen on a8 is behind it on the same diagonal. The king must move, and then the bishop takes the queen."
+        },
+        {
+          "fen": "8/pp6/8/8/3k2r1/8/5P1P/R6K w - - 0 1",
+          "solution": [
+            "Ra4+"
+          ],
+          "wins": 5,
+          "after": {
+            "lines": [
+              {
+                "kind": "skewer",
+                "attacker": "a4",
+                "front": "d4",
+                "back": "g4"
+              }
+            ]
+          },
+          "hint": "The rook checks along the 4th rank, with the other rook at the end of it.",
+          "explain": "**Ra4+** checks the king along the 4th rank. When the king steps away, your rook takes the rook on g4."
+        },
+        {
+          "fen": "1r4k1/pp3p1p/8/8/2K5/8/PP3PPP/2R5 b - - 0 1",
+          "solution": [
+            "Rc8+"
+          ],
+          "wins": 5,
+          "after": {
+            "lines": [
+              {
+                "kind": "skewer",
+                "attacker": "c8",
+                "front": "c4",
+                "back": "c1"
+              }
+            ]
+          },
+          "hint": "You are Black. Check the king along the file where the white rook stands.",
+          "explain": "**Rc8+** checks the king along the c-file, and the white rook is behind it. After the king moves, the rook takes the rook."
+        },
+        {
+          "fen": "4k3/ppp2ppp/8/3p4/1b6/2N5/1P3PPP/4K3 b - - 0 1",
+          "solution": [
+            "d4"
+          ],
+          "wins": 2,
+          "after": {
+            "attacked": [
+              "c3"
+            ]
+          },
+          "hint": "You are Black. The knight on c3 is pinned to its king. Attack it with a pawn.",
+          "explain": "The white knight is pinned by the bishop on b4. **d4** attacks it, and it cannot move away, so you win a knight for a pawn."
+        }
+      ]
+    }
+  ]
+}
