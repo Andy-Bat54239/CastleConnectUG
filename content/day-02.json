@@ -1,0 +1,239 @@
+{
+  "day": 2,
+  "title": "Opening principles",
+  "level": "0-800",
+  "blurb": "Three simple ideas get you through the first ten moves: fight for the centre, bring your pieces out, and castle.",
+  "deeperTitle": "Why pick one opening; first ideas for White and Black",
+  "share": { "prompt": "One thing I learned today…" },
+  "core": [
+    {
+      "type": "read",
+      "title": "Three jobs for the first moves",
+      "body": [
+        "Every game starts the same way. A good start follows three ideas:",
+        "**Centre.** Fight for the four middle squares.",
+        "**Develop.** Bring your knights and bishops out into the game.",
+        "**Castle.** Tuck your king away and wake up a rook."
+      ],
+      "board": {
+        "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+        "highlight": ["d4", "e4", "d5", "e5"],
+        "caption": "The four centre squares."
+      }
+    },
+    {
+      "type": "spot",
+      "prompt": "Tap any one of the four centre squares.",
+      "board": { "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1" },
+      "targets": ["d4", "e4", "d5", "e5"],
+      "explain": "**d4, e4, d5 and e5.** Pieces standing here can see the most of the board."
+    },
+    {
+      "type": "read",
+      "title": "Why the centre?",
+      "body": [
+        "A piece in the middle sees more of the board. Look at this knight on e4: it attacks **eight** squares. Put the same knight on a1 and it reaches only **two**.",
+        "More squares means more options for you, and fewer for your opponent."
+      ],
+      "board": {
+        "fen": "k7/8/8/8/4N3/8/8/7K w - - 0 1",
+        "highlight": ["c3", "c5", "d2", "d6", "f2", "f6", "g3", "g5"],
+        "caption": "The highlighted squares are the ones the knight attacks.",
+        "assert": { "attackCount": { "e4": 8 }, "highlightIsAttacksOf": "e4" }
+      }
+    },
+    {
+      "type": "choice",
+      "prompt": "It is move one and you are White. Which move fights for the centre?",
+      "board": { "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1" },
+      "options": ["Move a pawn to e4", "Move a pawn to a4", "Move a knight to h3", "Move a pawn to h4"],
+      "answer": 0,
+      "explain": "A pawn on e4 claims the centre and opens lines for your bishop and queen. (A pawn to d4 is just as good.)"
+    },
+    {
+      "type": "findMove",
+      "prompt": "White played e4. Fight back for the centre.",
+      "fen": "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1",
+      "solution": ["e5"],
+      "accept": ["d5", "c5", "Nf6"],
+      "hint": "Which of your pawns or knights can challenge the middle?",
+      "explain": "**e5** copies White and claims the middle. **d5**, **c5** and **Nf6** also challenge White's centre. Slow moves like a6 or h6 do not."
+    },
+    {
+      "type": "read",
+      "title": "Develop your pieces",
+      "body": [
+        "Your knights and bishops start behind the pawns, where they do nothing. **Developing** means moving them to squares where they see more.",
+        "Three habits: **knights before bishops**, **move each piece once**, and **keep the queen at home** for now."
+      ],
+      "board": {
+        "fen": "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2",
+        "arrows": [["g1", "f3"], ["b1", "c3"], ["f1", "c4"]]
+      }
+    },
+    {
+      "type": "spot",
+      "prompt": "White has played e4 and Nf3. Tap a White piece that still needs developing.",
+      "board": { "fen": "rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2" },
+      "targets": ["b1", "c1", "f1"],
+      "explain": "The knight on b1 and both bishops are still asleep. Wake them up before you attack anything."
+    },
+    {
+      "type": "findMove",
+      "prompt": "Develop a knight or a bishop. Leave the queen at home.",
+      "fen": "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2",
+      "solution": ["Nf3"],
+      "accept": ["Nc3", "Bc4", "Bb5", "Bd3", "Be2"],
+      "hint": "Knights first is a good habit.",
+      "explain": "**Nf3** is the classic: it develops a knight to a good square and attacks the e5 pawn. Any knight or bishop move follows the idea. Bringing the queen out does not."
+    },
+    {
+      "type": "findMove",
+      "prompt": "White's knight attacks your e5 pawn. Defend it and develop in one move.",
+      "fen": "rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2",
+      "solution": ["Nc6"],
+      "accept": ["Bd6"],
+      "hint": "A knight on the third rank guards e5.",
+      "explain": "**Nc6** defends the pawn and develops a knight. That is two jobs in one move."
+    },
+    {
+      "type": "choice",
+      "prompt": "Why is it a mistake to bring your queen out early?",
+      "options": ["The queen is not allowed to move yet", "Smaller pieces can attack her, and you lose time running away", "It stops you from castling"],
+      "answer": 1,
+      "explain": "Every time a knight or bishop attacks your queen, she has to run, and your opponent gets a free developing move."
+    },
+    {
+      "type": "read",
+      "title": "Castle early",
+      "body": [
+        "Castling does two jobs at once: your king moves to safety and a rook joins the game.",
+        "You move the **king two squares** towards a rook, and the rook jumps over to the other side of him.",
+        "It is not allowed if the king or that rook has already moved, if pieces are in the way, or if the king is in check or would cross an attacked square."
+      ],
+      "board": {
+        "fen": "r1bqk1nr/pppp1ppp/2n5/2b1p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4",
+        "arrows": [["e1", "g1"], ["h1", "f1"]],
+        "caption": "White is ready to castle kingside."
+      }
+    },
+    {
+      "type": "findMove",
+      "prompt": "Castle kingside.",
+      "fen": "r1bqk1nr/pppp1ppp/2n5/2b1p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4",
+      "solution": ["O-O"],
+      "hint": "Tap the king, then tap the square two steps to his right.",
+      "explain": "**O-O** is how castling kingside is written. The rook hopped to f1 by itself."
+    },
+    {
+      "type": "choice",
+      "prompt": "Which opening start follows all three ideas?",
+      "options": ["1.e4 e5 2.Nf3 Nc6 3.Bc4", "1.a4 a5 2.h4 h5 3.Rh3", "1.e4 e5 2.Qh5 Nc6 3.Qxe5+"],
+      "answer": 0,
+      "explain": "A centre pawn, then a knight, then a bishop. Next would come castling. The other two waste moves on the edge or bring the queen out too soon."
+    },
+    {
+      "type": "puzzleSet",
+      "title": "Punish an early queen",
+      "theme": "free queen",
+      "ratingMin": 0,
+      "ratingMax": 600,
+      "intro": "Both players brought their queen out too soon. Take her.",
+      "puzzles": [
+        { "fen": "rnb1kbnr/pppp1ppp/8/4p3/4P2q/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3", "solution": ["Nxh4"], "hint": "A knight can attack a queen from far away.", "explain": "Nothing protects the queen, so the knight wins her for free." },
+        { "fen": "rnbqkb1r/pppppppp/5n2/7Q/4P3/8/PPPP1PPP/RNB1KBNR b KQkq - 2 2", "solution": ["Nxh5"], "hint": "Your knight already attacks her.", "explain": "A knight is worth far less than a queen, so this trade is a gift." }
+      ]
+    }
+  ],
+  "deeper": [
+    {
+      "type": "read",
+      "title": "Pick one opening and stick with it",
+      "body": [
+        "An opening is just a well-tested way to follow the three ideas. You do not need a hundred of them.",
+        "Pick **one setup as White**, and **one reply to each first move as Black**. Play them again and again. You will learn the plans and the traps, and the first ten moves will start to feel easy."
+      ]
+    },
+    {
+      "type": "read",
+      "title": "A first idea for White: the Italian Game",
+      "body": [
+        "Pawn to e4, knight to f3, bishop to c4. It claims the centre, develops two pieces, and points the bishop at f7. Castle next."
+      ],
+      "board": {
+        "fen": "r1bqkbnr/pppp1ppp/2n5/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 3 3",
+        "arrows": [["c4", "f7"]],
+        "caption": "The Italian Game: 1.e4 e5 2.Nf3 Nc6 3.Bc4."
+      }
+    },
+    {
+      "type": "findMove",
+      "prompt": "Play the first three White moves of the Italian Game: e4, Nf3, then Bc4. Black replies by itself.",
+      "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+      "solution": ["e4", "e5", "Nf3", "Nc6", "Bc4"],
+      "hint": "Pawn first, then the knight, then the bishop.",
+      "explain": "That is the whole opening. The same three moves work against many replies."
+    },
+    {
+      "type": "findMove",
+      "prompt": "Now find White's calm fourth move. Support the centre and free your bishop.",
+      "fen": "r1bqk2r/pppp1ppp/2n2n2/2b1p3/2B1P3/5N2/PPPP1PPP/RNBQ1RK1 w kq - 6 5",
+      "solution": ["d3"],
+      "accept": ["c3"],
+      "hint": "A pawn move in front of the queen.",
+      "explain": "**d3** props up the e4 pawn and opens the c1 bishop. **c3** is the other popular plan: it prepares d4."
+    },
+    {
+      "type": "read",
+      "title": "A first idea for Black: copy the centre",
+      "body": [
+        "When White plays **e4**, answer **e5**. When White plays **d4**, answer **d5**. Copying keeps the centre fair, and you can develop with the same ideas."
+      ]
+    },
+    {
+      "type": "findMove",
+      "prompt": "White opened with d4. Claim your share of the centre.",
+      "fen": "rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq - 0 1",
+      "solution": ["d5"],
+      "accept": ["Nf6"],
+      "hint": "Copy White.",
+      "explain": "**d5** copies White. **Nf6** is another good answer: it attacks the centre with a knight instead of a pawn."
+    },
+    {
+      "type": "findMove",
+      "prompt": "You are Black in the Italian Game. Develop your bishop to the matching diagonal.",
+      "fen": "r1bqkbnr/pppp1ppp/2n5/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 3 3",
+      "solution": ["Bc5"],
+      "accept": ["Nf6", "Be7"],
+      "hint": "Mirror White's bishop.",
+      "explain": "**Bc5** mirrors White: a developed bishop, aiming at f2. **Nf6** and **Be7** are also fine."
+    },
+    {
+      "type": "findMove",
+      "prompt": "Time for Black to castle kingside.",
+      "fen": "r1bqk2r/pppp1ppp/2n2n2/2b1p3/2B1P3/3P1N2/PPP2PPP/RNBQ1RK1 b kq - 0 5",
+      "solution": ["O-O"],
+      "hint": "Move the king two squares towards the rook on h8.",
+      "explain": "Black's king is safe and the rook is ready. Both sides did the same job."
+    },
+    {
+      "type": "choice",
+      "prompt": "Which is a good reason to stick with one opening?",
+      "options": ["You learn its plans and traps", "It guarantees a win", "The computer plays it too"],
+      "answer": 0,
+      "explain": "Familiar positions mean less guessing and more thinking. That is what really helps you improve."
+    },
+    {
+      "type": "puzzleSet",
+      "title": "Famous opening traps",
+      "theme": "opening traps",
+      "ratingMin": 600,
+      "ratingMax": 1000,
+      "intro": "A king stuck in the middle is in danger. These are the traps that punish it. The second one is a classic.",
+      "puzzles": [
+        { "fen": "r1b1kbnr/pppp1Npp/8/8/3nq3/8/PPPPBP1P/RNBQKR2 b Qkq - 1 7", "solution": ["Nf3#"], "hint": "The white king cannot move. Check from a knight cannot be blocked.", "explain": "White's own pieces boxed the king in, and a knight's check cannot be blocked." },
+        { "fen": "rn1qkbnr/ppp2p1p/3p2p1/4N3/2B1P3/2N5/PPPP1PPP/R1BbK2R w KQkq - 0 6", "solution": ["Bxf7+", "Ke7", "Nd5#"], "hint": "Black has just taken your queen. Start with a check.", "explain": "This is **Légal's mate**. White gave up the queen so that Black's king would have to step into a net made of minor pieces." }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+[
+  { "day": 1,  "title": "How games end",                          "deeperTitle": "Back-rank mate and luft; the Scholar's Mate trap", "level": "0-600" },
+  { "day": 2,  "title": "Opening principles",                     "deeperTitle": "Why pick one opening; first ideas for White and Black", "level": "0-800" },
+  { "day": 3,  "title": "How pieces see, attack and defend",      "deeperTitle": "True piece value vs points; finding loose pieces", "level": "0-800" },
+  { "day": 4,  "title": "Must-know checkmates",                   "deeperTitle": "King and rook mate; avoiding stalemate", "level": "400-900" },
+  { "day": 5,  "title": "Forks",                                  "deeperTitle": "Pins and skewers", "level": "400-900" },
+  { "day": 6,  "title": "The checklist",                          "deeperTitle": "Discovered attacks and checks; danger levels", "level": "600-1000" },
+  { "day": 7,  "title": "Draws, and never resigning",             "deeperTitle": "Week 1 review quiz and puzzle set", "level": "All" },
+  { "day": 8,  "title": "Weaknesses",                             "deeperTitle": "Space; open vs closed positions", "level": "700-1100" },
+  { "day": 9,  "title": "Building a first repertoire",            "deeperTitle": "Common traps, and keeping the tension", "level": "800-1200" },
+  { "day": 10, "title": "Gambits",                                "deeperTitle": "When not to accept; trap patterns", "level": "800-1200" },
+  { "day": 11, "title": "Tactics level-up",                       "deeperTitle": "Deflection, attraction, sacrifices; calculating several moves", "level": "1000-1300" },
+  { "day": 12, "title": "Strategy: pawn structure",               "deeperTitle": "Bishop vs knight; outposts; rook activity", "level": "1100-1400" },
+  { "day": 13, "title": "Endgames",                               "deeperTitle": "Rook endgame ideas; queen vs pawn; opposite-coloured bishops", "level": "1200-1400" },
+  { "day": 14, "title": "Trading: when to trade",                 "deeperTitle": "Final test, reflection, next goals; invite to the Sunday KO", "level": "1000-1400" }
+]

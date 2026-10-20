@@ -1,0 +1,8 @@
+# Netlify reads this file, so the site needs no manual build settings in the dashboard.
+[build]
+  command = "npm run build"   # checks every lesson, typechecks, then builds
+  publish = "dist"
+
+[build.environment]
+  # Vite needs Node 20.19+ or 22.12+. Pinning it stops a Netlify default change from breaking builds.
+  NODE_VERSION = "22"

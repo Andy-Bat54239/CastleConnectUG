@@ -1,0 +1,14 @@
+{
+  "name": "Bridge Grind · Castle Connect",
+  "short_name": "Bridge Grind",
+  "description": "A 14-day chess learning challenge from Castle Connect UG.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#FEFAE7",
+  "theme_color": "#034F3B",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

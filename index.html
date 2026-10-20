@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Bridge Grind · Castle Connect</title>
+    <meta name="description" content="A 14-day chess learning challenge from Castle Connect UG. No sign-up." />
+    <meta name="theme-color" content="#034F3B" />
+    <meta name="color-scheme" content="light" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="icon" type="image/png" href="./favicon.png" />
+    <link rel="apple-touch-icon" href="./icons/icon-192.png" />
+    <script>
+      // Apply the saved theme before first paint so dark-mode members do not see a light flash.
+      try { document.documentElement.dataset.theme = localStorage.getItem('bg:theme') === 'dark' ? 'dark' : 'light' } catch (e) { document.documentElement.dataset.theme = 'light' }
+    </script>
+  </head>
+  <body>
+    <header class="app-bar">
+      <div class="bar-inner">
+        <a class="brand" href="#/" aria-label="Bridge Grind home">
+          <span class="mark"><img src="./icons/logo-mark.png" width="30" height="33" alt="" /></span>
+          <span class="brand-text"><b>Bridge Grind</b><small>Castle Connect UG</small></span>
+        </a>
+        <span id="theme-slot"></span>
+      </div>
+    </header>
+    <main id="app"><p class="loading">Loading…</p></main>
+    <noscript><p style="padding:24px">Bridge Grind needs JavaScript to run. Please turn it on, or open this link in Chrome.</p></noscript>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

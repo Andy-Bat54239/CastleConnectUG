@@ -1,0 +1,217 @@
+{
+  "day": 3,
+  "title": "How pieces see, attack and defend",
+  "level": "0-800",
+  "blurb": "Learn what every piece can attack, spot pieces nobody is guarding, and master the four ways to answer an attack.",
+  "deeperTitle": "True piece value vs points; finding loose pieces",
+  "share": { "prompt": "One thing I learned today…" },
+  "core": [
+    {
+      "type": "read",
+      "title": "Every piece has a line of sight",
+      "body": [
+        "A piece **attacks** a square when it could capture something standing there. Bishops, rooks, queens and knights attack the squares they can move to.",
+        "**Pawns are the odd ones out.** They move straight ahead, but they attack diagonally.",
+        "This bishop sits in the middle of an empty board and attacks **13 squares**."
+      ],
+      "board": {
+        "fen": "k7/8/8/8/3B4/8/8/7K w - - 0 1",
+        "highlight": ["a1", "b2", "c3", "e5", "f6", "g7", "h8", "a7", "b6", "c5", "e3", "f2", "g1"],
+        "caption": "The highlighted squares are the ones the bishop attacks.",
+        "assert": { "attackCount": { "d4": 13 }, "highlightIsAttacksOf": "d4" }
+      }
+    },
+    {
+      "type": "choice",
+      "prompt": "How many squares does this rook attack?",
+      "board": { "fen": "k7/8/8/8/3R4/8/8/7K w - - 0 1", "assert": { "attackCount": { "d4": 14 } } },
+      "options": ["8", "14", "16"],
+      "answer": 1,
+      "explain": "Seven along its file and seven along its rank. A rook on an empty board always attacks **14** squares, wherever it stands."
+    },
+    {
+      "type": "spot",
+      "prompt": "White's pawn on e4 can capture one black piece. Tap it.",
+      "board": { "fen": "k7/8/8/3nr3/4P3/8/8/7K w - - 0 1" },
+      "targets": ["d5"],
+      "verify": { "kind": "attackedBy", "square": "e4" },
+      "explain": "The pawn attacks **diagonally**, so it takes the knight on d5. The rook straight ahead on e5 is safe from it."
+    },
+    {
+      "type": "read",
+      "title": "Defended, or loose?",
+      "body": [
+        "A piece is **defended** when a friendly piece could take back after a capture. A piece that nobody defends is **loose**.",
+        "A loose piece that is also attacked is **hanging**. That is a free gift, so check yours and your opponent's before every move."
+      ]
+    },
+    {
+      "type": "spot",
+      "prompt": "White to move. Tap the black piece that nobody defends.",
+      "board": {
+        "fen": "6k1/3p1ppp/2n5/5b2/8/8/2Q2PPP/6K1 w - - 0 1",
+        "assert": { "attacked": ["f5"], "undefended": ["f5"] }
+      },
+      "targets": ["f5"],
+      "verify": { "kind": "loose", "color": "b" },
+      "explain": "The d7 pawn guards the knight, the bishop guards the d7 pawn, and the king guards the other pawns. But **nobody guards the bishop on f5**, so the queen can simply take it."
+    },
+    {
+      "type": "read",
+      "title": "Four ways to answer an attack",
+      "body": [
+        "When one of your pieces is attacked, you have four answers:",
+        "**Move** it away.",
+        "**Capture** the piece that attacks it.",
+        "**Block** the line between them.",
+        "**Defend** it, so that a capture would cost your opponent more than it wins.",
+        "Knights jump over pieces, so you can never block a knight. Let us practise each one."
+      ]
+    },
+    {
+      "type": "findMove",
+      "prompt": "Black's pawn attacks your queen. Answer by **moving** her to safety.",
+      "fen": "6k1/5ppp/3p4/4p3/3Q4/8/5PPP/6K1 w - - 0 1",
+      "goal": "answer",
+      "verify": { "method": "move", "target": "d4" },
+      "hint": "Do not take the e5 pawn: the d6 pawn would take your queen.",
+      "explain": "Any safe square works. A move with a capture, like **Qxd6**, is even better, because nothing guards that pawn."
+    },
+    {
+      "type": "findMove",
+      "prompt": "Their bishop attacks your knight, and nothing protects it. Answer by **capturing** the attacker.",
+      "fen": "6k1/5ppp/8/8/6b1/5NPP/5P2/6K1 w - - 0 1",
+      "goal": "answer",
+      "verify": { "method": "capture", "target": "f3" },
+      "hint": "Which of your pieces can take the bishop on g4?",
+      "explain": "**hxg4**. The pawn takes the bishop and nothing takes back. Pawns are excellent at removing attackers."
+    },
+    {
+      "type": "findMove",
+      "prompt": "Their rook attacks your queen, and the rook is guarded. Answer by **blocking**.",
+      "fen": "4rrk1/5ppp/8/8/8/8/3BQPPP/6K1 w - - 0 1",
+      "goal": "answer",
+      "verify": { "method": "block", "target": "e2" },
+      "hint": "Which piece can step onto the e-file between the two of them?",
+      "explain": "**Be3** steps between the rook and the queen. The queen protects the bishop, so the rook cannot take it for free."
+    },
+    {
+      "type": "findMove",
+      "prompt": "Their bishop attacks your e4 pawn. Answer by **defending** it.",
+      "fen": "6k1/5ppp/2b5/8/4P3/8/5PPP/1N3RK1 w - - 0 1",
+      "goal": "answer",
+      "verify": { "method": "defend", "target": "e4" },
+      "hint": "Which of your pieces could take back on e4?",
+      "explain": "Any move that guards e4 works. If the bishop now takes the pawn, you take the bishop back and win a piece for a pawn."
+    },
+    {
+      "type": "choice",
+      "prompt": "Which of these is NOT a way to answer an attack?",
+      "options": ["Move the piece away", "Pretend it is not there", "Block the line", "Capture the attacker"],
+      "answer": 1,
+      "explain": "The four answers are: **move**, **capture**, **block** and **defend**. Ignoring the attack is how pieces get lost."
+    },
+    {
+      "type": "findMove",
+      "prompt": "Their knight attacks your bishop on d3. Save it any way you like.",
+      "fen": "6k1/5ppp/8/8/5n2/3B4/5PPP/2B3K1 w - - 0 1",
+      "goal": "answer",
+      "verify": { "method": "any", "target": "d3" },
+      "hint": "You cannot block a knight, but you have other answers.",
+      "explain": "Moving the bishop works, and so does taking the knight with **Bxf4**. A good player checks all four answers before choosing."
+    },
+    {
+      "type": "puzzleSet",
+      "title": "Free pieces",
+      "theme": "hanging piece",
+      "ratingMin": 0,
+      "ratingMax": 600,
+      "intro": "Each of these has a piece nobody is guarding. Take it.",
+      "puzzles": [
+        { "fen": "6k1/5ppp/8/3n4/8/8/5PPP/3R2K1 w - - 0 1", "solution": ["Rxd5"], "hint": "Look for the piece with no defender.", "explain": "The knight on d5 had no defender, so the rook wins it for free." },
+        { "fen": "6k1/5ppp/8/8/1b6/2N5/5PPP/6K1 b - - 0 1", "solution": ["Bxc3"], "hint": "Which white piece is alone?", "explain": "The knight on c3 was unprotected. Always check before you leave a piece out on its own." },
+        { "fen": "3q2k1/5ppp/8/8/8/8/5PPP/3R2K1 w - - 0 1", "solution": ["Rxd8#"], "hint": "The queen is loose. Does taking her do more than win material?", "explain": "The queen was undefended, and taking her with check was also checkmate. Loose pieces cost games." }
+      ]
+    }
+  ],
+  "deeper": [
+    {
+      "type": "read",
+      "title": "Points are a guide, not a law",
+      "body": [
+        "Chess players count material in points: **pawn 1, knight 3, bishop 3, rook 5, queen 9**. The king has no value because he can never be traded.",
+        "Use the points to compare trades. But a piece is worth what it does. A knight that wins the game is worth far more than 3, and a bishop stuck behind its own pawns is worth less."
+      ]
+    },
+    {
+      "type": "choice",
+      "prompt": "You trade your bishop for your opponent's rook. How is that for you?",
+      "options": ["Good: you win 2 points (rook 5 against bishop 3)", "Even: all pieces are the same", "Bad: you lose 2 points"],
+      "answer": 0,
+      "explain": "A rook for a minor piece is called **winning the exchange**. You come out two points ahead."
+    },
+    {
+      "type": "choice",
+      "prompt": "Which of these trades is fair?",
+      "options": ["Knight for bishop", "Queen for rook and pawn", "Rook for two pawns"],
+      "answer": 0,
+      "explain": "Knight and bishop are both worth 3. A queen (9) for a rook and a pawn (6) loses 3 points, and a rook (5) for two pawns (2) loses 3 points."
+    },
+    {
+      "type": "choice",
+      "prompt": "Your knight is attacked by a pawn, and your rook defends the knight. Is the knight safe?",
+      "board": {
+        "fen": "6k1/5ppp/8/4p3/3N4/8/5PPP/3R2K1 w - - 0 1",
+        "arrows": [["e5", "d4"]],
+        "assert": { "attacked": ["d4"], "defended": ["d4"] }
+      },
+      "options": ["Yes, it is defended", "No: the pawn takes the knight, and you only win a pawn back", "Yes, pawns cannot take knights"],
+      "answer": 1,
+      "explain": "Being defended is not enough. The pawn is worth 1 and the knight is worth 3, so after the trade you are **2 points down**. Move the knight."
+    },
+    {
+      "type": "spot",
+      "prompt": "Tap the loose black piece.",
+      "board": { "fen": "r1b3k1/1p3ppp/2n5/8/8/8/5PPP/6K1 w - - 0 1" },
+      "targets": ["a8"],
+      "verify": { "kind": "loose", "color": "b" },
+      "explain": "Each piece guards another in a chain: the bishop guards b7, the rook guards the bishop. But **nobody guards the rook**. Look at the end of every chain."
+    },
+    {
+      "type": "spot",
+      "prompt": "Black to move. Tap the white piece that nobody defends.",
+      "board": { "fen": "6k1/5ppp/8/8/2B5/2N5/1P3PPP/2BQ1RK1 b - - 0 1" },
+      "targets": ["c4"],
+      "verify": { "kind": "loose", "color": "w" },
+      "explain": "The knight is guarded by the b2 pawn, the pawn by the bishop, the bishop by the queen, and the queen by the rook. The bishop on c4 stands alone."
+    },
+    {
+      "type": "findMove",
+      "prompt": "White to move. Win something for free, but check what is defended first.",
+      "fen": "6k1/pp3ppp/8/3n4/8/3Q4/PPP2PPP/6K1 w - - 0 1",
+      "solution": ["Qxd5"],
+      "hint": "One black piece has no defender.",
+      "explain": "**Qxd5** wins the knight. The tempting **Qxh7+** loses the queen, because the king takes it. Always ask who defends the target."
+    },
+    {
+      "type": "puzzleSet",
+      "title": "Loose pieces drop off",
+      "theme": "hanging piece",
+      "ratingMin": 400,
+      "ratingMax": 800,
+      "intro": "A little harder: the loose piece is not always the obvious one.",
+      "puzzles": [
+        { "fen": "6k1/5ppp/8/8/3n4/8/1B3PPP/6K1 w - - 0 1", "solution": ["Bxd4"], "hint": "The bishop sees all the way down the diagonal.", "explain": "Nothing guards the knight, so the long diagonal wins it." },
+        { "fen": "6k1/5ppp/2n5/8/3B4/8/5PPP/6K1 b - - 0 1", "solution": ["Nxd4"], "hint": "A knight attacks in an L shape.", "explain": "The bishop stood alone on d4, and the knight takes it." },
+        { "fen": "r5k1/5p1p/6p1/8/8/8/5PPP/Q5K1 w - - 0 1", "solution": ["Qxa8+"], "hint": "The rook has no defender, and the queen sees it along the file.", "explain": "The rook was loose, and the capture even comes with check." }
+      ]
+    },
+    {
+      "type": "choice",
+      "prompt": "What is the best habit to build?",
+      "options": ["Before every move, check which pieces are loose, mine and theirs", "Count how many pawns are left", "Only move the piece you moved last"],
+      "answer": 0,
+      "explain": "Most games below 1200 are decided by a piece that someone left unguarded. This one habit wins more games than any opening."
+    }
+  ]
+}

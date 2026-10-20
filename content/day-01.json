@@ -1,0 +1,265 @@
+{
+  "day": 1,
+  "title": "How games end",
+  "level": "0-600",
+  "blurb": "A game can end four different ways. Learn all four, then deliver your first checkmates.",
+  "deeperTitle": "Back-rank mate and luft; the Scholar's Mate trap",
+  "share": { "prompt": "One thing I learned today…" },
+  "core": [
+    {
+      "type": "read",
+      "title": "Four ways to win",
+      "body": [
+        "Most games end in **checkmate**. But that is only one of four ways to win.",
+        "You also win if your opponent **resigns**, if their **clock runs out**, or if they **walk away** and never come back.",
+        "Today you will learn all four. First, the big one."
+      ]
+    },
+    {
+      "type": "read",
+      "title": "Checkmate: no way out",
+      "body": [
+        "A king that is attacked is **in check**. It must get out of check straight away.",
+        "There are only three ways: **step away**, **block** the attack, or **capture** the piece giving check. If none of them works, it is **checkmate** and the game is over."
+      ],
+      "board": {
+        "fen": "rnb1kbnr/pppp1ppp/8/4p3/6Pq/5P2/PPPPP2P/RNBQKBNR w KQkq - 1 3",
+        "arrows": [["h4", "e1"]],
+        "caption": "Black's queen attacks the white king. White has no way out.",
+        "assert": { "status": "checkmate" }
+      }
+    },
+    {
+      "type": "choice",
+      "prompt": "Black's king is in check. What happens next?",
+      "board": {
+        "fen": "4k3/8/8/8/8/8/8/4R1K1 b - - 0 1",
+        "arrows": [["e1", "e8"]],
+        "assert": { "status": "check" }
+      },
+      "options": ["Checkmate: no way out", "Not mate: the king can step away", "Not mate: the king can capture the checker", "Not mate: another piece can block"],
+      "answer": 1,
+      "explain": "The rook gives check along the e-file, but the king has free squares beside it. It simply **steps aside**."
+    },
+    {
+      "type": "choice",
+      "prompt": "Black's king is in check again. Is this the end?",
+      "board": {
+        "fen": "4k3/4Q3/8/8/8/8/8/6K1 b - - 0 1",
+        "arrows": [["e7", "e8"]],
+        "assert": { "status": "check" }
+      },
+      "options": ["Checkmate: no way out", "Not mate: the king can step away", "Not mate: the king can capture the checker", "Not mate: another piece can block"],
+      "answer": 2,
+      "explain": "Every square around the king is covered, but the queen is right next to it and **nothing protects her**. The king just takes her."
+    },
+    {
+      "type": "choice",
+      "prompt": "One more check. What now?",
+      "board": {
+        "fen": "3rkr2/3b1ppp/8/8/8/8/PPP2PPP/4R1K1 b - - 0 1",
+        "arrows": [["e1", "e8"]],
+        "assert": { "status": "check" }
+      },
+      "options": ["Checkmate: no way out", "Not mate: the king can step away", "Not mate: the king can capture the checker", "Not mate: another piece can block"],
+      "answer": 3,
+      "explain": "The king is boxed in by its own pieces and cannot reach the rook. But the bishop can jump in front of the check on e6. That is a **block**."
+    },
+    {
+      "type": "choice",
+      "prompt": "And this one?",
+      "board": {
+        "fen": "7k/6Q1/5K2/8/8/8/8/8 b - - 0 1",
+        "arrows": [["g7", "h8"]],
+        "assert": { "status": "checkmate" }
+      },
+      "options": ["Checkmate: no way out", "Not mate: the king can step away", "Not mate: the king can capture the checker", "Not mate: another piece can block"],
+      "answer": 0,
+      "explain": "The queen is **protected by the white king**, so Black's king cannot capture her. Every other square next to it is covered. That is **checkmate**."
+    },
+    {
+      "type": "findMove",
+      "prompt": "Your king is in check from the rook. Get out of it by blocking.",
+      "fen": "4r1k1/ppp2ppp/8/8/8/8/3B1PPP/3RKR2 w - - 0 1",
+      "solution": ["Be3"],
+      "hint": "Your king has no free squares. Which piece can step in front of the rook?",
+      "explain": "**Be3** blocks the e-file. When your king is boxed in and cannot capture the checker, a block is your way out.",
+      "verify": { "method": "block", "target": "e1" }
+    },
+    {
+      "type": "findMove",
+      "prompt": "The queen gives check, and she is next to your king. Get out of check.",
+      "fen": "6k1/5ppp/8/8/2b5/2N5/4q1PP/4K3 w - - 0 1",
+      "solution": ["Nxe2"],
+      "hint": "Your king cannot take her, because the bishop protects her. Who else can capture on e2?",
+      "explain": "**Nxe2** captures the queen. The bishop takes the knight back, but you traded a knight for a queen. Capturing the checker can win material, too.",
+      "verify": { "method": "capture", "target": "e1" }
+    },
+    {
+      "type": "findMove",
+      "prompt": "Checkmate in one. Your king is helping.",
+      "fen": "7k/8/5K2/8/8/8/8/6Q1 w - - 0 1",
+      "goal": "mate",
+      "hint": "Put the queen on a square next to the black king that your own king also guards.",
+      "explain": "**Qg7#**. The queen attacks the king, your king protects her, and no square is left to run to."
+    },
+    {
+      "type": "findMove",
+      "prompt": "Checkmate in one. The queen needs a partner this time.",
+      "fen": "5rk1/5ppp/8/7Q/8/3B4/8/6K1 w - - 0 1",
+      "goal": "mate",
+      "hint": "Which black pawn is attacked twice, by the queen and by the bishop?",
+      "explain": "**Qxh7#**. The bishop on d3 protects the queen, and the black pieces are blocking their own king's escape squares."
+    },
+    {
+      "type": "read",
+      "title": "Three more ways to win",
+      "body": [
+        "**Resignation.** A player gives up because they are clearly losing. You win. It saves everyone time.",
+        "**Time.** Every game has a clock. If yours hits zero you lose, even if you are ahead on the board.",
+        "**Abandonment.** If your opponent leaves and never comes back, you win."
+      ]
+    },
+    {
+      "type": "choice",
+      "prompt": "You are up a queen, but your clock runs out. What is the result?",
+      "options": ["You win, because you are ahead", "You lose on time", "It is a draw"],
+      "answer": 1,
+      "explain": "The clock is part of the game. Being ahead on the board does not save you. (There is one rare exception, which you will meet on Day 7.)"
+    },
+    {
+      "type": "choice",
+      "prompt": "Your opponent closes the app and never comes back. What happens?",
+      "options": ["It is a draw", "You win once the site declares them gone", "You have to resign"],
+      "answer": 1,
+      "explain": "Walking away is called **abandonment**. Online, the site gives them a little time to return, then awards you the win."
+    },
+    {
+      "type": "choice",
+      "prompt": "Which of these ends the game with a win for you?",
+      "options": ["You capture their queen", "Their king is in check", "They resign"],
+      "answer": 2,
+      "explain": "Winning the queen or giving check does not end the game. Only checkmate, resignation, time or abandonment do."
+    },
+    {
+      "type": "spot",
+      "prompt": "Black's king is in check. Tap the piece giving check.",
+      "board": {
+        "fen": "rnbqkbnr/ppppp1pp/5p2/7Q/4P3/8/PPPP1PPP/RNB1KBNR b KQkq - 1 2",
+        "assert": { "status": "check" }
+      },
+      "targets": ["h5"],
+      "verify": { "kind": "checkers" },
+      "explain": "The queen on h5 sees along the diagonal all the way to the king on e8."
+    },
+    {
+      "type": "puzzleSet",
+      "title": "Checkmate in one",
+      "theme": "mate in one",
+      "ratingMin": 0,
+      "ratingMax": 600,
+      "intro": "Three quick ones. Find the move that ends the game.",
+      "puzzles": [
+        { "fen": "k7/8/1K6/8/8/8/8/7R w - - 0 1", "solution": ["Rh8#"], "hint": "Your king already covers the squares in front of the black king.", "explain": "The king on b6 guards a7 and b7, so the rook only has to check along the back rank." },
+        { "fen": "rnbqkbnr/pppp1ppp/8/4p3/6P1/5P2/PPPPP2P/RNBQKBNR b KQkq - 0 2", "solution": ["Qh4#"], "hint": "White's king is exposed on the diagonal.", "explain": "White's pawn moves opened a diagonal straight to the king. This is the quickest checkmate in chess." },
+        { "fen": "6k1/7p/7Q/8/8/8/1B6/7K w - - 0 1", "solution": ["Qg7#"], "hint": "Look at where the bishop is aiming.", "explain": "The bishop on b2 protects g7 along the long diagonal, so the queen cannot be taken." }
+      ]
+    }
+  ],
+  "deeper": [
+    {
+      "type": "read",
+      "title": "The back-rank mate",
+      "body": [
+        "This is the most common checkmate at every level. The king stays on its back rank, behind a wall of its own pawns. Then a rook or queen arrives on that rank and the king has nowhere to go."
+      ],
+      "board": {
+        "fen": "3R2k1/5ppp/8/8/8/8/8/6K1 b - - 0 1",
+        "arrows": [["d8", "g8"]],
+        "caption": "The pawns that were meant to protect the king now trap it.",
+        "assert": { "status": "checkmate" }
+      }
+    },
+    {
+      "type": "findMove",
+      "prompt": "Checkmate in one. Use the open file.",
+      "fen": "6k1/5ppp/8/8/8/8/8/3R2K1 w - - 0 1",
+      "goal": "mate",
+      "hint": "Which rank is the black king stuck on?",
+      "explain": "**Rd8#**. The rook checks along the back rank and the king's own pawns block every escape."
+    },
+    {
+      "type": "findMove",
+      "prompt": "Checkmate in one. Their rook is in the way, but that can change.",
+      "fen": "2r3k1/5ppp/8/8/8/8/5PPP/2R3K1 w - - 0 1",
+      "goal": "mate",
+      "hint": "Can you take the rook and give check at the same time?",
+      "explain": "**Rxc8#**. Capturing with check ends the game, because Black has nothing left to recapture with."
+    },
+    {
+      "type": "findMove",
+      "prompt": "White threatens Rd8 checkmate. Find a move that stops it.",
+      "fen": "6k1/5ppp/8/8/8/8/5PPP/3R2K1 b - - 0 1",
+      "goal": "avoidMate",
+      "hint": "Give the king somewhere to run.",
+      "explain": "Moving a pawn to give your king an escape square is called making **luft** (German for \"air\"). Any pawn move on the f, g or h file works. Only stepping to h8 walks into mate."
+    },
+    {
+      "type": "puzzleSet",
+      "title": "Back-rank mates",
+      "theme": "back rank mate",
+      "ratingMin": 0,
+      "ratingMax": 600,
+      "intro": "Same idea, three different looks.",
+      "puzzles": [
+        { "fen": "6k1/5ppp/8/8/8/8/8/R5K1 w - - 0 1", "solution": ["Ra8#"], "hint": "Rooks love open files.", "explain": "The black pawns trap their own king." },
+        { "fen": "r5k1/5ppp/8/8/8/8/5PPP/6K1 b - - 0 1", "solution": ["Ra1#"], "hint": "Black can use the same trick against White.", "explain": "White forgot to make luft, so the back rank falls." },
+        { "fen": "6k1/5ppp/8/8/8/8/5PPP/3Q2K1 w - - 0 1", "solution": ["Qd8#"], "hint": "The queen also travels along files.", "explain": "A queen does the job of a rook here." }
+      ]
+    },
+    {
+      "type": "read",
+      "title": "Scholar's Mate: the trap everyone falls for once",
+      "body": [
+        "At the start of the game, the pawn on **f7** is protected only by the king. That makes it the weakest point in Black's camp.",
+        "A quick attack with the queen and the bishop can aim at f7 and mate in four moves. Beginners both **play it** and **fall for it**, so learn to spot it."
+      ],
+      "board": {
+        "fen": "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2",
+        "caption": "After 1.e4 e5. Both sides have opened the diagonals."
+      }
+    },
+    {
+      "type": "spot",
+      "prompt": "The white bishop is aiming at one black pawn. Tap it.",
+      "board": { "fen": "r1bqkbnr/pppp1ppp/2n5/4p3/2B1P3/8/PPPP1PPP/RNBQK1NR w KQkq - 2 3" },
+      "targets": ["f7"],
+      "verify": { "kind": "attackedBy", "square": "c4" },
+      "explain": "Only the black king guards f7. If the queen joins the bishop, f7 falls."
+    },
+    {
+      "type": "findMove",
+      "prompt": "Black just blundered with Nf6. Finish the game.",
+      "fen": "r1bqkb1r/pppp1ppp/2n2n2/4p2Q/2B1P3/8/PPPP1PPP/RNB1K1NR w KQkq - 4 4",
+      "goal": "mate",
+      "arrows": [["c4", "f7"], ["h5", "f7"]],
+      "hint": "The queen and the bishop both attack f7.",
+      "explain": "**Qxf7#**. The bishop protects the queen, and the king's escape squares are blocked by its own pieces."
+    },
+    {
+      "type": "findMove",
+      "prompt": "You are Black. White threatens Qxf7 checkmate. Stop it.",
+      "fen": "r1bqkbnr/pppp1ppp/2n5/4p2Q/2B1P3/8/PPPP1PPP/RNB1K1NR b KQkq - 3 3",
+      "goal": "avoidMate",
+      "hint": "Defend f7, or chase the queen away.",
+      "explain": "The simplest answers are **Qe7** or **Nh6**, which defend f7, or **g6**, which kicks the queen. Nf6 looks active, but it leaves f7 hanging."
+    },
+    {
+      "type": "choice",
+      "prompt": "What is the best habit against Scholar's Mate?",
+      "options": ["Always play the same first move", "Check f7 (or f2) every time a queen and a bishop line up", "Never move your king's pawn"],
+      "answer": 1,
+      "explain": "A quick look at f7 before every move in the first few turns will save you from this trap for life."
+    }
+  ]
+}

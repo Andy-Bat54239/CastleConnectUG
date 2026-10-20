@@ -1,0 +1,30 @@
+{
+  "name": "bridge-grind",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Bridge Grind: a 14-day chess learning challenge for Castle Connect UG",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "validate": "tsx scripts/validate-content.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "build": "npm run validate && npm run typecheck && vite build",
+    "preview": "vite preview",
+    "probe": "tsx scripts/probe.ts",
+    "line": "tsx scripts/line.ts"
+  },
+  "dependencies": {
+    "chess.js": "^1.4.0"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.4",
+    "vitest": "^5.0.5"
+  },
+  "engines": {
+    "node": ">=22.12"
+  }
+}
