@@ -2,6 +2,7 @@ import type { Plugin } from 'vite'
 import { defineConfig } from 'vitest/config'
 import { readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
 import { createHash } from 'node:crypto'
+import { injectSocialTags, siteUrlFromEnv } from './scripts/social'
 import { join, relative } from 'node:path'
 
 /**
@@ -44,10 +45,30 @@ function serviceWorker(): Plugin {
   }
 }
 
+/**
+ * Writes the WhatsApp link-preview tags into index.html. The picture needs the site's full address,
+ * which Netlify supplies as the URL environment variable during its build (or set SITE_URL yourself).
+ */
+function socialPreview(): Plugin {
+  const siteUrl = siteUrlFromEnv(process.env)
+  return {
+    name: 'bridge-grind-social-preview',
+    apply: 'build',
+    buildStart() {
+      console.log(
+        siteUrl
+          ? `Link preview: using ${siteUrl}`
+          : 'Link preview: no site address known (set SITE_URL, or build on Netlify), so the card will have text but no picture.',
+      )
+    },
+    transformIndexHtml: (html) => injectSocialTags(html, siteUrl),
+  }
+}
+
 export default defineConfig({
   // Relative base so the site works from any host path (Cloudflare Pages, GitHub Pages project sites, ...).
   base: './',
-  plugins: [serviceWorker()],
+  plugins: [serviceWorker(), socialPreview()],
   // chess.js uses BigInt, so Chrome 67 (mid-2018) is the real floor. WhatsApp's in-app browser tracks system WebView.
   build: { target: ['chrome67', 'safari14', 'firefox68'], cssCodeSplit: false, assetsInlineLimit: 0, sourcemap: false },
   test: { environment: 'node', include: ['tests/**/*.test.ts'] },

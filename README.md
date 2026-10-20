@@ -137,14 +137,38 @@ After a deploy, open the link once, then check `/?preview=1#/day/1` and `/?previ
 The file `public/_headers` makes Netlify re-check the page and service worker on every visit (so
 lesson fixes reach members promptly) and cache the fingerprinted files for a year.
 
+**The "Powered by Netlify" badge.** Free-plan Netlify projects can show a badge in the bottom-right
+corner of every page. To remove it: **Project configuration, General, Powered by Netlify badge**, switch
+it off and save (no redeploy needed). If it stays on, the app notices Netlify's badge script and lifts
+the lesson's Back/Next row clear of the corner (`src/lib/hostBadge.ts`), so it can never cover a button.
+
 **Never publish the parent folder.** This project lives in `bridge-grind/`. The folder around it holds
 the source book PDF and working files that must not go on the internet.
+
+## WhatsApp link preview
+
+When someone pastes the link into a chat, WhatsApp shows a card: the picture in
+`public/og-image.png`, a title and one line of text (both set in `scripts/social.ts`).
+
+- **On Netlify there is nothing to set.** WhatsApp needs the picture's full `https://` address, and the
+  build takes it from Netlify's own `URL` setting. A custom domain added later is picked up on the next deploy.
+- **Building by hand** (the drag-and-drop route): give it the address, for example
+  `SITE_URL=https://your-site.netlify.app npm run build`. Without one the card still has the title
+  and text but no picture, and the build says so.
+- **Check it after a deploy:** `curl -s https://your-site.netlify.app | grep og:` should list
+  `og:image` with a full `https://` address, and that address should open the picture in a browser.
+- **WhatsApp remembers cards.** A link already pasted somewhere before this deploy may keep its old
+  card for a while. Adding anything to the end of the link, such as `?v=2`, makes WhatsApp fetch a
+  fresh one. Brand-new links are not affected.
+- The card is the same for every page, because the part after `#` (like `#/day/3`) never reaches the server.
+- To change the picture: replace `public/og-image.png` (1200 by 630, under 300 KB is safest).
 
 ## Before launch: test on real phones
 
 These could not be tested in this build environment and need a real Android phone, opening the
 link **from inside WhatsApp**:
 
+- [ ] Paste the link into a WhatsApp chat: the card shows the picture, title and text.
 - [ ] The page loads and is styled; the board shows pieces.
 - [ ] Progress survives closing WhatsApp and tapping the link again (some in-app browsers block storage; the page shows a warning if so).
 - [ ] "Share my progress" opens the phone's share menu; if not, that it copies; if not, the WhatsApp button works.
