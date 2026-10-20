@@ -4,7 +4,7 @@
  *
  * WhatsApp reads these from the HTML the server sends (it does not run scripts), and the picture
  * needs a full https:// address. So the tags are written into index.html at build time, using the
- * site's real address, which Netlify hands to the build as an environment variable.
+ * site's real address, which the host (Vercel or Netlify) hands to the build as an environment variable.
  */
 
 export const PREVIEW = {
@@ -22,11 +22,13 @@ type Env = Record<string, string | undefined>
 /**
  * Where the site lives, for absolute links. In order of preference:
  *  1. SITE_URL, set by hand (for example for a drag-and-drop deploy or a custom domain).
- *  2. Netlify's URL for production builds, or its per-deploy URL for previews and branches.
+ *  2. Vercel's production address for production builds, or the deployment's own address for previews, so a preview links to itself.
+ *  3. Netlify's URL for production builds, or its per-deploy URL for previews and branches.
  * Returns undefined when it cannot be known (a local build), in which case no picture is promised.
  */
 export function siteUrlFromEnv(env: Env): string | undefined {
-  const pick = env.SITE_URL?.trim() || (env.CONTEXT && env.CONTEXT !== 'production' ? env.DEPLOY_PRIME_URL?.trim() : undefined) || env.URL?.trim()
+  const vercel = env.VERCEL_ENV === 'production' ? env.VERCEL_PROJECT_PRODUCTION_URL?.trim() || env.VERCEL_URL?.trim() : env.VERCEL_ENV ? env.VERCEL_URL?.trim() : undefined
+  const pick = env.SITE_URL?.trim() || vercel || (env.CONTEXT && env.CONTEXT !== 'production' ? env.DEPLOY_PRIME_URL?.trim() : undefined) || env.URL?.trim()
   if (!pick) return undefined
   const withScheme = /^https?:\/\//i.test(pick) ? pick : `https://${pick}`
   return withScheme.replace(/\/+$/, '')

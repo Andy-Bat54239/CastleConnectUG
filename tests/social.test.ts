@@ -5,6 +5,15 @@ describe('finding the site address', () => {
   it('uses a hand-set SITE_URL first', () => {
     expect(siteUrlFromEnv({ SITE_URL: 'https://bridge.example.org', URL: 'https://other.netlify.app' })).toBe('https://bridge.example.org')
   })
+  it("uses Vercel's production address for a production build (it comes without https://)", () => {
+    expect(siteUrlFromEnv({ VERCEL_ENV: 'production', VERCEL_PROJECT_PRODUCTION_URL: 'castle-connect-ug.vercel.app', VERCEL_URL: 'castle-connect-ug-abc123.vercel.app' })).toBe('https://castle-connect-ug.vercel.app')
+  })
+  it("uses the deployment's own Vercel address for previews, so a preview links to itself", () => {
+    expect(siteUrlFromEnv({ VERCEL_ENV: 'preview', VERCEL_PROJECT_PRODUCTION_URL: 'castle-connect-ug.vercel.app', VERCEL_URL: 'castle-connect-ug-git-test.vercel.app' })).toBe('https://castle-connect-ug-git-test.vercel.app')
+  })
+  it('lets a hand-set SITE_URL beat Vercel', () => {
+    expect(siteUrlFromEnv({ SITE_URL: 'https://bridge.example.org', VERCEL_ENV: 'production', VERCEL_PROJECT_PRODUCTION_URL: 'castle-connect-ug.vercel.app' })).toBe('https://bridge.example.org')
+  })
   it("uses Netlify's main URL for a production build", () => {
     expect(siteUrlFromEnv({ CONTEXT: 'production', URL: 'https://bridge-grind.netlify.app', DEPLOY_PRIME_URL: 'https://main--bridge-grind.netlify.app' })).toBe('https://bridge-grind.netlify.app')
   })

@@ -47,7 +47,7 @@ function serviceWorker(): Plugin {
 
 /**
  * Writes the WhatsApp link-preview tags into index.html. The picture needs the site's full address,
- * which Netlify supplies as the URL environment variable during its build (or set SITE_URL yourself).
+ * which Vercel (or Netlify) supplies as an environment variable during its build (or set SITE_URL yourself).
  */
 function socialPreview(): Plugin {
   const siteUrl = siteUrlFromEnv(process.env)
@@ -58,7 +58,7 @@ function socialPreview(): Plugin {
       console.log(
         siteUrl
           ? `Link preview: using ${siteUrl}`
-          : 'Link preview: no site address known (set SITE_URL, or build on Netlify), so the card will have text but no picture.',
+          : 'Link preview: no site address known (set SITE_URL, or build on Vercel), so the card will have text but no picture.',
       )
     },
     transformIndexHtml: (html) => injectSocialTags(html, siteUrl),

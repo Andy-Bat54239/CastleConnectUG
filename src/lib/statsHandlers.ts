@@ -2,13 +2,22 @@ import { mergeRecord, parseSnapshot, summarise, type PlayerRecord } from './stat
 
 /**
  * The two server routes, written against plain Request/Response and a tiny store interface, so the same code runs in the
- * Netlify functions (with Netlify Blobs behind the store) and in the tests and local checks (with a map behind it).
+ * Vercel functions (with a Redis database behind the store) and in the tests and local checks (with a map behind it).
  */
 
 export interface PlayerStore {
   get(id: string): Promise<PlayerRecord | null>
   set(id: string, record: PlayerRecord): Promise<void>
   all(): Promise<PlayerRecord[]>
+}
+
+/** Thrown by a store that has no database behind it yet, so the routes can say so (503) instead of failing blindly (500). */
+export class StorageMissing extends Error {}
+
+function storageProblem(e: unknown): Response {
+  if (e instanceof StorageMissing) return json({ error: e.message }, 503)
+  console.error('counter storage error', e)
+  return json({ error: 'storage error' }, 500)
 }
 
 const MAX_BODY = 2000
@@ -35,9 +44,13 @@ export async function handleTrack(req: Request, store: PlayerStore, now: number,
   }
   const snap = parseSnapshot(raw, now, totalDays)
   if (!snap) return json({ error: 'not a progress picture' }, 400)
-  const merged = mergeRecord(await store.get(snap.id), snap, now)
-  if (merged) await store.set(snap.id, merged)
-  return json({ ok: true, stored: !!merged })
+  try {
+    const merged = mergeRecord(await store.get(snap.id), snap, now)
+    if (merged) await store.set(snap.id, merged)
+    return json({ ok: true, stored: !!merged })
+  } catch (e) {
+    return storageProblem(e)
+  }
 }
 
 /** Compares two strings in a way that takes the same time wherever they differ. */
@@ -55,5 +68,9 @@ export async function handleStats(req: Request, store: PlayerStore, secret: stri
   if (!secret || secret.length < MIN_KEY_LENGTH) return json({ error: 'The STATS_KEY setting is missing or too short (use at least 16 characters).' }, 503)
   const given = (req.headers.get('authorization') ?? '').replace(/^Bearer\s+/i, '')
   if (!sameSecret(given, secret)) return json({ error: 'wrong key' }, 401)
-  return json({ ...summarise(await store.all(), now, totalDays), titles })
+  try {
+    return json({ ...summarise(await store.all(), now, totalDays), titles })
+  } catch (e) {
+    return storageProblem(e)
+  }
 }

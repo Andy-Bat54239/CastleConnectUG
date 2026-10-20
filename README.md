@@ -58,7 +58,7 @@ Example: `https://your-site/?preview=1#/review/3`
   things out. `false` (or deleting the line) is the real challenge. Use `true` or `false` without quotes; the validator
   rejects anything else.
 
-Change the file, commit and push, and Netlify redeploys. Everyone's own start stays on their phone, so changing
+Change the file, commit and push, and Vercel redeploys. Everyone's own start stays on their phone, so changing
 `startDate` later only affects members who have not started yet, and anyone whose start would fall before the new date.
 
 To try it yourself: `?now=2026-10-22T09:00:00%2B03:00` pretends it is that moment (tap Start, and your Day 1 is that day),
@@ -82,16 +82,27 @@ tells members that they are counted and that no names are kept.
 | Finished all 14 days | The core lesson of every day. |
 | Where people are | The last core day each person finished, to show where people stop. |
 
-**One-time setup (about two minutes).** The counter uses Netlify Functions and Netlify Blobs, both built into Netlify, so
-there is nothing to install or pay for. The only thing to set is a secret key that protects the numbers:
+**How it is built.** Two small Vercel functions, `/api/track` (a phone reports) and `/api/stats` (the private totals), keep
+their records in a Redis database that Vercel adds to the project (Upstash, from Vercel's Marketplace, with a free plan).
+The functions are written in `server/` and bundled into `api/track.js` and `api/stats.js` by `npm run build:api`
+(`npm run build` does it too). The bundles are committed because Vercel reads functions from `api/`, and a test fails
+if they ever fall out of date. Each bundle is self-contained, so nothing has to be looked up when it runs.
 
-1. Make a key of at least 16 characters. In a terminal, `openssl rand -hex 16` prints a good one. Keep it private.
-2. In Netlify: **Site configuration, Environment variables, Add a variable**. Key `STATS_KEY`, value your key. Save.
-3. **Deploys, Trigger deploy, Deploy site** (a new deploy picks up the variable).
-4. Open `https://YOUR-SITE/stats.html#key=YOUR_KEY` and bookmark it. The part after `#` is never sent to the server in
-   the page request. Without the `#key=` part the page asks for the key.
+**One-time setup (a few minutes, in the Vercel dashboard).** Until both parts are done, `/api/track` and `/api/stats`
+answer "not set up" and nothing is counted or readable (members see nothing wrong).
 
-Until `STATS_KEY` is set, `/api/stats` answers "not set up" and nobody can read anything. The page never opens without the key.
+1. **Add the database.** Open the project, go to the **Storage** tab, **Create Database**, pick **Upstash** and **Redis**
+   (the free plan is plenty for a group this size), and connect it to the project for all environments. Vercel adds the
+   connection settings to the project for you. The code accepts the usual names (`UPSTASH_REDIS_REST_URL` and
+   `_TOKEN`, or `KV_REST_API_URL` and `_TOKEN`), with or without a prefix.
+2. **Add the secret key.** Make a key of at least 16 characters; in a terminal, `openssl rand -hex 16` prints a good one.
+   Under **Settings, Environment Variables**, add `STATS_KEY` with that value for Production.
+3. **Redeploy.** Settings apply to new deployments only: **Deployments**, open the latest one, **Redeploy**.
+4. **Open the stats.** `https://YOUR-SITE/stats.html#key=YOUR_KEY`, and bookmark it. The part after `#` is never sent to
+   the server in the page request. Without the `#key=` part the page asks for the key.
+
+The stats page tells you which step is missing: "no database yet" for step 1, "STATS_KEY missing" for step 2, "wrong key"
+if the key does not match. The page never opens without the key.
 
 **What it cannot tell you.**
 - Counts are per phone or browser. Someone who clears their data, switches phones or uses two browsers is counted twice.
@@ -101,9 +112,10 @@ Until `STATS_KEY` is set, `/api/stats` answers "not set up" and nobody can read 
 - Test links (`?preview=1`, `?now=...`) and the local dev server are never counted, so reviewing does not change the numbers.
 - Players who tapped Start and then reset their progress go back to "not started" in the counts.
 
-**Trying it locally.** The Vite dev server does not run Netlify functions (and does not count anyway). To see the whole thing
-working, use `npx netlify-cli dev` from this folder with a `STATS_KEY` in the environment, or run the unit tests
-(`tests/stats.test.ts`, `tests/tracker.test.ts`), which cover the same code with an in-memory store.
+**Trying it locally.** The Vite dev server does not run the functions (and does not count anyway). The unit tests
+(`tests/stats.test.ts`, `tests/tracker.test.ts`, `tests/redisStore.test.ts`, `tests/api.test.ts`) cover the same code with a
+stand-in database. To run the real functions on your computer, use `vercel dev` after `vercel login` and `vercel link`
+(this connects the folder to the project, so do it only if you mean to).
 
 ## Edit or add lessons
 
@@ -158,52 +170,49 @@ src/
   ui/               board, cards, move/spot tasks, home, lesson, review screens
   styles.css        design tokens and styles (light + dark)
 public/             icons, manifest, _headers, stats.html (the private stats page)
-netlify/functions/  the two counter functions: /api/track and /api/stats
+server/             the two counter routes (TypeScript): /api/track and /api/stats
+api/                those two routes bundled for Vercel (generated; committed)
 tests/              vitest suite
 ```
 
-## Deploy (Netlify)
+## Deploy (Vercel)
 
-The repository includes `netlify.toml`, so Netlify needs no manual build settings: it runs
-`npm run build` (which checks every lesson first), publishes `dist/`, and uses Node 22.
+The site is a Vercel project connected to the GitHub repository (`Andy-Bat54239/CastleConnectUG`, branch `main`).
+`vercel.json` tells Vercel what to do, so the dashboard needs no build settings: it runs `npm run build` (which
+bundles the counter functions, checks every lesson and the types, then builds), publishes `dist/`, and sets the
+page headers. Vercel picks the Node version from `engines` in `package.json`.
 
-1. Netlify, **Add new site**, **Import an existing project**, choose GitHub, pick this repository.
-2. Leave the build settings as they are (they come from `netlify.toml`) and deploy.
-3. Every push to `main` redeploys automatically. A bad lesson fails the build, so it never goes live.
-4. Optional: **Site configuration, Change site name** for a friendlier address than the random one.
-   Netlify serves HTTPS automatically, which the offline mode and "add to home screen" need.
+1. Vercel, **Add New, Project**, import this repository. Leave the build settings as they are (they come from `vercel.json`).
+2. Every push to `main` redeploys automatically. A bad lesson fails the build, so it never goes live; Vercel keeps the
+   last good version serving.
+3. Pushes to other branches get preview addresses, which Vercel protects with a login by default.
+4. Optional: add your own domain under **Settings, Domains**. The link preview and the picture's footer pick it up.
 
-Leave the Netlify **Asset optimization** options off, and do not set `NODE_ENV=production` for the
-build (it would skip the dev tools the build uses).
-
-Without GitHub: run `npm install && npm run build`, then drag the `dist` folder onto
-https://app.netlify.com/drop. Do it again to update.
+`vercel.json` also makes Vercel re-check the page and service worker on every visit (so lesson fixes reach members
+promptly), cache the fingerprinted files for a year, and keep `/stats.html` out of caches and search engines.
 
 After a deploy, open the link once, then check `/?preview=1#/day/1` and `/?preview=1#/review/1`.
-The file `public/_headers` makes Netlify re-check the page and service worker on every visit (so
-lesson fixes reach members promptly) and cache the fingerprinted files for a year.
 
-**The "Powered by Netlify" badge.** Free-plan Netlify projects can show a badge in the bottom-right
-corner of every page. To remove it: **Project configuration, General, Powered by Netlify badge**, switch
-it off and save (no redeploy needed). If it stays on, the app notices Netlify's badge script
-(`src/lib/hostBadge.ts`): on tablets and computers the buttons stay at the bottom and Next stops short of the
-badge. On phones the buttons stay on the bottom edge and the badge can cover part of Next, so switching
-the badge off is the way to avoid that.
+**A host badge.** Some hosts (Netlify's free plan, for one) overlay a badge on every page. The app notices Netlify's badge
+script (`src/lib/hostBadge.ts`) and keeps the buttons clear of it. Vercel adds no badge to a deployed site.
 
 **Never publish the parent folder.** This project lives in `bridge-grind/`. The folder around it holds
-the source book PDF and working files that must not go on the internet.
+the source book PDF and working files that must not go on the internet. Vercel's project must use `bridge-grind` as its
+root (it does, because that is the repository).
 
 ## WhatsApp link preview
 
 When someone pastes the link into a chat, WhatsApp shows a card: the picture in
 `public/og-image.png`, a title and one line of text (both set in `scripts/social.ts`).
 
-- **On Netlify there is nothing to set.** WhatsApp needs the picture's full `https://` address, and the
-  build takes it from Netlify's own `URL` setting. A custom domain added later is picked up on the next deploy.
+- **On Vercel there is normally nothing to set.** WhatsApp needs the picture's full `https://` address, and the
+  build takes it from Vercel's production address (`VERCEL_PROJECT_PRODUCTION_URL`), so a custom domain added later is
+  picked up on the next deploy. If the card has no picture, check that **Settings, Environment Variables, Automatically
+  expose System Environment Variables** is on, or set `SITE_URL` to the full address yourself.
 - **Building by hand** (the drag-and-drop route): give it the address, for example
-  `SITE_URL=https://your-site.netlify.app npm run build`. Without one the card still has the title
+  `SITE_URL=https://your-site.vercel.app npm run build`. Without one the card still has the title
   and text but no picture, and the build says so.
-- **Check it after a deploy:** `curl -s https://your-site.netlify.app | grep og:` should list
+- **Check it after a deploy:** `curl -s https://your-site.vercel.app | grep og:` should list
   `og:image` with a full `https://` address, and that address should open the picture in a browser.
 - **WhatsApp remembers cards.** A link already pasted somewhere before this deploy may keep its old
   card for a while. Adding anything to the end of the link, such as `?v=2`, makes WhatsApp fetch a

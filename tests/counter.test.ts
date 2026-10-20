@@ -6,18 +6,20 @@ const root = join(__dirname, '..')
 const read = (p: string) => readFileSync(join(root, p), 'utf8')
 
 describe('player counter wiring', () => {
-  it('has the two Netlify functions, on the routes the site calls', () => {
-    expect(read('netlify.toml')).toMatch(/\[functions\]\s*\n\s*directory = "netlify\/functions"/)
-    expect(read('netlify/functions/track.ts')).toContain("path: '/api/track'")
-    expect(read('netlify/functions/stats.ts')).toContain("path: '/api/stats'")
+  it('has the two Vercel functions in api/, on the routes the site calls', () => {
+    for (const name of ['track', 'stats']) {
+      expect(existsSync(join(root, `api/${name}.js`))).toBe(true)
+      expect(read(`api/${name}.js`)).toContain('export {')
+      expect(existsSync(join(root, `server/${name}.ts`))).toBe(true)
+    }
     expect(read('src/lib/tracker.ts')).toContain("'/api/track'")
     expect(read('public/stats.html')).toContain("'/api/stats'")
   })
 
-  it('reads the secret key from Netlify\'s environment, never from the repository', () => {
-    expect(read('netlify/functions/stats.ts')).toContain('process.env.STATS_KEY')
+  it('reads the secret key from the host\'s environment, never from the repository', () => {
+    expect(read('src/lib/statsRoutes.ts')).toContain('env.STATS_KEY')
     // the repository is public: no key may be written into any file that ships or runs
-    const shipped = ['public/stats.html', 'src/lib/statsHandlers.ts', 'src/lib/tracker.ts', 'netlify.toml', 'public/_headers']
+    const shipped = ['public/stats.html', 'src/lib/statsHandlers.ts', 'src/lib/statsRoutes.ts', 'src/lib/tracker.ts', 'vercel.json', 'api/stats.js', 'api/track.js']
     for (const f of shipped) expect(read(f)).not.toMatch(/STATS_KEY\s*=\s*["']?[A-Za-z0-9]{12,}/)
   })
 
@@ -29,7 +31,20 @@ describe('player counter wiring', () => {
 
   it('keeps the stats page out of search engines and out of caches', () => {
     expect(read('public/stats.html')).toContain('noindex')
-    expect(read('public/_headers')).toMatch(/\/stats\.html\s*\n\s*Cache-Control: no-store\s*\n\s*X-Robots-Tag: noindex/)
+    const headers = JSON.parse(read('vercel.json')).headers as { source: string; headers: { key: string; value: string }[] }[]
+    const stats = headers.find((h) => h.source === '/stats.html')!
+    expect(stats.headers).toContainEqual({ key: 'Cache-Control', value: 'no-store' })
+    expect(stats.headers).toContainEqual({ key: 'X-Robots-Tag', value: 'noindex, nofollow' })
+  })
+
+  it('tells Vercel how to build the site, and keeps the page and service worker fresh', () => {
+    const v = JSON.parse(read('vercel.json'))
+    expect(v.buildCommand).toBe('npm run build')
+    expect(v.outputDirectory).toBe('dist')
+    const rule = (source: string) => v.headers.find((h: { source: string }) => h.source === source)?.headers ?? []
+    expect(rule('/sw.js')).toContainEqual({ key: 'Cache-Control', value: 'no-cache' })
+    expect(rule('/index.html')).toContainEqual({ key: 'Cache-Control', value: 'no-cache' })
+    expect(rule('/assets/(.*)')).toContainEqual({ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' })
   })
 
   it('builds the stats page from text only, so a stored value can never inject markup', () => {
@@ -42,8 +57,12 @@ describe('player counter wiring', () => {
   })
 
   it('starts counting when the app starts, but not on the dev server or test links', () => {
-    const main = read('src/main.ts')
-    expect(main).toContain('startTracking(TOTAL_DAYS, location.search, import.meta.env.DEV)')
-    expect(existsSync(join(root, 'netlify/functions/track.ts'))).toBe(true)
+    expect(read('src/main.ts')).toContain('startTracking(TOTAL_DAYS, location.search, import.meta.env.DEV)')
+  })
+
+  it('has no leftovers from the old host in the counter', () => {
+    expect(existsSync(join(root, 'netlify'))).toBe(false)
+    expect(existsSync(join(root, 'netlify.toml'))).toBe(false)
+    expect(read('package.json')).not.toContain('@netlify/blobs')
   })
 })

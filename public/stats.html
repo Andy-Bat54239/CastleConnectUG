@@ -46,7 +46,7 @@
     <header><b>Bridge Grind · Stats</b><small>Private. Please do not share this page's link.</small></header>
     <main>
       <section id="ask" hidden>
-        <p>Paste the stats key (the STATS_KEY you set on Netlify) to see the numbers.</p>
+        <p>Paste the stats key (the STATS_KEY you set in Vercel) to see the numbers.</p>
         <input id="key" type="password" autocomplete="off" aria-label="Stats key" />
         <button id="go" type="button">Show the numbers</button>
       </section>
@@ -144,7 +144,7 @@
           fetch('/api/stats', { headers: { authorization: 'Bearer ' + key }, cache: 'no-store' })
             .then(function (res) {
               if (res.status === 401) { try { sessionStorage.removeItem(KEY_STORE) } catch (e) {} key = ''; $('out').hidden = true; $('ask').hidden = false; problem('That key is not right. Check it and try again.'); return null }
-              if (res.status === 503) { problem('The stats key has not been set up on Netlify yet. See the README, under "Counting players".'); return null }
+              if (res.status === 503) { return res.json().catch(function () { return {} }).then(function (b) { problem((b && b.error) || 'The counter is not set up yet. See the README, under "Counting players".'); return null }) }
               if (!res.ok) { problem('Could not load the numbers (error ' + res.status + '). Try again in a minute.'); return null }
               return res.json()
             })
