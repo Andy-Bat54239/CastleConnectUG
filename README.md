@@ -77,6 +77,7 @@ illegal move, a false "checkmate" claim or a mistyped field.
 | Board and pieces | Own board code; piece artwork supplied by Castle Connect, traced to SVG (`src/ui/pieces.ts`) | No GPL board library. The piece set is the one Castle Connect supplied; confirm you hold the rights to it. |
 | Routing | `#/day/3` style hash links | Works on any static host and inside WhatsApp's browser, no server rules. |
 | Moving pieces | Drag a piece, or tap it and tap where it goes | Both work on every device (one code path: pointer events). A press that barely moves is a tap; one that travels is a drag, with a ghost piece that rides above a finger so it is not hidden. Only squares holding a piece stop page scrolling, and only on boards where dragging is on. Escape cancels a drag. |
+| Share picture | A 1080x1350 PNG drawn on the member's phone with a canvas (`src/lib/shareCard.ts`), sent through the phone's share menu | Carries the Castle Connect logo (embedded, so it works offline) and every detail of the day. WhatsApp cannot attach a picture from a link, so the share menu is the way; computers get a saved file instead. Nothing is uploaded anywhere. |
 | Progress | `localStorage`, wrapped in try/catch, in-memory fallback | In-app browsers sometimes block storage; the app warns instead of breaking. |
 | Time | Fixed UTC+3 arithmetic, no `Intl` | Exact for Kampala and works in every in-app browser. |
 | Theme | Light by default; dark is a switch the member turns on | The phone's own light/dark setting is ignored. The sun/moon button is in the header and in the lesson bar, and the choice is remembered. A tiny script in `index.html` applies it before the first paint so there is no flash. |
@@ -109,7 +110,7 @@ scripts/
   line.ts               authoring helper: moves -> FEN
   sw-template.js        service worker template (filled in at build time)
 src/
-  lib/              time, store, share, chess helpers (no DOM, easy to test)
+  lib/              time, store, share, shareCard (draws the WhatsApp picture), chess helpers (mostly no DOM, easy to test)
   ui/               board, cards, move/spot tasks, home, lesson, review screens
   styles.css        design tokens and styles (light + dark)
 public/             icons, manifest, _headers
@@ -173,7 +174,8 @@ link **from inside WhatsApp**:
 - [ ] Paste the link into a WhatsApp chat: the card shows the picture, title and text.
 - [ ] The page loads and is styled; the board shows pieces.
 - [ ] Progress survives closing WhatsApp and tapping the link again (some in-app browsers block storage; the page shows a warning if so).
-- [ ] "Share my progress" opens the phone's share menu; if not, that it copies; if not, the WhatsApp button works.
+- [ ] "Share the picture" opens the phone's share menu with the progress picture (logo, day, score, days done, the member's line); choose the WhatsApp group and check the picture arrives with the message as its caption. On a computer it saves the picture and copies the message instead. "Share the text only" and the WhatsApp button still work.
+- [ ] The picture shows the real site address in its footer (not on localhost), and a long line of 240 characters still fits.
 - [ ] Tapping and moving pieces feels right with a thumb, on the smallest phone you have. Try dragging too, and check that scrolling the page by swiping on empty squares still works.
 - [ ] On a laptop and a tablet: the layout fills the screen sensibly and dragging and clicking pieces with a mouse both work.
 - [ ] The sun/moon button switches modes, and the choice is still there after closing WhatsApp and reopening the link.

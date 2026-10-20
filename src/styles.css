@@ -701,6 +701,23 @@ textarea[readonly] {
 .card-grind .task-status {
   margin-top: 10px;
 }
+/* The progress picture members post in the group (drawn on their phone by src/lib/shareCard.ts). */
+[hidden] {
+  display: none !important;
+}
+.share-pic-box {
+  margin: 16px 0 6px;
+}
+.share-pic {
+  display: block;
+  width: 100%;
+  max-width: 380px;
+  height: auto;
+  margin: 0 auto;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+}
 
 /* Board */
 .board {

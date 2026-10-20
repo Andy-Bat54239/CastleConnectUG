@@ -1,8 +1,8 @@
 import type { Card, DayContent } from '../types'
-import { course, loadDay } from '../lib/content'
+import { course, loadDay, TOTAL_DAYS } from '../lib/content'
 import * as store from '../lib/store'
 import { dayOpen, formatDate, getNow, isPreview, parseStart, unlockAt } from '../lib/time'
-import { buildMessage, shareText, waLink } from '../lib/share'
+import { buildMessage, pictureName, shareImage, shareText, waLink } from '../lib/share'
 import { renderCard, scoredKeys, type CardView } from './cards'
 import { button, h } from './dom'
 import { themeButton } from './themeButton'
@@ -134,6 +134,60 @@ export async function mountDay(root: HTMLElement, day: number, current: () => bo
 
     const message = () =>
       buildMessage({ name: course.challengeName, day, right, total, note: noteBox.value, wentDeeper: store.isDeeperDone(day) })
+
+    // The picture for the group: drawn on this phone from the same facts as the message.
+    const pic = h('img', { class: 'share-pic', alt: 'Your progress picture for the group', width: '1080', height: '1350' }) as HTMLImageElement
+    const picBox = h('div', { class: 'share-pic-box' }, pic)
+    picBox.hidden = true
+    const savePic = h('a', { class: 'btn alt' }, 'Save the picture') as HTMLAnchorElement
+    savePic.hidden = true
+    let png: Blob | null = null
+    let picUrl = ''
+    let drawing = 0
+    let drawTimer = 0
+    let maker: typeof import('../lib/shareCard') | null = null
+    const fileName = pictureName(course.challengeName, day)
+
+    async function makePicture(): Promise<Blob | null> {
+      const mine = ++drawing
+      try {
+        maker = maker ?? (await import('../lib/shareCard'))
+        const blob = await maker.renderShareCard({
+          name: course.challengeName,
+          day,
+          totalDays: TOTAL_DAYS,
+          title: lesson.title,
+          level: lesson.level,
+          right,
+          total,
+          wentDeeper: store.isDeeperDone(day),
+          done: Array.from({ length: TOTAL_DAYS }, (_, k) => k + 1 === day || store.isCoreDone(k + 1)),
+          note: noteBox.value,
+          dateText: formatDate(getNow()),
+          host: maker.footerHost(location.hostname),
+        })
+        if (mine !== drawing) return png
+        png = blob
+        if (picUrl) URL.revokeObjectURL(picUrl)
+        picUrl = URL.createObjectURL(blob)
+        pic.src = picUrl
+        pic.alt = `Your progress picture: ${message().replace(/\n/g, ', ')}`
+        picBox.hidden = false
+        savePic.href = picUrl
+        savePic.download = fileName
+        savePic.hidden = false
+        return blob
+      } catch {
+        // No canvas, or the picture code could not load (offline on first use): the text message still works.
+        if (mine === drawing) {
+          png = null
+          picBox.hidden = true
+          savePic.hidden = true
+        }
+        return null
+      }
+    }
+
     const sync = () => {
       const m = message()
       preview.value = m
@@ -142,14 +196,35 @@ export async function mountDay(root: HTMLElement, day: number, current: () => bo
     noteBox.addEventListener('input', () => {
       store.update(day, (x) => (x.note = noteBox.value))
       sync()
+      window.clearTimeout(drawTimer)
+      drawTimer = window.setTimeout(() => void makePicture(), 350)
     })
     preview.addEventListener('focus', () => preview.select())
     sync()
+    void makePicture()
 
-    const share = button('Share my progress', 'btn', async () => {
+    const shareTextOnly = button('Share the text only', 'btn alt', async () => {
       const out = await shareText(message())
       result.textContent =
         out === 'shared' ? 'Shared. Look for it in the group.' : out === 'copied' ? 'Copied. Paste it into the group chat.' : out === 'cancelled' ? 'Share cancelled.' : 'Could not copy automatically. Press and hold the message above to copy it, or use the WhatsApp button.'
+    })
+
+    const share = button('Share the picture', 'btn', async () => {
+      const blob = png ?? (await makePicture())
+      if (!blob) {
+        result.textContent = 'Could not make the picture on this phone, so sharing the text instead.'
+        shareTextOnly.click()
+        return
+      }
+      const out = await shareImage(blob, fileName, message())
+      if (out === 'shared') result.textContent = 'Shared. Look for it in the group.'
+      else if (out === 'cancelled') result.textContent = 'Share cancelled.'
+      else {
+        // This browser cannot send pictures straight to WhatsApp (most computers): save it and copy the message.
+        savePic.click()
+        void navigator.clipboard?.writeText(message()).catch(() => undefined)
+        result.textContent = 'Picture saved. Open the WhatsApp group, attach it, and paste your message (we copied it).'
+      }
     })
 
     const habits = h(
@@ -177,11 +252,14 @@ export async function mountDay(root: HTMLElement, day: number, current: () => bo
       h('p', null, 'Three habits make the day count:'),
       habits,
       h('h3', null, 'Share it with the group'),
-      h('p', { class: 'mute' }, 'One line is enough. Say what you learned, a win, or a blunder you survived.'),
+      h('p', { class: 'mute' }, 'One line is enough. Say what you learned, a win, or a blunder you survived. We turn your result into a picture for the group.'),
       noteBox,
-      h('p', { class: 'mute small-label' }, 'Your message'),
-      preview,
+      picBox,
       share,
+      savePic,
+      h('p', { class: 'mute small-label' }, 'Your message (it goes with the picture)'),
+      preview,
+      shareTextOnly,
       wa,
       result,
     )
