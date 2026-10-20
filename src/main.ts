@@ -3,6 +3,7 @@ import { installSprite } from './ui/pieces'
 import { mountHome } from './ui/home'
 import { applyTheme, loadTheme } from './lib/theme'
 import { themeButton } from './ui/themeButton'
+import { hostBadgeShown } from './lib/hostBadge'
 
 const root = document.getElementById('app') as HTMLElement
 
@@ -28,6 +29,8 @@ function route(): void {
 }
 
 installSprite()
+// A host badge in the bottom-right corner (Netlify's free plan) would sit on top of the Next button.
+if (hostBadgeShown(document)) document.documentElement.classList.add('host-badge')
 applyTheme(loadTheme())
 document.getElementById('theme-slot')?.append(themeButton('on-bar'))
 window.addEventListener('hashchange', route)

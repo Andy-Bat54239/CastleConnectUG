@@ -60,7 +60,7 @@ body {
   background: var(--bg);
   color: var(--ink);
   font: 17px/1.55 system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
-  padding-bottom: env(safe-area-inset-bottom, 0);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 h1,
@@ -109,7 +109,7 @@ a {
 .app-bar {
   background: #034f3b;
   color: #fefae7;
-  padding: calc(10px + env(safe-area-inset-top, 0)) var(--pad) 10px;
+  padding: calc(10px + env(safe-area-inset-top, 0px)) var(--pad) 10px;
 }
 body[data-lesson] .app-bar {
   display: none;
@@ -409,7 +409,7 @@ a:focus-visible {
   grid-template-rows: auto auto;
   align-items: center;
   column-gap: 4px;
-  padding: calc(8px + env(safe-area-inset-top, 0)) 0 8px;
+  padding: calc(8px + env(safe-area-inset-top, 0px)) 0 8px;
   margin: 0 calc(-1 * var(--pad));
   padding-left: calc(var(--pad) - 4px);
   padding-right: var(--pad);
@@ -492,9 +492,24 @@ a:focus-visible {
   gap: 10px;
   max-width: var(--wrap);
   margin: 0 auto;
-  padding: 10px var(--pad) calc(10px + env(safe-area-inset-bottom, 0));
+  padding: 10px var(--pad) calc(10px + env(safe-area-inset-bottom, 0px));
   background: var(--bg);
   border-top: 1px solid var(--line);
+}
+
+/* When the host overlays a badge in the bottom-right corner (see src/lib/hostBadge.ts), lift the lesson's
+   Back/Next row clear of it, and leave room under the content so nothing ends up hidden behind the row. */
+.host-badge .lesson-foot {
+  padding-bottom: calc(74px + env(safe-area-inset-bottom, 0px));
+}
+.host-badge .stage {
+  padding-bottom: 188px;
+}
+.host-badge .fb-slot {
+  scroll-margin-bottom: 200px;
+}
+.host-badge main {
+  padding-bottom: 120px;
 }
 
 /* Cards */
