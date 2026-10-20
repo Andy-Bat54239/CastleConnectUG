@@ -1,0 +1,507 @@
+{
+  "day": 8,
+  "title": "Weaknesses",
+  "level": "700-1100",
+  "blurb": "Every position has weak spots. Learn to spot a piece nothing defends, a lonely pawn and a hole next to the king, and to attack them before your opponent attacks yours.",
+  "deeperTitle": "Space; open vs closed positions",
+  "share": {
+    "prompt": "One thing I learned today…"
+  },
+  "core": [
+    {
+      "type": "read",
+      "title": "A weakness is a target",
+      "body": [
+        "A **weakness** is something your opponent can attack and you cannot easily protect: a piece nothing defends, a pawn with no pawn beside it, or a square next to your king that your pawns no longer guard.",
+        "Find your opponent’s weaknesses, and do not make your own."
+      ],
+      "board": {
+        "fen": "r4rk1/pp3ppp/5n2/3p4/8/2N5/PP3PPP/3R2K1 w - - 0 1",
+        "highlight": [
+          "d5"
+        ],
+        "caption": "Black’s pawn on d5 stands alone.",
+        "assert": {
+          "isolated": [
+            "d5"
+          ]
+        }
+      }
+    },
+    {
+      "type": "spot",
+      "prompt": "Tap Black’s **isolated** pawn: the one with no Black pawn on either side of it.",
+      "board": {
+        "fen": "r4rk1/ppp3pp/4p3/8/3P4/8/PPP2PPP/R4RK1 w - - 0 1"
+      },
+      "targets": [
+        "e6"
+      ],
+      "verify": {
+        "kind": "isolatedPawns",
+        "color": "b"
+      },
+      "explain": "The pawn on **e6** has no pawn on the d or f file, so no pawn can ever protect it. Pieces have to guard it, and they get tied down doing that."
+    },
+    {
+      "type": "read",
+      "title": "Count the attackers and the defenders",
+      "body": [
+        "Before you capture, count. The pawn on d5 is **attacked twice** (knight and rook) and **defended once** (knight). More attackers than defenders, so it falls.",
+        "But the order matters: **capture with your cheapest piece first**."
+      ],
+      "board": {
+        "fen": "r4rk1/pp3ppp/5n2/3p4/8/2N5/PP3PPP/3R2K1 w - - 0 1",
+        "arrows": [
+          [
+            "c3",
+            "d5"
+          ],
+          [
+            "d1",
+            "d5"
+          ],
+          [
+            "f6",
+            "d5"
+          ]
+        ],
+        "caption": "Two attackers against one defender.",
+        "assert": {
+          "counts": {
+            "d5": {
+              "attackers": 2,
+              "defenders": 1
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "findMove",
+      "prompt": "Win the pawn on d5. Mind the order of the captures.",
+      "fen": "r4rk1/pp3ppp/5n2/3p4/8/2N5/PP3PPP/3R2K1 w - - 0 1",
+      "solution": [
+        "Nxd5"
+      ],
+      "wins": 1,
+      "hint": "Start with your cheapest attacker, not your rook.",
+      "explain": "**Nxd5** wins a pawn: after **Nxd5 Nxd5 Rxd5** you are a pawn up. If you start with **Rxd5**, Black takes with the knight, you take back with the knight, and you have given a rook for a knight and a pawn."
+    },
+    {
+      "type": "choice",
+      "prompt": "Here the pawn on d5 is attacked twice and defended once. Is it worth taking with the knight?",
+      "board": {
+        "fen": "r4rk1/pp3ppp/4p3/3p4/8/2N5/PP3PPP/3R2K1 w - - 0 1",
+        "arrows": [
+          [
+            "c3",
+            "d5"
+          ],
+          [
+            "d1",
+            "d5"
+          ],
+          [
+            "e6",
+            "d5"
+          ]
+        ],
+        "assert": {
+          "counts": {
+            "d5": {
+              "attackers": 2,
+              "defenders": 1
+            }
+          }
+        }
+      },
+      "options": [
+        "No: the pawn takes back, and you lose a knight for two pawns",
+        "Yes: two attackers beat one defender",
+        "Yes, but only with the rook"
+      ],
+      "answer": 0,
+      "explain": "Counting is not enough: look at **what** is defending. After **Nxd5 exd5 Rxd5** you have given a knight (3) for two pawns (2). The defender here is a cheap pawn, so the pawn is safe."
+    },
+    {
+      "type": "spot",
+      "prompt": "Now pieces. Tap a black piece that nothing defends.",
+      "board": {
+        "fen": "r4rk1/pp3ppp/2n5/5b2/8/2N5/PP3PPP/3R2K1 w - - 0 1"
+      },
+      "targets": [
+        "f5",
+        "b7"
+      ],
+      "verify": {
+        "kind": "loose",
+        "color": "b"
+      },
+      "explain": "Nothing defends the bishop on **f5**, or the pawn on b7. A piece nobody defends is the first thing to look for: it can be attacked at no risk."
+    },
+    {
+      "type": "read",
+      "title": "Weak squares: holes",
+      "body": [
+        "A pawn can never go backwards. When it moves, it stops guarding some squares for good. Here, after **g6**, no Black pawn can ever guard f6 or h6 again: they are **holes**.",
+        "A good piece on a hole, backed by your queen, can be deadly."
+      ],
+      "board": {
+        "fen": "6k1/pp3p1p/6p1/8/8/8/PP3PPP/6K1 b - - 0 1",
+        "arrows": [
+          [
+            "g6",
+            "f5"
+          ],
+          [
+            "g6",
+            "h5"
+          ]
+        ],
+        "highlight": [
+          "f6",
+          "h6"
+        ],
+        "caption": "The pawn on g6 guards f5 and h5, but not f6 or h6.",
+        "assert": {
+          "attackedFrom": {
+            "g6": [
+              "f5",
+              "h5"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "type": "findMove",
+      "prompt": "Your bishop sits on a hole at f6. Find the quiet queen move that forces checkmate in two.",
+      "fen": "r4rk1/pp3p1p/5Bp1/8/8/8/PP1Q1PPP/6K1 w - - 0 1",
+      "solution": [
+        "Qh6",
+        "Rfe8",
+        "Qg7#"
+      ],
+      "after": {
+        "attackedFrom": {
+          "h6": [
+            "g7"
+          ],
+          "f6": [
+            "g7"
+          ]
+        }
+      },
+      "hint": "The other hole is h6. Your queen and your bishop can both attack g7 from there.",
+      "explain": "**Qh6** threatens **Qg7#**: the bishop protects the queen, and the king has no square. Black has no pawn left to guard f6 or h6, so nothing stops it. The pawn move g6 created these holes."
+    },
+    {
+      "type": "findMove",
+      "prompt": "Another weakness from Day 1: the back rank. White threatens Rd8 checkmate. Find a move that stops it.",
+      "fen": "6k1/5ppp/8/8/8/8/5PPP/3R2K1 b - - 0 1",
+      "goal": "avoidMate",
+      "hint": "Give the king somewhere to run.",
+      "explain": "Moving a pawn to give your king an escape square is called making **luft** (German for \"air\"). Any pawn move on the f, g or h file works. Only stepping to h8 walks into mate."
+    },
+    {
+      "type": "puzzleSet",
+      "title": "Hit the weakness",
+      "theme": "weakness",
+      "ratingMin": 700,
+      "ratingMax": 1100,
+      "intro": "Each one has a weak point to attack. Count first, and start with the right piece.",
+      "puzzles": [
+        {
+          "fen": "r4rk1/pp3ppp/2b5/3p4/8/2N5/PP3PPP/3QR1K1 w - - 0 1",
+          "solution": [
+            "Nxd5"
+          ],
+          "wins": 1,
+          "hint": "The pawn is attacked by your knight and your queen, and defended once. Which captures first?",
+          "explain": "**Nxd5 Bxd5 Qxd5**: you win a pawn. Taking with the queen first would give her up for a bishop and a pawn."
+        },
+        {
+          "fen": "r4rk1/pp1b1ppp/2n5/8/8/2N5/PP3PPP/3RR1K1 w - - 0 1",
+          "solution": [
+            "Rxd7"
+          ],
+          "wins": 3,
+          "hint": "Which black piece has no defender?",
+          "explain": "The bishop on d7 is protected by nothing, and your rook sees it down the open file. **Rxd7** wins a whole bishop."
+        },
+        {
+          "fen": "r4rk1/pp3ppp/5n2/3p4/8/5B2/PP3PPP/3R2K1 w - - 0 1",
+          "solution": [
+            "Bxd5"
+          ],
+          "wins": 1,
+          "hint": "The pawn is attacked by a bishop and a rook, and defended by a knight.",
+          "explain": "**Bxd5 Nxd5 Rxd5**: you take the pawn, trade bishop for knight, and end a pawn up. Taking with the rook first would lose the exchange."
+        }
+      ]
+    },
+    {
+      "type": "puzzleSet",
+      "title": "Weaknesses for Black",
+      "theme": "weakness",
+      "ratingMin": 700,
+      "ratingMax": 1100,
+      "intro": "The same ideas from Black’s side. The board is flipped, so take your time.",
+      "puzzles": [
+        {
+          "fen": "3r2k1/pp3ppp/2n5/8/3P4/5N2/PP3PPP/R4RK1 b - - 0 1",
+          "solution": [
+            "Nxd4"
+          ],
+          "wins": 1,
+          "hint": "White’s pawn on d4 stands alone. Take it with the cheaper piece.",
+          "explain": "**Nxd4 Nxd4 Rxd4**: you win the lonely pawn. Taking with the rook first would lose the exchange."
+        },
+        {
+          "fen": "3rr1k1/pp3ppp/2n5/8/8/2N5/PP1B1PPP/R4RK1 b - - 0 1",
+          "solution": [
+            "Rxd2"
+          ],
+          "wins": 3,
+          "hint": "Which white piece has no defender?",
+          "explain": "The bishop on d2 is protected by nothing. **Rxd2** wins it."
+        },
+        {
+          "fen": "6k1/pp1q1ppp/8/8/8/5bP1/PP3P1P/R4RK1 b - - 0 1",
+          "solution": [
+            "Qh3",
+            "Rfe1",
+            "Qg2#"
+          ],
+          "hint": "Your bishop sits on a hole at f3. Bring the queen to the other one.",
+          "explain": "White’s pawn move g3 left holes on f3 and h3. **Qh3** threatens **Qg2#**, and nothing can stop it."
+        }
+      ]
+    }
+  ],
+  "deeper": [
+    {
+      "type": "read",
+      "title": "Space",
+      "body": [
+        "**Space** is room to move. A side with more space controls more squares on the other side of the board, so its pieces move freely while the other side’s bump into each other.",
+        "A simple count: how many squares on **their** half of the board do you attack?"
+      ],
+      "board": {
+        "fen": "rnbq1rk1/pp3pbp/3p1np1/2pP4/4P3/2N2N2/PP2BPPP/R1BQ1RK1 w - - 0 1",
+        "caption": "White attacks 9 squares on Black’s half. Black attacks 5 on White’s half.",
+        "assert": {
+          "space": {
+            "w": 9,
+            "b": 5
+          }
+        }
+      }
+    },
+    {
+      "type": "choice",
+      "prompt": "Count the squares each side attacks on the other half of the board. Who has more space here?",
+      "board": {
+        "fen": "r1bqk2r/pp2bppp/2n1p1n1/2ppP3/3P4/2PB1N2/PP3PPP/RNBQ1RK1 w kq - 7 8",
+        "assert": {
+          "space": {
+            "w": 10,
+            "b": 6
+          }
+        }
+      },
+      "options": [
+        "White",
+        "Black",
+        "Equal"
+      ],
+      "answer": 0,
+      "explain": "White attacks 10 squares on Black’s half; Black attacks only 6. The pawn on e5 cramps Black’s knights and bishop."
+    },
+    {
+      "type": "read",
+      "title": "Closed positions",
+      "body": [
+        "In a **closed** position the pawns are locked together in the middle, and no file is open. Pieces cannot swing through, so play moves to the wings and a slow plan wins.",
+        "Knights are good here: they jump over the pawns."
+      ],
+      "board": {
+        "fen": "r1bqk2r/pp2bppp/2n1p1n1/2ppP3/3P4/2PB1N2/PP3PPP/RNBQ1RK1 w kq - 7 8",
+        "caption": "No file is completely open.",
+        "assert": {
+          "openFiles": []
+        }
+      }
+    },
+    {
+      "type": "choice",
+      "prompt": "This Black bishop is hemmed in by its own pawns. How many squares does it attack?",
+      "board": {
+        "fen": "r1bqk2r/pp2bppp/2n1p1n1/2ppP3/3P4/2PB1N2/PP3PPP/RNBQ1RK1 w kq - 7 8",
+        "highlight": [
+          "b7",
+          "d7",
+          "e6"
+        ],
+        "assert": {
+          "attackCount": {
+            "c8": 3
+          },
+          "highlightIsAttacksOf": "c8"
+        }
+      },
+      "options": [
+        "3",
+        "7",
+        "11"
+      ],
+      "answer": 0,
+      "explain": "Only b7, d7 and e6: its own pawns block the rest. In a closed position a bishop behind its own pawns is often a “bad” bishop."
+    },
+    {
+      "type": "read",
+      "title": "Open positions",
+      "body": [
+        "In an **open** position pawns have been traded, and files and diagonals are free. Rooks want the open files, and bishops can see across the whole board.",
+        "Whoever moves their pieces to the open lines first often gets an advantage."
+      ],
+      "board": {
+        "fen": "r4rk1/pp3ppp/8/8/3B4/8/PP3PPP/R4RK1 w - - 0 1",
+        "caption": "The c, d and e files have no pawns on them.",
+        "assert": {
+          "openFiles": [
+            "c",
+            "d",
+            "e"
+          ]
+        }
+      }
+    },
+    {
+      "type": "choice",
+      "prompt": "This bishop sits in an open position. How many squares does it attack?",
+      "board": {
+        "fen": "r4rk1/pp3ppp/8/8/3B4/8/PP3PPP/R4RK1 w - - 0 1",
+        "assert": {
+          "attackCount": {
+            "d4": 10
+          }
+        }
+      },
+      "options": [
+        "3",
+        "10",
+        "14"
+      ],
+      "answer": 1,
+      "explain": "Ten squares, in all four directions. Compare that with the 3 squares of the hemmed-in bishop: this is why bishops like open positions."
+    },
+    {
+      "type": "choice",
+      "prompt": "Which files are completely open in this position (no pawn of either colour)?",
+      "board": {
+        "fen": "r4rk1/pp3ppp/8/8/3B4/8/PP3PPP/R4RK1 w - - 0 1"
+      },
+      "options": [
+        "c, d and e",
+        "Only d",
+        "a and h"
+      ],
+      "answer": 0,
+      "explain": "Both sides have pawns on a, b, f, g and h. The c, d and e files are empty of pawns, so rooks can use them."
+    },
+    {
+      "type": "findMove",
+      "prompt": "Rooks belong on open files. Put one of your rooks on an open file.",
+      "fen": "r4rk1/pp3ppp/8/8/8/8/PP3PPP/R4RK1 w - - 0 1",
+      "solution": [
+        "Rac1"
+      ],
+      "accept": [
+        "Rad1",
+        "Rae1",
+        "Rfc1",
+        "Rfd1",
+        "Rfe1"
+      ],
+      "after": {
+        "openFiles": [
+          "c",
+          "d",
+          "e"
+        ]
+      },
+      "hint": "Which files have no pawns?",
+      "explain": "The c, d and e files are open, so any of these works. From an open file a rook can reach the other side of the board; on a closed file it is stuck behind its own pawns."
+    },
+    {
+      "type": "puzzleSet",
+      "title": "Back-rank mates",
+      "theme": "back rank mate",
+      "ratingMin": 0,
+      "ratingMax": 600,
+      "intro": "Same idea, three different looks.",
+      "puzzles": [
+        {
+          "fen": "6k1/5ppp/8/8/8/8/8/R5K1 w - - 0 1",
+          "solution": [
+            "Ra8#"
+          ],
+          "hint": "Rooks love open files.",
+          "explain": "The black pawns trap their own king."
+        },
+        {
+          "fen": "r5k1/5ppp/8/8/8/8/5PPP/6K1 b - - 0 1",
+          "solution": [
+            "Ra1#"
+          ],
+          "hint": "Black can use the same trick against White.",
+          "explain": "White forgot to make luft, so the back rank falls."
+        },
+        {
+          "fen": "6k1/5ppp/8/8/8/8/5PPP/3Q2K1 w - - 0 1",
+          "solution": [
+            "Qd8#"
+          ],
+          "hint": "The queen also travels along files.",
+          "explain": "A queen does the job of a rook here."
+        }
+      ]
+    },
+    {
+      "type": "puzzleSet",
+      "title": "Loose pieces drop off",
+      "theme": "hanging piece",
+      "ratingMin": 400,
+      "ratingMax": 800,
+      "intro": "A little harder: the loose piece is not always the obvious one.",
+      "puzzles": [
+        {
+          "fen": "6k1/5ppp/8/8/3n4/8/1B3PPP/6K1 w - - 0 1",
+          "solution": [
+            "Bxd4"
+          ],
+          "hint": "The bishop sees all the way down the diagonal.",
+          "explain": "Nothing guards the knight, so the long diagonal wins it."
+        },
+        {
+          "fen": "6k1/5ppp/2n5/8/3B4/8/5PPP/6K1 b - - 0 1",
+          "solution": [
+            "Nxd4"
+          ],
+          "hint": "A knight attacks in an L shape.",
+          "explain": "The bishop stood alone on d4, and the knight takes it."
+        },
+        {
+          "fen": "r5k1/5p1p/6p1/8/8/8/5PPP/Q5K1 w - - 0 1",
+          "solution": [
+            "Qxa8+"
+          ],
+          "hint": "The rook has no defender, and the queen sees it along the file.",
+          "explain": "The rook was loose, and the capture even comes with check."
+        }
+      ]
+    }
+  ]
+}
