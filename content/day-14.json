@@ -1,0 +1,551 @@
+{
+  "day": 14,
+  "title": "Trading: when to trade",
+  "level": "1000-1400",
+  "blurb": "Trading is a decision: when to trade, which pieces to keep, and the good and bad bishop. Then a final test, a look back, your next goals, and an invitation to the Sunday KO.",
+  "deeperTitle": "Final test, reflection, next goals; invite to the Sunday KO",
+  "share": {
+    "prompt": "My biggest takeaway from the 14 days…"
+  },
+  "core": [
+    {
+      "type": "read",
+      "title": "Every trade is a decision",
+      "body": [
+        "A **trade** is when pieces of equal value come off the board. A trade is not good or bad by itself: it helps one side and hurts the other.",
+        "Before you trade, or accept a trade, ask three questions. **Am I ahead or behind? Am I cramped? Is it my bad piece for their good one?**"
+      ]
+    },
+    {
+      "type": "read",
+      "title": "Ahead? Trade pieces",
+      "body": [
+        "When you are ahead in material, trade **pieces**. Each trade makes your extra material a bigger share of what is left, and gives your opponent fewer ways to fight back.",
+        "Keep your pawns when you are ahead. You need them to win the ending."
+      ],
+      "board": {
+        "fen": "3qr1k1/ppp2ppp/2n5/8/8/2N2N2/PPP2PPP/3QR1K1 w - - 0 1",
+        "caption": "White is a knight up (+3). The queens face each other.",
+        "assert": {
+          "materialDiff": 3
+        }
+      }
+    },
+    {
+      "type": "findMove",
+      "prompt": "You are a knight up, and the queens face each other. Trade them.",
+      "fen": "3qr1k1/ppp2ppp/2n5/8/8/2N2N2/PPP2PPP/3QR1K1 w - - 0 1",
+      "solution": [
+        "Qxd8"
+      ],
+      "takes": "d8",
+      "after": {
+        "materialDiff": 12,
+        "counts": {
+          "d8": {
+            "attackers": 2,
+            "defenders": 0
+          }
+        }
+      },
+      "hint": "Take their queen. Your own queen is protected by the rook.",
+      "explain": "**Qxd8** trades the queens: Black takes back, and you are still a knight up. With fewer pieces left, your extra knight counts for more."
+    },
+    {
+      "type": "choice",
+      "prompt": "Now you are a knight down, and the queens face each other. It is your move. Do you trade?",
+      "board": {
+        "fen": "3qr1k1/ppp2ppp/2nn4/8/8/5N2/PPP2PPP/3QR1K1 w - - 0 1",
+        "caption": "White is a knight down (-3).",
+        "assert": {
+          "materialDiff": -3
+        }
+      },
+      "options": [
+        "No. Keep the queens on and look for chances",
+        "Yes. Fewer pieces make the game simpler",
+        "Yes. Trading is always good"
+      ],
+      "answer": 0,
+      "explain": "Every trade makes the other side’s extra knight count for more. When you are behind, keep the pieces on the board, make threats, and wait for a mistake."
+    },
+    {
+      "type": "findMove",
+      "prompt": "Now you are Black, a knight up, and the queens face each other. Trade them.",
+      "fen": "3qr1k1/ppp2ppp/2n2n2/8/8/2N5/PPP2PPP/3QR1K1 b - - 0 1",
+      "solution": [
+        "Qxd1"
+      ],
+      "takes": "d1",
+      "after": {
+        "materialDiff": -12,
+        "counts": {
+          "d1": {
+            "attackers": 2,
+            "defenders": 0
+          }
+        }
+      },
+      "hint": "Take their queen. Your own queen is protected by the rook.",
+      "explain": "The same idea from Black’s side: **Qxd1** trades the queens, and you stay a knight up."
+    },
+    {
+      "type": "findMove",
+      "prompt": "You are a pawn up, and the rooks face each other on the d-file. Trade a pair of rooks.",
+      "fen": "3r1rk1/pp3ppp/8/8/8/2P5/PP3PPP/3R1RK1 w - - 0 1",
+      "solution": [
+        "Rxd8"
+      ],
+      "takes": "d8",
+      "after": {
+        "materialDiff": 6,
+        "counts": {
+          "d8": {
+            "attackers": 1,
+            "defenders": 0
+          }
+        }
+      },
+      "hint": "Take the rook that is looking at yours.",
+      "explain": "**Rxd8** trades a pair of rooks. After Black takes back you are still a pawn up, with fewer pieces to worry about."
+    },
+    {
+      "type": "read",
+      "title": "Cramped? Trade",
+      "body": [
+        "A **cramped** position is one where your pieces have little room and get in each other’s way. Black is cramped here: White attacks 8 squares on Black’s side, and Black attacks only 4.",
+        "If you are the cramped side, trade a pair of pieces. The pieces that stay get more room. If you have the space, avoid trades."
+      ],
+      "board": {
+        "fen": "r1bqkb1r/pp2nppp/2n1p3/2ppP3/3P1B2/2P2N2/PP3PPP/RN1QKB1R b KQkq - 0 1",
+        "caption": "Black to move. Count the squares each side attacks on the other half of the board.",
+        "assert": {
+          "space": {
+            "w": 8,
+            "b": 4
+          }
+        }
+      }
+    },
+    {
+      "type": "choice",
+      "prompt": "Black is cramped. Which plan helps Black most?",
+      "board": {
+        "fen": "r1bqkb1r/pp2nppp/2n1p3/2ppP3/3P1B2/2P2N2/PP3PPP/RN1QKB1R b KQkq - 0 1",
+        "assert": {
+          "space": {
+            "w": 8,
+            "b": 4
+          }
+        }
+      },
+      "options": [
+        "Trade a pair of pieces, so the rest have more room",
+        "Keep every piece on the board",
+        "Push more pawns forward"
+      ],
+      "answer": 0,
+      "explain": "Crowded pieces block each other. After a trade, the pieces that are left can use the squares that were crowded. The side with more space wants the opposite."
+    },
+    {
+      "type": "read",
+      "title": "Good and bad bishops",
+      "body": [
+        "A bishop stays on one colour. When many of your own pawns stand on that colour, they block it: a **bad bishop**. A bishop outside its own pawns is a **good bishop**.",
+        "Count the pawns on your bishop’s colour. It is a rule of thumb: most of them on its colour usually means a bad bishop."
+      ],
+      "board": {
+        "fen": "r2r2k1/p2q1pp1/1p1p4/2p1pb2/2P5/1P1BP2P/P2Q1PP1/R4RK1 w - - 0 1",
+        "highlight": [
+          "d3",
+          "f5"
+        ],
+        "caption": "White’s bishop on d3 has five of its own pawns on its colour. Black’s bishop on f5 has only one.",
+        "assert": {
+          "bishopPawns": {
+            "d3": {
+              "same": 5,
+              "other": 2
+            },
+            "f5": {
+              "same": 1,
+              "other": 6
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "spot",
+      "prompt": "White has two bishops. Tap the bad one: the bishop with most of its own pawns on its colour.",
+      "board": {
+        "fen": "r3k2r/ppp2ppp/8/8/8/2P1P3/1PPP1PPP/R1B1KB1R w KQkq - 0 1"
+      },
+      "targets": [
+        "c1"
+      ],
+      "verify": {
+        "kind": "badBishops",
+        "color": "w"
+      },
+      "explain": "The bishop on **c1** moves on dark squares, and six of White’s eight pawns (b2, c3, d2, e3, f2, h2) are on dark squares too. The bishop on f1 has only two pawns on its colour."
+    },
+    {
+      "type": "findMove",
+      "prompt": "White’s bishop on d3 is the bad one, and Black’s bishop on f5 is the good one. They face each other. Trade them.",
+      "fen": "r2r2k1/p2q1pp1/1p1p4/2p1pb2/2P5/1P1BP2P/P2Q1PP1/R4RK1 w - - 0 1",
+      "solution": [
+        "Bxf5"
+      ],
+      "takes": "f5",
+      "after": {
+        "materialDiff": 3,
+        "counts": {
+          "f5": {
+            "attackers": 1,
+            "defenders": 0
+          }
+        }
+      },
+      "hint": "Both bishops attack each other along the same diagonal. Take first.",
+      "explain": "**Bxf5** swaps your bad bishop for Black’s good one. Black takes back with the queen, and material is level. Trade your bad pieces for their good ones."
+    },
+    {
+      "type": "findMove",
+      "prompt": "Now you are Black. Your bishop on d6 is the bad one, and White’s bishop on f4 is the good one. Trade them.",
+      "fen": "r4rk1/p2q1pp1/1p1bp2p/2p5/2P1PB2/1P1P4/P2Q1PP1/R2R2K1 b - - 0 1",
+      "solution": [
+        "Bxf4"
+      ],
+      "takes": "f4",
+      "after": {
+        "materialDiff": -3,
+        "counts": {
+          "f4": {
+            "attackers": 1,
+            "defenders": 0
+          }
+        }
+      },
+      "hint": "Both bishops attack each other along the same diagonal. Take first.",
+      "explain": "The same idea from Black’s side: **Bxf4** swaps your bad bishop for White’s good one."
+    },
+    {
+      "type": "read",
+      "title": "Knights like the centre",
+      "body": [
+        "A knight in the centre can reach up to eight squares. On the edge of the board it reaches at most four, and in a corner only two.",
+        "A knight on the edge is a **bad knight**. Improve your worst-placed piece before you start something new, or trade it."
+      ],
+      "board": {
+        "fen": "4k3/8/8/8/N2N4/8/8/4K3 w - - 0 1",
+        "highlight": [
+          "b3",
+          "b5",
+          "c2",
+          "c6",
+          "e2",
+          "e6",
+          "f3",
+          "f5"
+        ],
+        "caption": "The knight on d4 attacks 8 squares (marked). The knight on a4 attacks only 4.",
+        "assert": {
+          "attackCount": {
+            "d4": 8,
+            "a4": 4
+          },
+          "highlightIsAttacksOf": "d4"
+        }
+      }
+    },
+    {
+      "type": "choice",
+      "prompt": "Both knights are White’s. Which one is the bad piece?",
+      "board": {
+        "fen": "4k3/8/8/4N3/8/7N/8/4K3 w - - 0 1",
+        "assert": {
+          "attackCount": {
+            "e5": 8,
+            "h3": 4
+          }
+        }
+      },
+      "options": [
+        "The knight on h3, on the edge",
+        "The knight on e5, in the centre",
+        "Both are equally good"
+      ],
+      "answer": 0,
+      "explain": "The knight on h3 attacks 4 squares, and the one on e5 attacks 8. Bring the h3 knight towards the centre, for example with Nf4 or Ng5. If a trade comes, offer the bad piece and keep the good one."
+    },
+    {
+      "type": "spot",
+      "prompt": "White is thinking of taking the knight on d5. Tap every black piece that could take back on d5.",
+      "board": {
+        "fen": "3q2k1/pp3ppp/4b3/3n4/8/2N5/PP3PPP/3Q2K1 w - - 0 1"
+      },
+      "targets": [
+        "d8",
+        "e6"
+      ],
+      "verify": {
+        "kind": "defenders",
+        "square": "d5"
+      },
+      "explain": "The bishop on **e6** and the queen on **d8** both guard d5. Count the recaptures before you start a trade."
+    },
+    {
+      "type": "choice",
+      "prompt": "White plays Nxd5, and Black takes back with the bishop. What should White do now?",
+      "board": {
+        "fen": "3q2k1/pp3ppp/4b3/3n4/8/2N5/PP3PPP/3Q2K1 w - - 0 1",
+        "assert": {
+          "counts": {
+            "d5": {
+              "attackers": 2,
+              "defenders": 2
+            }
+          }
+        }
+      },
+      "options": [
+        "Stop. Knight for knight is an even trade, and Qxd5 would lose the queen for a bishop",
+        "Take again with Qxd5, and win the bishop",
+        "Take again with Qxd5, and win a pawn"
+      ],
+      "answer": 0,
+      "explain": "The square d5 is attacked twice and defended twice. The first trade is even. If White takes again, Black’s queen takes the white queen. Know where a trade should stop."
+    },
+    {
+      "type": "choice",
+      "prompt": "Which of these trades loses points? (pawn 1, knight and bishop 3, rook 5)",
+      "options": [
+        "A knight for a bishop",
+        "A rook for a rook",
+        "A rook for a knight"
+      ],
+      "answer": 2,
+      "explain": "A rook is worth 5 and a knight 3, so you lose 2 points. Count a trade before you make it. Sometimes the exchange is worth giving up, but only when you can see what you get for it."
+    },
+    {
+      "type": "read",
+      "title": "Your trading checklist",
+      "body": [
+        "**Ahead?** Trade pieces. **Behind?** Keep them on.",
+        "**Cramped?** Trade to get room. **Plenty of room?** Do not.",
+        "**Bad piece for their good one?** Trade it.",
+        "Then **count** the trade, and run the checklist from Day 6: checks, captures, attacks."
+      ]
+    }
+  ],
+  "deeper": [
+    {
+      "type": "read",
+      "title": "The final test",
+      "body": [
+        "Eight questions from across the challenge, and six puzzles. Nothing is timed.",
+        "Use the checklist: **checks, captures, attacks**, for you and for your opponent. At the end you will see how many you got right the first time."
+      ]
+    },
+    {
+      "type": "spot",
+      "prompt": "Day 8. Tap Black’s **isolated** pawn: the one with no Black pawn on either side of it.",
+      "board": {
+        "fen": "r4rk1/ppp3pp/4p3/8/3P4/8/PPP2PPP/R4RK1 w - - 0 1"
+      },
+      "targets": [
+        "e6"
+      ],
+      "verify": {
+        "kind": "isolatedPawns",
+        "color": "b"
+      },
+      "explain": "The pawn on **e6** has no pawn on the d or f file, so no pawn can ever protect it. Pieces have to guard it, and they get tied down doing that."
+    },
+    {
+      "type": "choice",
+      "prompt": "Day 10. When is a gambit a good idea?",
+      "options": [
+        "When you know the lines well and your opponent may not",
+        "Always, because pawns do not matter",
+        "Never"
+      ],
+      "answer": 0,
+      "explain": "A gambit works when you know the plan and keep up the pressure. Pawns do matter, so do not play a gambit you have not learned."
+    },
+    {
+      "type": "findMove",
+      "prompt": "Day 11. Win the bishop on c5 by removing its defender.",
+      "fen": "6k1/ppp2ppp/n7/2b5/8/8/BPR1BPPP/6K1 w - - 0 1",
+      "solution": [
+        "Bxa6"
+      ],
+      "wins": 3,
+      "hint": "Which of your pieces can take the knight on a6?",
+      "explain": "**Bxa6** takes the defender. If Black recaptures on a6, **Rxc5** wins the bishop. Either way you come out a piece ahead."
+    },
+    {
+      "type": "spot",
+      "prompt": "Day 12. Tap Black’s backward pawn.",
+      "board": {
+        "fen": "r4rk1/pp3ppp/3p4/2p1p3/4P3/2N2N2/PPP2PPP/R4RK1 w - - 0 1"
+      },
+      "targets": [
+        "d6"
+      ],
+      "verify": {
+        "kind": "backwardPawns",
+        "color": "b"
+      },
+      "explain": "The pawn on **d6** is behind c5 and e5, and White’s e4 pawn controls d5. Nothing can protect it except pieces."
+    },
+    {
+      "type": "findMove",
+      "prompt": "Day 13. Take the opposition. Find the only king move that keeps the win.",
+      "fen": "8/4k3/8/3K4/4P3/8/8/8 w - - 0 1",
+      "solution": [
+        "Ke5"
+      ],
+      "keeps": "win",
+      "hint": "Put your king in front of the pawn, facing the black king with one square between.",
+      "explain": "**Ke5** takes the opposition: the kings face each other with one square between, and Black is to move. Any other move lets Black draw."
+    },
+    {
+      "type": "choice",
+      "prompt": "Day 11. In what order should you look at candidate moves?",
+      "options": [
+        "Checks first, then captures, then threats",
+        "Quiet moves first, forcing moves last",
+        "Whatever looks nicest"
+      ],
+      "answer": 0,
+      "explain": "Forcing moves leave your opponent the fewest replies, so you can calculate them to the end. That is the checklist from Day 6."
+    },
+    {
+      "type": "puzzleSet",
+      "title": "Final puzzles",
+      "theme": "mixed",
+      "ratingMin": 1000,
+      "ratingMax": 1400,
+      "intro": "Six puzzles, one from across the challenge each: a mate, a fork, a checks-first line, a defender to remove, a weak pawn and a king and pawn ending.",
+      "puzzles": [
+        {
+          "fen": "6k1/7p/7Q/8/8/8/1B6/7K w - - 0 1",
+          "solution": [
+            "Qg7#"
+          ],
+          "hint": "Look at where the bishop is aiming.",
+          "explain": "The bishop on b2 protects g7 along the long diagonal, so the queen cannot be taken."
+        },
+        {
+          "fen": "6k1/pp4pp/B7/8/8/br6/PP4PP/6K1 w - - 0 1",
+          "solution": [
+            "Bc4+"
+          ],
+          "wins": 4,
+          "after": {
+            "attackedFrom": {
+              "c4": [
+                "g8",
+                "b3"
+              ]
+            }
+          },
+          "hint": "Check the king and attack the rook at the same time.",
+          "explain": "The bishop checks the king and attacks the rook on b3, so the rook falls next."
+        },
+        {
+          "fen": "6k1/1pbQ1ppp/3q2B1/8/8/2B5/P4PPP/6K1 w - - 0 1",
+          "solution": [
+            "Qxf7+",
+            "Kh8",
+            "Qxg7#"
+          ],
+          "hint": "Take with check. Where does the king have to go?",
+          "explain": "**Qxf7+** drives the king to h8. Then **Qxg7#** is checkmate, because the bishop on c3 protects the queen."
+        },
+        {
+          "fen": "6k1/ppp2ppp/5b2/4n3/8/5RQ1/PPP2PPP/6K1 w - - 0 1",
+          "solution": [
+            "Rxf6"
+          ],
+          "wins": 3,
+          "after": {
+            "lines": [
+              {
+                "kind": "pin",
+                "attacker": "g3",
+                "front": "g7",
+                "back": "g8"
+              }
+            ]
+          },
+          "hint": "What is holding up the knight on e5? And can the g7 pawn take back?",
+          "explain": "The bishop on f6 defends the knight. **Rxf6** takes it, and the pawn on g7 cannot take back because your queen pins it to the king. You win a piece and the knight on e5 is still attacked."
+        },
+        {
+          "fen": "6k1/2n2ppp/3r4/4p3/2P1P3/3PN3/PP3PPP/6KB b - - 0 1",
+          "solution": [
+            "Rxd3"
+          ],
+          "wins": 1,
+          "hint": "You are Black. Which black pawn is backward?",
+          "explain": "The same idea from Black’s side: the rook takes the undefended backward pawn down the open file."
+        },
+        {
+          "fen": "8/1K6/8/1k2P3/8/8/8/8 b - - 0 1",
+          "solution": [
+            "Kc5"
+          ],
+          "keeps": "draw",
+          "hint": "You are the defender. Where must your king stand?",
+          "explain": "**…Kc5** keeps the black king close enough to the pawn. Any other move loses the draw."
+        }
+      ]
+    },
+    {
+      "type": "findMove",
+      "prompt": "Day 11. Checkmate in three. Give up your queen, then a rook will finish. Which queen move starts it?",
+      "fen": "3r2k1/pp3ppp/8/8/5R2/1QN5/PPP2PPP/6K1 w - - 0 1",
+      "solution": [
+        "Qxf7+",
+        "Kh8",
+        "Qf8+",
+        "Rxf8",
+        "Rxf8#"
+      ],
+      "hint": "The rook on d8 guards the back rank. How can you force it away?",
+      "explain": "**Qxf7+** (protected by the rook on f4) drives the king to h8. **Qf8+** deflects the rook from d8, and **Rxf8#** is checkmate."
+    },
+    {
+      "type": "read",
+      "title": "Look back",
+      "body": [
+        "Fourteen days ago you chose moves by feel. Now you have a checklist, the must-know mates, forks and pins, a first opening, a sense of pawn structure, and some endgame facts.",
+        "Ask yourself: **Which idea changed my games most? Which mistake keeps coming back? Which day would I do again?**",
+        "Say one of your answers in the group. It may help someone else to start."
+      ]
+    },
+    {
+      "type": "read",
+      "title": "Your next goals",
+      "body": [
+        "Pick two or three, not all of them.",
+        "**Play** one game a day, and look back at one loss each week.",
+        "**Puzzle** for ten minutes a day, on the themes you found hardest.",
+        "**Learn one opening line** well, for White or Black, from Day 9.",
+        "**Come back** to any day from the All days page, whenever you like."
+      ]
+    },
+    {
+      "type": "read",
+      "title": "Join the Sunday KO",
+      "body": [
+        "The **Sunday Chess League KO** is a knockout tournament on Chess.com, played in rating tiers, so you meet players close to your level.",
+        "You have finished 14 days of lessons, puzzles and games. That is real preparation. Look for the sign-up message in the WhatsApp group, or ask there how to join.",
+        "You will lose some games. Everybody does, and it is how everyone improves."
+      ]
+    }
+  ]
+}
