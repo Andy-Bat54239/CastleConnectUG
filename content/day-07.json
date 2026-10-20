@@ -1,0 +1,410 @@
+{
+  "day": 7,
+  "title": "Draws, and never resigning",
+  "level": "All",
+  "blurb": "Not every game is won or lost. Learn the ways a game ends in a draw, how to save a lost position, and why you never resign.",
+  "deeperTitle": "Week 1 review quiz and puzzle set",
+  "share": {
+    "prompt": "One thing I learned today…"
+  },
+  "core": [
+    {
+      "type": "read",
+      "title": "A draw is a result too",
+      "body": [
+        "A game can end in a **draw**, half a point each. The main ways: **stalemate**, the **same position three times**, **not enough pieces to checkmate**, or both players **agree**.",
+        "When you are losing, a draw is a great result. This lesson is about getting one."
+      ],
+      "board": {
+        "fen": "7k/5K2/6Q1/8/8/8/8/8 b - - 0 1",
+        "caption": "Stalemate: Black has no legal move and is not in check.",
+        "assert": {
+          "status": "stalemate"
+        }
+      }
+    },
+    {
+      "type": "choice",
+      "prompt": "White has a king and a bishop. Black has only a king. How does this game end?",
+      "board": {
+        "fen": "8/8/4k3/8/8/3B4/8/4K3 w - - 0 1",
+        "assert": {
+          "status": "insufficient"
+        }
+      },
+      "options": [
+        "A draw: nobody can ever give checkmate",
+        "White wins by chasing the king",
+        "Black wins on time"
+      ],
+      "answer": 0,
+      "explain": "A king and a bishop (or a king and a knight) cannot checkmate a lone king, so the game is drawn on the spot. King against king is a draw too."
+    },
+    {
+      "type": "choice",
+      "prompt": "Now White has a king and a rook against a lone king. What happens with good play?",
+      "board": {
+        "fen": "8/8/4k3/8/8/8/8/R3K3 w - - 0 1",
+        "assert": {
+          "status": "normal"
+        }
+      },
+      "options": [
+        "White can force checkmate",
+        "It is a draw, just like the bishop",
+        "Black wins"
+      ],
+      "answer": 0,
+      "explain": "A king and a rook can force checkmate (you met the ladder and the king-and-rook mate on Day 4). A lone bishop or knight cannot. When you are losing, trading down to that is one way out."
+    },
+    {
+      "type": "read",
+      "title": "The same position three times",
+      "body": [
+        "If the **same position** appears **three times**, a player can claim a draw. So can they after fifty moves with no capture and no pawn move.",
+        "The classic way to force it is **perpetual check**: keep giving check, and their king has to keep stepping to the same squares."
+      ],
+      "board": {
+        "fen": "r5k1/p1p5/4N3/8/8/3Q4/q7/7K w - - 0 1",
+        "caption": "White is behind in material, but Black’s king has nowhere to hide."
+      }
+    },
+    {
+      "type": "findMove",
+      "prompt": "White is losing on points. Find the check that forces a draw by perpetual check.",
+      "fen": "r5k1/p1p5/4N3/8/8/3Q4/q7/7K w - - 0 1",
+      "solution": [
+        "Qg6+",
+        "Kh8",
+        "Qh6+",
+        "Kg8",
+        "Qg6+"
+      ],
+      "ends": "perpetual",
+      "hint": "Check the king from g6. Where can it go? Then check again so that it has to come back.",
+      "explain": "**Qg6+** forces **Kh8**, then **Qh6+** forces **Kg8**, and **Qg6+** again. The knight on e6 covers f8 and g7, and nothing can block or capture, so Black cannot escape. The position repeats: a draw."
+    },
+    {
+      "type": "read",
+      "title": "Stalemate can save you",
+      "body": [
+        "Stalemate is not only something to avoid. When **you** are losing, it can save you: have no legal move while you are **not in check**.",
+        "The trick is to give up your last mobile piece, so that your opponent has to take it."
+      ],
+      "board": {
+        "fen": "k3r3/8/1Q6/8/8/2B5/5PPP/7K b - - 0 1",
+        "caption": "Black is a queen and a bishop down. Black’s king is boxed in by the queen."
+      }
+    },
+    {
+      "type": "findMove",
+      "prompt": "You are Black, far behind. Find the move that saves the game.",
+      "fen": "k3r3/8/1Q6/8/8/2B5/5PPP/7K b - - 0 1",
+      "solution": [
+        "Re1+"
+      ],
+      "ends": "stalemateTrap",
+      "hint": "Your king cannot move. Give up your rook with check, so that White has to take it.",
+      "explain": "**Re1+** is check. White’s king cannot move and the queen cannot block, so the only legal reply is **Bxe1**. Now Black has no legal move and is not in check: **stalemate**, a draw."
+    },
+    {
+      "type": "findMove",
+      "prompt": "Now the other side. You are winning. Checkmate in one. One tempting queen move would be stalemate, so check each square.",
+      "fen": "7k/5K2/8/8/8/8/8/6Q1 w - - 0 1",
+      "goal": "mate",
+      "hint": "The queen must give check, not just trap the king.",
+      "explain": "**Qg7#**, **Qg8#**, **Qh1#** and **Qh2#** all mate. **Qg6** looks strong, but it is stalemate: the king has no move and is not in check."
+    },
+    {
+      "type": "read",
+      "title": "Never resign",
+      "body": [
+        "Resigning gives away the half point you might still get. Strong players resign rarely, and beginners should almost never.",
+        "Opponents miss checks, miss stalemate tricks and run out of time. Make them find the win."
+      ]
+    },
+    {
+      "type": "choice",
+      "prompt": "You are a queen down against someone who plays fast. What is the best plan?",
+      "options": [
+        "Play on, set traps and look for checks and stalemate",
+        "Resign to save time",
+        "Offer a draw on every move"
+      ],
+      "answer": 0,
+      "explain": "Fast players blunder. Keep making threats, give checks when they are safe, and watch for a perpetual or a stalemate. You lose nothing by trying."
+    },
+    {
+      "type": "choice",
+      "prompt": "You are clearly winning, and your opponent offers a draw. What should you do?",
+      "options": [
+        "Decline and keep playing for the win",
+        "Accept straight away",
+        "Ask them to resign instead"
+      ],
+      "answer": 0,
+      "explain": "A draw is only half a point. When you are winning, play on, and watch out for stalemate. When you are the one losing, a draw offer is worth taking."
+    },
+    {
+      "type": "puzzleSet",
+      "title": "Escape artists",
+      "theme": "draw",
+      "ratingMin": 600,
+      "ratingMax": 1000,
+      "intro": "You are losing in every one of these, and you have a way out. Find the perpetual check or the stalemate trap.",
+      "puzzles": [
+        {
+          "fen": "7k/Q7/3q4/8/8/4n3/P1P5/R5K1 b - - 0 1",
+          "solution": [
+            "Qg3+",
+            "Kh1",
+            "Qh3+",
+            "Kg1",
+            "Qg3+"
+          ],
+          "ends": "perpetual",
+          "hint": "You are Black. Check the king from g3, and keep checking.",
+          "explain": "The knight on e3 covers f1 and g2, so the king can only shuffle between g1 and h1. **Qg3+**, **Qh3+**, **Qg3+**: a perpetual check."
+        },
+        {
+          "fen": "5qkr/ppp2p1p/8/4Q3/8/8/5PPP/6K1 w - - 0 1",
+          "solution": [
+            "Qg5+",
+            "Qg7",
+            "Qd8+",
+            "Qf8",
+            "Qg5+"
+          ],
+          "ends": "perpetual",
+          "hint": "Black’s king is boxed in by its own pieces. Check on the g-file.",
+          "explain": "**Qg5+** forces the queen to block on g7. **Qd8+** forces it back to f8, and **Qg5+** starts again. Black cannot break the cycle."
+        },
+        {
+          "fen": "7k/5ppp/2b5/8/8/1q6/8/K3R3 w - - 0 1",
+          "solution": [
+            "Re8+"
+          ],
+          "ends": "stalemateTrap",
+          "hint": "Your king is boxed in by the queen. Give up your rook with check.",
+          "explain": "**Re8+** can only be answered by **Bxe8**, and then White has no legal move and is not in check: stalemate."
+        },
+        {
+          "fen": "k7/8/1Q6/8/8/1R6/1r3PPP/7K b - - 0 1",
+          "solution": [
+            "Rb1+"
+          ],
+          "ends": "stalemateTrap",
+          "hint": "You are Black. Your king is boxed in. Give up the rook with check.",
+          "explain": "**Rb1+** can only be answered by **Rxb1**, because the queen on b6 is blocked by the rook on b3. Then Black has no legal move and is not in check: stalemate."
+        }
+      ]
+    }
+  ],
+  "deeper": [
+    {
+      "type": "read",
+      "title": "Week 1 in a minute",
+      "body": [
+        "Six days, six ideas: how games end, the opening rules, how pieces see, the must-know mates, forks, and the checklist.",
+        "Here is one or two questions from each. Answer first time and your score counts."
+      ]
+    },
+    {
+      "type": "findMove",
+      "prompt": "Day 1. Checkmate in one. Your king is helping.",
+      "fen": "7k/8/5K2/8/8/8/8/6Q1 w - - 0 1",
+      "goal": "mate",
+      "hint": "Put the queen on a square next to the black king that your own king also guards.",
+      "explain": "**Qg7#**. The queen attacks the king, your king protects her, and no square is left to run to."
+    },
+    {
+      "type": "choice",
+      "prompt": "Day 1. Which of these ends the game with a win for you?",
+      "options": [
+        "You capture their queen",
+        "Their king is in check",
+        "They resign"
+      ],
+      "answer": 2,
+      "explain": "Winning the queen or giving check does not end the game. Only checkmate, resignation, time or abandonment do."
+    },
+    {
+      "type": "choice",
+      "prompt": "Day 2. Which opening start follows all three ideas?",
+      "options": [
+        "1.e4 e5 2.Nf3 Nc6 3.Bc4",
+        "1.a4 a5 2.h4 h5 3.Rh3",
+        "1.e4 e5 2.Qh5 Nc6 3.Qxe5+"
+      ],
+      "answer": 0,
+      "explain": "A centre pawn, then a knight, then a bishop. Next would come castling. The other two waste moves on the edge or bring the queen out too soon."
+    },
+    {
+      "type": "spot",
+      "prompt": "Day 3. White to move. Tap the black piece that nobody defends.",
+      "board": {
+        "fen": "6k1/3p1ppp/2n5/5b2/8/8/2Q2PPP/6K1 w - - 0 1",
+        "assert": {
+          "attacked": [
+            "f5"
+          ],
+          "undefended": [
+            "f5"
+          ]
+        }
+      },
+      "targets": [
+        "f5"
+      ],
+      "verify": {
+        "kind": "loose",
+        "color": "b"
+      },
+      "explain": "The d7 pawn guards the knight, the bishop guards the d7 pawn, and the king guards the other pawns. But **nobody guards the bishop on f5**, so the queen can simply take it."
+    },
+    {
+      "type": "findMove",
+      "prompt": "Day 3. Their bishop attacks your knight, and nothing protects it. Answer by **capturing** the attacker.",
+      "fen": "6k1/5ppp/8/8/6b1/5NPP/5P2/6K1 w - - 0 1",
+      "goal": "answer",
+      "verify": {
+        "method": "capture",
+        "target": "f3"
+      },
+      "hint": "Which of your pieces can take the bishop on g4?",
+      "explain": "**hxg4**. The pawn takes the bishop and nothing takes back. Pawns are excellent at removing attackers."
+    },
+    {
+      "type": "findMove",
+      "prompt": "Day 4. Checkmate in one. One tempting queen move would be stalemate, so check each square.",
+      "fen": "7k/5K2/8/8/8/8/8/6Q1 w - - 0 1",
+      "goal": "mate",
+      "hint": "The queen must give check, not just trap the king.",
+      "explain": "**Qg7#**, **Qg8#**, **Qh1#** and **Qh2#** all mate. **Qg6** looks strong, but it is stalemate: the king has no move and is not in check."
+    },
+    {
+      "type": "findMove",
+      "prompt": "Day 5. Fork the king and the queen with your knight.",
+      "fen": "6k1/3q1p1p/8/8/4N3/8/PPP2PPP/6K1 w - - 0 1",
+      "solution": [
+        "Nf6+",
+        "Kg7",
+        "Nxd7"
+      ],
+      "wins": 9,
+      "after": {
+        "attackedFrom": {
+          "f6": [
+            "g8",
+            "d7"
+          ]
+        }
+      },
+      "hint": "Find the square from which the knight attacks both the king and the queen.",
+      "explain": "**Nf6+** attacks the king and the queen at once. The king must move, and then **Nxd7** wins the queen."
+    },
+    {
+      "type": "findMove",
+      "prompt": "Day 6. White to move. Find the check that leads to checkmate in two.",
+      "fen": "6k1/ppQ2ppp/8/4b1b1/6N1/8/5PPP/6K1 w - - 0 1",
+      "solution": [
+        "Qc8+",
+        "Bd8",
+        "Qxd8#"
+      ],
+      "hint": "You have several checks. Which one leaves Black only one legal reply?",
+      "explain": "**Qc8+** leaves Black one reply: the bishop must block on d8, because the king has no square. Then **Qxd8#** is checkmate. None of your other checks forces mate. Your queen is attacked by the bishop on e5, but with a check every move Black never gets to take it."
+    },
+    {
+      "type": "findMove",
+      "prompt": "Day 6. Several pieces can be taken here, but only one capture wins material. Find it.",
+      "fen": "3q1rk1/pp3ppp/2b2n2/4n1B1/3P4/2NB4/PPP2PPP/R2Q1RK1 w - - 0 1",
+      "solution": [
+        "dxe5"
+      ],
+      "wins": 3,
+      "after": {
+        "attackedFrom": {
+          "e5": [
+            "f6"
+          ]
+        }
+      },
+      "hint": "Before you take anything, ask: is it protected? One black piece is not.",
+      "explain": "**dxe5** wins a knight that nothing protects, and the pawn now attacks the knight on f6 as well. **Bxh7+** looks tempting, but the knight on f6 simply takes the bishop."
+    },
+    {
+      "type": "puzzleSet",
+      "title": "Week 1 puzzles",
+      "theme": "review",
+      "ratingMin": 400,
+      "ratingMax": 1000,
+      "intro": "One from each part of the week. Take your time.",
+      "puzzles": [
+        {
+          "fen": "k7/8/1K6/8/8/8/8/7R w - - 0 1",
+          "solution": [
+            "Rh8#"
+          ],
+          "hint": "Your king already covers the squares in front of the black king.",
+          "explain": "The king on b6 guards a7 and b7, so the rook only has to check along the back rank."
+        },
+        {
+          "fen": "6k1/5ppp/8/3n4/8/8/5PPP/3R2K1 w - - 0 1",
+          "solution": [
+            "Rxd5"
+          ],
+          "hint": "Look for the piece with no defender.",
+          "explain": "The knight on d5 had no defender, so the rook wins it for free."
+        },
+        {
+          "fen": "k7/7R/8/8/8/8/8/2R3K1 w - - 0 1",
+          "solution": [
+            "Rc8#"
+          ],
+          "hint": "Check from far away, so the king cannot take the rook.",
+          "explain": "The rook on h7 guards the 7th rank. Rc8 checks along the 8th, and the king cannot reach it."
+        },
+        {
+          "fen": "6k1/ppp2ppp/8/4n3/8/8/3Q1P1P/6K1 b - - 0 1",
+          "solution": [
+            "Nf3+",
+            "Kg2",
+            "Nxd2"
+          ],
+          "wins": 9,
+          "after": {
+            "attackedFrom": {
+              "f3": [
+                "g1",
+                "d2"
+              ]
+            }
+          },
+          "hint": "You are Black. Jump to the square that checks the king and attacks the queen.",
+          "explain": "The knight on f3 attacks the king and the queen. After the king moves, the queen falls."
+        },
+        {
+          "fen": "6k1/1pp2ppp/8/Qb1N4/8/8/P4PPP/6KR w - - 0 1",
+          "solution": [
+            "Qa8+",
+            "Be8",
+            "Qxe8#"
+          ],
+          "hint": "A queen check on the back rank. Where can Black block?",
+          "explain": "**Qa8+** forces the bishop to block on e8, and **Qxe8#** takes it with checkmate."
+        },
+        {
+          "fen": "1r3nk1/1pp2ppp/4q3/8/4pB2/7b/PRP2PPP/1QB3K1 b - - 0 1",
+          "solution": [
+            "Qg4",
+            "f3",
+            "Qxg2#"
+          ],
+          "hint": "No check is needed. Aim at the weak pawn next to the king.",
+          "explain": "**Qg4** threatens **Qxg2#**, and the g2 pawn is pinned to the king, so White cannot take the bishop on h3 with it. The mate cannot be stopped."
+        }
+      ]
+    }
+  ]
+}
