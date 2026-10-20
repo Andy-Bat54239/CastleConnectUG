@@ -54,7 +54,7 @@ describe('content validator', () => {
     const r = run(join(root, 'content'))
     expect(r.out).toContain('0 error(s)')
     expect(r.code).toBe(0)
-  })
+  }, 120_000) // proves every mate and tactic in every day, so it grows with each day written
 
   it('accepts a correct card', () => {
     const r = run(dayWith([{ type: 'findMove', prompt: 'Mate.', fen: MATE_FEN, goal: 'mate', explain: 'x' }]))
@@ -171,6 +171,22 @@ describe('content validator', () => {
     const pinBoard = { fen: '4k3/1p3ppp/2n5/1B6/3P4/8/PPP2PPP/4K3 b - - 0 1' }
     expect(run(dayWith([{ type: 'spot', prompt: 'x', board: pinBoard, targets: ['c6'], explain: 'x', verify: { kind: 'pinned', color: 'b' } }])).code).toBe(0)
     expect(run(dayWith([{ type: 'spot', prompt: 'x', board: pinBoard, targets: ['f7'], explain: 'x', verify: { kind: 'pinned', color: 'b' } }])).code).toBe(1)
+  })
+
+  it('checks tap-a-check cards', () => {
+    const board = { fen: 'r5k1/5ppp/8/8/8/8/5PPP/3Q2K1 w - - 0 1' }
+    const spot = (targets: string[]) => dayWith([{ type: 'spot', prompt: 'x', board, targets, explain: 'x', verify: { kind: 'checkSquares', square: 'd1' } }])
+    expect(run(spot(['d8'])).code).toBe(0)
+    expect(run(spot(['d7'])).code).toBe(1)
+    // the piece may belong to the side that is NOT to move ("what would they do?"); mate squares are checked too
+    const theirs = { fen: '6k1/5ppp/8/8/8/8/5PPP/r3R1K1 w - - 0 1' }
+    const mateCard = (targets: string[], kind = 'mateSquares') => dayWith([{ type: 'spot', prompt: 'x', board: theirs, targets, explain: 'x', verify: { kind, square: 'a1' } }])
+    expect(run(mateCard(['e1'])).code).toBe(0) // Black's rook would mate on e1 (back rank), though White is to move
+    expect(run(mateCard(['e1'], 'checkSquares')).code).toBe(0)
+    expect(run(mateCard(['b1'])).code).toBe(1)
+    // a piece with no check available is an authoring mistake
+    const none = dayWith([{ type: 'spot', prompt: 'x', board, targets: ['g2'], explain: 'x', verify: { kind: 'checkSquares', square: 'g2' } }])
+    expect(run(none).code).toBe(1)
   })
 
   it('rejects an unlockAll that is not true or false', () => {

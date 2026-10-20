@@ -23,7 +23,7 @@ import {
 } from '../src/lib/chessUtil'
 import { estimateMinutes } from '../src/lib/estimate'
 import { answersByMethod, classifyAnswer, isSafe } from '../src/lib/verify'
-import { alignment, forkSquares, moveGain, pinnedPieces, winningMoves } from '../src/lib/tactics'
+import { alignment, forkSquares, moveGain, movesOfPiece, pinnedPieces, winningMoves } from '../src/lib/tactics'
 
 // BG_CONTENT_DIR lets the tests point the validator at a scratch folder.
 const ROOT = process.env.BG_CONTENT_DIR ? resolve(process.env.BG_CONTENT_DIR) + '/' : new URL('../content/', import.meta.url).pathname
@@ -364,6 +364,13 @@ function checkSpot(c: Obj) {
     const squares = forkSquares(chess, v.square)
     if (!squares) return err('could not set the position up to find fork squares')
     actual = squares
+  } else if (v.kind === 'checkSquares' || v.kind === 'mateSquares') {
+    if (!v.square || !chess.get(v.square as never)) return err('verify.square must hold the piece whose checks are listed')
+    const moves = movesOfPiece(chess, v.square)
+    if (!moves) return err('could not set the position up to find check squares')
+    const wanted = v.kind === 'mateSquares' ? moves.filter((m) => m.san.endsWith('#')) : moves.filter((m) => /[+#]/.test(m.san))
+    actual = [...new Set(wanted.map((m) => m.to as string))]
+    if (!actual.length) return err(`the piece on ${v.square} has no move that ${v.kind === 'mateSquares' ? 'gives checkmate' : 'gives check'}`)
   } else if (v.kind === 'pinned') {
     if (v.color !== 'w' && v.color !== 'b') return err('verify.color must be "w" or "b"')
     actual = pinnedPieces(chess, v.color)

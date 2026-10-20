@@ -193,3 +193,24 @@ export function forkSquares(chess: Chess, from: Square): Square[] | null {
   }
   return [...out]
 }
+
+/**
+ * Every legal move of the piece on `square`, for either side (the turn is flipped if the piece does not belong
+ * to the side to move). Returns null if the position cannot be set up that way.
+ */
+export function movesOfPiece(chess: Chess, square: Square) {
+  const piece = chess.get(square as never)
+  if (!piece) return null
+  try {
+    let probe = chess
+    if (piece.color !== chess.turn()) {
+      const parts = chess.fen().split(' ')
+      parts[1] = piece.color
+      parts[3] = '-'
+      probe = new Chess(parts.join(' '))
+    }
+    return probe.moves({ square: square as never, verbose: true })
+  } catch {
+    return null
+  }
+}

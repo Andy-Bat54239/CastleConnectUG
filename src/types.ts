@@ -106,9 +106,10 @@ export interface SpotVerify {
    * Targets must be exactly: the pieces giving check / the enemy pieces the piece on `square` attacks /
    * the undefended pieces of `color` / the squares the piece on `square` can legally move to / the squares the
    * piece on `square` could move to and attack two or more enemy pieces (fork squares) / the pieces of `color`
-   * pinned to their own king.
+   * pinned to their own king / the squares the piece on `square` can legally move to and give check from / the same
+   * but checkmate. The piece may belong to either side, whoever is to move.
    */
-  kind: 'checkers' | 'attackedBy' | 'loose' | 'legalMoves' | 'forkSquares' | 'pinned'
+  kind: 'checkers' | 'attackedBy' | 'loose' | 'legalMoves' | 'forkSquares' | 'pinned' | 'checkSquares' | 'mateSquares'
   square?: Square
   color?: 'w' | 'b'
 }

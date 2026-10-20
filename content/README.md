@@ -112,7 +112,10 @@ Members get a hint after one miss and a **Show me** button after two, so nobody 
 pieces that piece attacks), `loose` + `color` (the pieces with no defender), `legalMoves` + `square`
 (the squares the piece on that square can legally move to, for example a king's escape squares),
 `forkSquares` + `square` (squares that piece could move to and attack two or more enemy pieces, not
-counting pawns) and `pinned` + `color` (the pieces pinned to their own king).
+counting pawns), `pinned` + `color` (the pieces pinned to their own king) and `checkSquares` + `square`
+(the squares that piece can legally move to and give check from) and `mateSquares` + `square` (the same, but
+checkmate). For these two the piece can belong to either side, so a card can ask "where would Black's queen
+mate?" while White is to move.
 
 ### `puzzleSet`: 2 to 6 short puzzles
 
