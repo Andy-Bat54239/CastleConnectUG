@@ -5,6 +5,8 @@ import { applyTheme, loadTheme } from './lib/theme'
 import { themeButton } from './ui/themeButton'
 import { hostBadgeShown } from './lib/hostBadge'
 import { button, h } from './ui/dom'
+import { TOTAL_DAYS } from './lib/content'
+import { startTracking } from './lib/tracker'
 
 const root = document.getElementById('app') as HTMLElement
 
@@ -65,6 +67,8 @@ applyTheme(loadTheme())
 document.getElementById('theme-slot')?.append(themeButton('on-bar'))
 window.addEventListener('hashchange', route)
 route()
+// Anonymous player counts (no names): see src/lib/tracker.ts. Test links and the dev server are never counted.
+startTracking(TOTAL_DAYS, location.search, import.meta.env.DEV)
 
 // Offline support. Skipped quietly where in-app browsers do not offer service workers.
 if ('serviceWorker' in navigator && import.meta.env.PROD) {

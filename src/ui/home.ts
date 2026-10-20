@@ -154,6 +154,7 @@ export function mountHome(root: HTMLElement): void {
     h('h2', null, 'How each day works'),
     h('ol', { class: 'steps' }, ...PARTS.map(([k, v]) => h('li', null, h('b', null, k), h('span', null, v)))),
     h('p', { class: 'mute' }, 'No sign-up, no password. Your progress stays on this phone, and the WhatsApp group is where we see each other’s.'),
+    h('p', { class: 'mute' }, 'To see how the challenge is going, we count how many people start and finish each day. We never ask for a name, and we never keep one.'),
   )
 
   const reset = button('Reset my progress on this phone', 'link-btn', () => {

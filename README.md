@@ -64,6 +64,47 @@ Change the file, commit and push, and Netlify redeploys. Everyone's own start st
 To try it yourself: `?now=2026-10-22T09:00:00%2B03:00` pretends it is that moment (tap Start, and your Day 1 is that day),
 `?preview=1` opens every day for reading, and "Reset my progress on this phone" at the bottom of the home page starts again.
 
+## Counting players
+
+The site counts how many people start, finish each day and go deeper, without names. Each phone makes a random ID
+(kept next to its progress) and reports a small picture: the day the member tapped Start, which core lessons are
+finished and which Go deeper sections are finished. The server keeps one record per ID and the latest picture replaces
+the last, so a repeated or lost message never double-counts. It stores no name, phone number or address. The home page
+tells members that they are counted and that no names are kept.
+
+**What is counted.**
+
+| Number | Meaning |
+| --- | --- |
+| Tapped Start | A phone that tapped "Start the challenge" (or picked "Started earlier"). |
+| Active in the last 3 days | Of those, a phone the server heard from in the last 3 days. Phones report when something changes and at least once every 6 hours while the app is open. |
+| Finished the lesson / went deeper (per day) | The core lesson reached its last card; the Go deeper section reached its last card. |
+| Finished all 14 days | The core lesson of every day. |
+| Where people are | The last core day each person finished, to show where people stop. |
+
+**One-time setup (about two minutes).** The counter uses Netlify Functions and Netlify Blobs, both built into Netlify, so
+there is nothing to install or pay for. The only thing to set is a secret key that protects the numbers:
+
+1. Make a key of at least 16 characters. In a terminal, `openssl rand -hex 16` prints a good one. Keep it private.
+2. In Netlify: **Site configuration, Environment variables, Add a variable**. Key `STATS_KEY`, value your key. Save.
+3. **Deploys, Trigger deploy, Deploy site** (a new deploy picks up the variable).
+4. Open `https://YOUR-SITE/stats.html#key=YOUR_KEY` and bookmark it. The part after `#` is never sent to the server in
+   the page request. Without the `#key=` part the page asks for the key.
+
+Until `STATS_KEY` is set, `/api/stats` answers "not set up" and nobody can read anything. The page never opens without the key.
+
+**What it cannot tell you.**
+- Counts are per phone or browser. Someone who clears their data, switches phones or uses two browsers is counted twice.
+- A browser that cannot save data (some in-app browsers) cannot keep an ID, so it is not counted at all.
+- It starts counting when this goes live. Nothing earlier is known.
+- It does not know who posted in the WhatsApp group or who joined the Sunday KO.
+- Test links (`?preview=1`, `?now=...`) and the local dev server are never counted, so reviewing does not change the numbers.
+- Players who tapped Start and then reset their progress go back to "not started" in the counts.
+
+**Trying it locally.** The Vite dev server does not run Netlify functions (and does not count anyway). To see the whole thing
+working, use `npx netlify-cli dev` from this folder with a `STATS_KEY` in the environment, or run the unit tests
+(`tests/stats.test.ts`, `tests/tracker.test.ts`), which cover the same code with an in-memory store.
+
 ## Edit or add lessons
 
 Lessons are plain JSON files in `content/`, one per day (`day-01.json`, ...). See
@@ -113,10 +154,11 @@ scripts/
   line.ts               authoring helper: moves -> FEN
   sw-template.js        service worker template (filled in at build time)
 src/
-  lib/              time, store, share, shareCard (draws the WhatsApp picture), chess helpers (mostly no DOM, easy to test)
+  lib/              time, store, share, shareCard (draws the WhatsApp picture), stats + tracker (the player counter), chess helpers (mostly no DOM, easy to test)
   ui/               board, cards, move/spot tasks, home, lesson, review screens
   styles.css        design tokens and styles (light + dark)
-public/             icons, manifest, _headers
+public/             icons, manifest, _headers, stats.html (the private stats page)
+netlify/functions/  the two counter functions: /api/track and /api/stats
 tests/              vitest suite
 ```
 

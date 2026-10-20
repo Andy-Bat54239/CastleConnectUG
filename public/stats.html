@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Bridge Grind · Stats</title>
+    <link rel="icon" type="image/png" href="./favicon.png" />
+    <script>
+      // The same light or dark choice the lessons use.
+      try { document.documentElement.dataset.theme = localStorage.getItem('bg:theme') === 'dark' ? 'dark' : 'light' } catch (e) { document.documentElement.dataset.theme = 'light' }
+    </script>
+    <style>
+      :root { --bg: #fefae7; --card: #ffffff; --ink: #0f241c; --mute: #4a5f56; --brand: #034f3b; --on-brand: #fefae7; --gold: #e0ac40; --line: #e6deb6; --bad: #b3372c; --bar: #1b7a4b; --bar2: #e0ac40; color-scheme: light; }
+      :root[data-theme='dark'] { --bg: #0a1612; --card: #11231c; --ink: #f4eed6; --mute: #a8b9b0; --brand: #58c79a; --on-brand: #08201a; --line: #23402f; --bad: #ff8b7f; --bar: #5fd596; --bar2: #e8be5e; color-scheme: dark; }
+      * { box-sizing: border-box; }
+      body { margin: 0; background: var(--bg); color: var(--ink); font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; font-size: 16px; line-height: 1.5; }
+      header { background: #034f3b; color: #fefae7; padding: 14px 16px; }
+      header b { display: block; font-size: 18px; }
+      header small { opacity: 0.85; }
+      main { max-width: 640px; margin: 0 auto; padding: 16px; }
+      h2 { margin: 28px 0 8px; padding-bottom: 6px; border-bottom: 3px solid var(--gold); font-size: 20px; }
+      .mute { color: var(--mute); font-size: 14px; }
+      .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; }
+      .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; }
+      .card b { display: block; font-size: 32px; line-height: 1.1; color: var(--brand); }
+      .card span { font-size: 14px; color: var(--mute); }
+      .row { padding: 10px 0; border-bottom: 1px solid var(--line); }
+      .row .name { font-weight: 700; margin-bottom: 4px; }
+      .bar { margin-top: 6px; }
+      .bar .top { display: flex; justify-content: space-between; gap: 12px; font-size: 14px; color: var(--mute); }
+      .bar .top b { color: var(--ink); }
+      .bar .track { height: 10px; margin-top: 3px; border-radius: 5px; background: var(--line); overflow: hidden; }
+      .bar .track i { display: block; height: 100%; border-radius: 5px; background: var(--bar); }
+      .bar.deep .track i { background: var(--bar2); }
+      ul { margin: 0; padding: 0; list-style: none; }
+      li { display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--line); }
+      button, input { font: inherit; font-size: 16px; }
+      button { appearance: none; border: 0; border-radius: 12px; background: var(--brand); color: var(--on-brand); font-weight: 800; padding: 12px 18px; cursor: pointer; }
+      input { width: 100%; padding: 10px 12px; border: 2px solid var(--line); border-radius: 12px; background: var(--card); color: var(--ink); margin: 8px 0 12px; }
+      .err { color: var(--bad); font-weight: 700; }
+      [hidden] { display: none !important; }
+    </style>
+  </head>
+  <body>
+    <header><b>Bridge Grind · Stats</b><small>Private. Please do not share this page's link.</small></header>
+    <main>
+      <section id="ask" hidden>
+        <p>Paste the stats key (the STATS_KEY you set on Netlify) to see the numbers.</p>
+        <input id="key" type="password" autocomplete="off" aria-label="Stats key" />
+        <button id="go" type="button">Show the numbers</button>
+      </section>
+      <p id="msg" class="mute" role="status">Loading…</p>
+      <section id="out" hidden>
+        <div class="cards" id="cards"></div>
+        <h2>Day by day</h2>
+        <p class="mute">Out of the people who tapped Start: how many finished each day's lesson, and how many also went deeper.</p>
+        <div id="days"></div>
+        <h2>Where people are</h2>
+        <p class="mute">The last day each person finished.</p>
+        <ul id="where"></ul>
+        <h2>When people started</h2>
+        <ul id="joined"></ul>
+        <p class="mute" id="when"></p>
+        <p><button id="refresh" type="button">Refresh</button></p>
+        <p class="mute">Counts are per phone or browser, with no names. Someone who clears their browser, or uses two browsers, is counted twice, and a browser that cannot save data is not counted at all.</p>
+      </section>
+    </main>
+    <script>
+      (function () {
+        var $ = function (id) { return document.getElementById(id) }
+        var KEY_STORE = 'bg:stats-key'
+        var MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+        var WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+        var key = ''
+        try {
+          var m = /[#&]key=([^&]+)/.exec(location.hash)
+          if (m) { key = decodeURIComponent(m[1]); sessionStorage.setItem(KEY_STORE, key) } else key = sessionStorage.getItem(KEY_STORE) || ''
+        } catch (e) { /* the page still works if storage is blocked: the key is simply asked for again */ }
+
+        function kampala(ms) { return new Date(ms + 3 * 3600000) }
+        function dateText(ms) { var d = kampala(ms); return WEEKDAYS[d.getUTCDay()] + ' ' + d.getUTCDate() + ' ' + MONTHS[d.getUTCMonth()] }
+        function timeText(ms) { var d = kampala(ms); var p = function (n) { return (n < 10 ? '0' : '') + n }; return dateText(ms) + ', ' + p(d.getUTCHours()) + ':' + p(d.getUTCMinutes()) }
+        function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text !== undefined) e.textContent = text; return e }
+        function plural(n, one, many) { return n + ' ' + (n === 1 ? one : many) }
+
+        function show(s) {
+          $('msg').hidden = true
+          $('ask').hidden = true
+          $('out').hidden = false
+          var cards = $('cards')
+          cards.textContent = ''
+          ;[[s.players, 'tapped Start'], [s.active3d, 'active in the last 3 days'], [s.finishedAll, 'finished all ' + s.days.length + ' days'], [s.wentDeeper, 'went deeper at least once']].forEach(function (c) {
+            var card = el('div', 'card')
+            card.append(el('b', '', String(c[0])), el('span', '', c[1]))
+            cards.append(card)
+          })
+          var days = $('days')
+          days.textContent = ''
+          var best = Math.max(1, s.players)
+          s.days.forEach(function (d) {
+            var row = el('div', 'row')
+            row.append(el('div', 'name', 'Day ' + d.day + (s.titles && s.titles[d.day - 1] ? ' · ' + s.titles[d.day - 1] : '')))
+            ;[['core', 'finished the lesson', d.core], ['deep', 'went deeper', d.deeper]].forEach(function (b) {
+              var bar = el('div', 'bar ' + b[0])
+              var top = el('div', 'top')
+              top.append(el('span', '', b[1]), el('b', '', String(b[2])))
+              var track = el('div', 'track')
+              var fill = el('i')
+              fill.style.width = Math.round((b[2] / best) * 100) + '%'
+              if (b[2]) fill.style.minWidth = '6px' // a small count still shows
+              track.append(fill)
+              bar.append(top, track)
+              row.append(bar)
+            })
+            days.append(row)
+          })
+          var where = $('where')
+          where.textContent = ''
+          if (!s.where.length) where.append(el('li', 'mute', 'Nobody has tapped Start yet.'))
+          s.where.forEach(function (w) {
+            var li = el('li')
+            li.append(el('span', '', w.lastDay === 0 ? 'Not finished a day yet' : w.lastDay === s.days.length ? 'Finished all ' + s.days.length + ' days' : 'Last finished Day ' + w.lastDay), el('b', '', plural(w.people, 'person', 'people')))
+            where.append(li)
+          })
+          var joined = $('joined')
+          joined.textContent = ''
+          if (!s.joined.length) joined.append(el('li', 'mute', 'Nobody yet.'))
+          s.joined.forEach(function (j) {
+            var li = el('li')
+            li.append(el('span', '', dateText(j.date)), el('b', '', plural(j.people, 'person', 'people')))
+            joined.append(li)
+          })
+          $('when').textContent = 'Updated ' + timeText(s.generatedAt) + ' (Kampala time).'
+        }
+
+        function problem(text) { $('msg').hidden = false; $('msg').className = 'err'; $('msg').textContent = text }
+
+        function load() {
+          if (!key) { $('msg').hidden = true; $('ask').hidden = false; return }
+          $('msg').hidden = false
+          $('msg').className = 'mute'
+          $('msg').textContent = 'Loading…'
+          fetch('/api/stats', { headers: { authorization: 'Bearer ' + key }, cache: 'no-store' })
+            .then(function (res) {
+              if (res.status === 401) { try { sessionStorage.removeItem(KEY_STORE) } catch (e) {} key = ''; $('out').hidden = true; $('ask').hidden = false; problem('That key is not right. Check it and try again.'); return null }
+              if (res.status === 503) { problem('The stats key has not been set up on Netlify yet. See the README, under "Counting players".'); return null }
+              if (!res.ok) { problem('Could not load the numbers (error ' + res.status + '). Try again in a minute.'); return null }
+              return res.json()
+            })
+            .then(function (s) { if (s) show(s) })
+            .catch(function () { problem('Could not reach the server. Check the connection and try again.') })
+        }
+
+        $('go').addEventListener('click', function () {
+          key = $('key').value.trim()
+          try { sessionStorage.setItem(KEY_STORE, key) } catch (e) {}
+          load()
+        })
+        $('refresh').addEventListener('click', load)
+        load()
+      })()
+    </script>
+  </body>
+</html>

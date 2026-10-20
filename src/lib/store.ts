@@ -69,7 +69,15 @@ export function load(): Progress {
   return p
 }
 
+let listener: (() => void) | null = null
+
+/** Called after every change to the progress (the player counter listens, and decides for itself whether there is news). */
+export function onChange(fn: () => void): void {
+  listener = fn
+}
+
 function persist(): void {
+  listener?.()
   if (!persistent || !memory) return
   try {
     localStorage.setItem(KEY, JSON.stringify(memory))

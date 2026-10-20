@@ -17,6 +17,11 @@
 /manifest.webmanifest
   Cache-Control: no-cache
 
+# The private stats page: never cached, and kept out of search engines.
+/stats.html
+  Cache-Control: no-store
+  X-Robots-Tag: noindex, nofollow
+
 # Built files have a fingerprint in their name, so they can be cached for a year.
 /assets/*
   Cache-Control: public, max-age=31536000, immutable

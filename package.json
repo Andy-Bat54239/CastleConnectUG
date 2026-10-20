@@ -15,6 +15,7 @@
     "line": "tsx scripts/line.ts"
   },
   "dependencies": {
+    "@netlify/blobs": "^10.7.13",
     "chess.js": "^1.4.0"
   },
   "devDependencies": {

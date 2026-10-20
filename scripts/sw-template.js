@@ -22,6 +22,8 @@ self.addEventListener('fetch', (event) => {
   if (req.method !== 'GET') return
   const url = new URL(req.url)
   if (url.origin !== self.location.origin) return
+  // The player counter and its private page are always fetched live, never from the cache.
+  if (url.pathname.indexOf('/api/') === 0 || url.pathname === '/stats.html') return
 
   // Page loads: try the network (so updates arrive), fall back to the cached shell when offline.
   if (req.mode === 'navigate') {
