@@ -1,0 +1,422 @@
+{
+  "day": 4,
+  "title": "Must-know checkmates",
+  "level": "400-900",
+  "blurb": "Two checkmates that finish most won games: the two-rook ladder, and king and queen against king. Learn them once and you can always convert a win.",
+  "deeperTitle": "King and rook mate; avoiding stalemate",
+  "share": {
+    "prompt": "One thing I learned today…"
+  },
+  "core": [
+    {
+      "type": "read",
+      "title": "Two rooks make a ladder",
+      "body": [
+        "Two rooks can checkmate a lone king by themselves. They work like the rungs of a ladder.",
+        "One rook checks along a rank while the other guards the next rank, so the king cannot step back. Each check pushes the king one rung closer to the edge."
+      ],
+      "board": {
+        "fen": "8/4k3/R7/8/8/8/8/1R5K w - - 0 1",
+        "arrows": [
+          [
+            "b1",
+            "b7"
+          ]
+        ],
+        "caption": "White to move. Ra6 guards the whole 6th rank, and Rb1 is ready to check on the 7th."
+      }
+    },
+    {
+      "type": "findMove",
+      "prompt": "Climb the ladder: check with the rook on b1, then finish with the other rook.",
+      "fen": "8/4k3/R7/8/8/8/8/1R5K w - - 0 1",
+      "solution": [
+        "Rb7+",
+        "Kd8",
+        "Ra8#"
+      ],
+      "hint": "Check on the 7th rank with the rook that is NOT guarding the 6th.",
+      "explain": "**Rb7+** pushes the king to the back rank, because the rook on a6 still guards the 6th. Then **Ra8#** finishes it, and it mates wherever the king stepped on the 8th rank."
+    },
+    {
+      "type": "spot",
+      "prompt": "White has just played Rb7+. Tap a square the black king can escape to.",
+      "board": {
+        "fen": "8/1R2k3/R7/8/8/8/8/7K b - - 1 1"
+      },
+      "targets": [
+        "d8",
+        "e8",
+        "f8"
+      ],
+      "verify": {
+        "kind": "legalMoves",
+        "square": "e7"
+      },
+      "explain": "The rook on a6 guards the 6th rank and the rook on b7 guards the 7th. The only way out is up to the back rank, and that is where the ladder ends."
+    },
+    {
+      "type": "findMove",
+      "prompt": "Checkmate in one. One rook guards the 7th rank, and the other comes from far away.",
+      "fen": "6k1/1R6/8/8/8/8/8/R6K w - - 0 1",
+      "goal": "mate",
+      "hint": "The rook on a1 can reach the 8th rank.",
+      "explain": "**Ra8#**. The rook on b7 stops the king stepping down, and the rook on a8 checks from so far away that the king cannot touch it."
+    },
+    {
+      "type": "puzzleSet",
+      "title": "Ladder mates",
+      "theme": "ladder mate",
+      "ratingMin": 400,
+      "ratingMax": 800,
+      "intro": "The same idea from three different angles. Look for the rook that guards a rank and the rook that checks.",
+      "puzzles": [
+        {
+          "fen": "k7/7R/8/8/8/8/8/2R3K1 w - - 0 1",
+          "solution": [
+            "Rc8#"
+          ],
+          "hint": "Check from far away, so the king cannot take the rook.",
+          "explain": "The rook on h7 guards the 7th rank. Rc8 checks along the 8th, and the king cannot reach it."
+        },
+        {
+          "fen": "1r5k/8/8/8/8/r7/4K3/8 b - - 0 1",
+          "solution": [
+            "Rb2+",
+            "Kd1",
+            "Ra1#"
+          ],
+          "hint": "You are Black. The ladder works upside down: climb towards the first rank.",
+          "explain": "The rook on a3 guards the 3rd rank, so Rb2+ drives the king to the first rank, and Ra1 finishes it."
+        },
+        {
+          "fen": "8/3k4/7R/8/8/8/8/K5R1 w - - 0 1",
+          "solution": [
+            "Rg7+",
+            "Kd8",
+            "Rh8#"
+          ],
+          "hint": "The ladder can come from the right as well.",
+          "explain": "The rook on h6 guards the 6th rank, Rg7+ drives the king to the 8th, and Rh8 mates."
+        }
+      ]
+    },
+    {
+      "type": "read",
+      "title": "King and queen: squeeze, then finish",
+      "body": [
+        "A queen alone cannot give checkmate: next to the king she simply gets taken. She needs her own king to protect her.",
+        "The plan: **1.** shrink the enemy king's space with the queen. **2.** Bring your king closer. **3.** Give check with the queen, protected by your king."
+      ],
+      "board": {
+        "fen": "4k3/4Q3/4K3/8/8/8/8/8 b - - 0 1",
+        "caption": "Checkmate: the queen is protected by the white king, so the black king cannot take her.",
+        "assert": {
+          "status": "checkmate"
+        }
+      }
+    },
+    {
+      "type": "findMove",
+      "prompt": "Checkmate in one. Your king is two squares from theirs.",
+      "fen": "4k3/7Q/4K3/8/8/8/8/8 w - - 0 1",
+      "goal": "mate",
+      "hint": "Put the queen where your king protects her, or where she checks from far away.",
+      "explain": "Three moves mate here. **Qe7#** is protected by your king. **Qg8#** and **Qh8#** check from a distance along the back rank, while your king covers the squares in front of the black king."
+    },
+    {
+      "type": "findMove",
+      "prompt": "Checkmate in one. The black king is stuck on the edge.",
+      "fen": "k7/8/1K6/8/8/8/8/6Q1 w - - 0 1",
+      "goal": "mate",
+      "hint": "Look along the back rank from the queen's file.",
+      "explain": "**Qg8#**. The queen checks along the 8th rank, and your king on b6 covers a7 and b7."
+    },
+    {
+      "type": "read",
+      "title": "Careful: stalemate",
+      "body": [
+        "If the enemy king is **not in check** but has **no legal move**, the game is a draw by **stalemate**. Nobody wins.",
+        "It is Black's turn here: no move, and no check. Before every queen move, ask: does the king still have a square, or am I giving check?"
+      ],
+      "board": {
+        "fen": "7k/5K2/6Q1/8/8/8/8/8 b - - 0 1",
+        "caption": "Stalemate: Black has no legal move and is not in check.",
+        "assert": {
+          "status": "stalemate"
+        }
+      }
+    },
+    {
+      "type": "findMove",
+      "prompt": "Checkmate in one. One tempting queen move would be stalemate, so check each square.",
+      "fen": "7k/5K2/8/8/8/8/8/6Q1 w - - 0 1",
+      "goal": "mate",
+      "hint": "The queen must give check, not just trap the king.",
+      "explain": "**Qg7#**, **Qg8#**, **Qh1#** and **Qh2#** all mate. **Qg6** looks strong, but it is stalemate: the king has no move and is not in check."
+    },
+    {
+      "type": "read",
+      "title": "The quiet queen move",
+      "body": [
+        "Often you cannot mate at once. Take squares away quietly: put the queen **a knight's move away** from the king, like c3 to c7 here. The king cannot step towards her."
+      ],
+      "board": {
+        "fen": "4k3/8/6K1/8/8/2Q5/8/8 w - - 0 1",
+        "arrows": [
+          [
+            "c3",
+            "c7"
+          ]
+        ],
+        "caption": "Qc7 is a knight's move from the king on e8."
+      }
+    },
+    {
+      "type": "spot",
+      "prompt": "After Qc7, the black king is nearly trapped. Tap the one square it can go to.",
+      "board": {
+        "fen": "4k3/2Q5/6K1/8/8/8/8/8 b - - 0 1"
+      },
+      "targets": [
+        "f8"
+      ],
+      "verify": {
+        "kind": "legalMoves",
+        "square": "e8"
+      },
+      "explain": "The queen covers d8, d7, e7 and f7. Only **f8** is left. A king with a single square is as good as beaten."
+    },
+    {
+      "type": "findMove",
+      "prompt": "Mate in two. Make the quiet move first, then give checkmate.",
+      "fen": "4k3/8/6K1/8/8/2Q5/8/8 w - - 0 1",
+      "solution": [
+        "Qc7",
+        "Kf8",
+        "Qf7#"
+      ],
+      "hint": "Put the queen a knight's move from the king.",
+      "explain": "**Qc7** leaves the king only f8. After **Kf8**, **Qf7#** is checkmate: the queen is protected by your king on g6."
+    },
+    {
+      "type": "puzzleSet",
+      "title": "Queen mates",
+      "theme": "queen and king mate",
+      "ratingMin": 400,
+      "ratingMax": 800,
+      "intro": "Two checkmates in one. Make sure the queen checks from a distance or is protected by your king.",
+      "puzzles": [
+        {
+          "fen": "6k1/8/6K1/8/8/8/8/4Q3 w - - 0 1",
+          "solution": [
+            "Qe8#"
+          ],
+          "hint": "Check along the 8th rank. Your king covers the squares in front of the black king.",
+          "explain": "The queen checks from a distance, and the white king on g6 covers f7, g7 and h7."
+        },
+        {
+          "fen": "4q3/8/8/8/8/6k1/8/6K1 b - - 0 1",
+          "solution": [
+            "Qe1#"
+          ],
+          "hint": "You are Black now. Same idea, other side of the board.",
+          "explain": "The queen checks along the first rank, and the black king on g3 covers f2, g2 and h2."
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "prompt": "You have a queen and king against a lone king. What is the best plan?",
+      "options": [
+        "Give check as many times as you can",
+        "Take away squares, bring your king closer, then mate",
+        "Park the queen next to the enemy king"
+      ],
+      "answer": 1,
+      "explain": "Random checks just chase the king around the board. Squeeze first, bring your own king, then mate. And never leave your queen next to the king without protection."
+    }
+  ],
+  "deeper": [
+    {
+      "type": "read",
+      "title": "King and rook: the king must help",
+      "body": [
+        "A rook can mate too, but it needs your king even more. Drive the enemy king to an edge, bring your king to face it with one square between you, then check with the rook along the edge.",
+        "Kings facing like this is called the **opposition**: the enemy king cannot step towards yours."
+      ],
+      "board": {
+        "fen": "R3k3/8/4K3/8/8/8/8/8 b - - 0 1",
+        "caption": "Checkmate: the rook checks along the edge and the kings face each other.",
+        "assert": {
+          "status": "checkmate"
+        }
+      }
+    },
+    {
+      "type": "findMove",
+      "prompt": "Checkmate in one. The kings are facing each other.",
+      "fen": "4k3/8/4K3/8/8/8/8/7R w - - 0 1",
+      "goal": "mate",
+      "hint": "Check along the edge the black king is stuck on.",
+      "explain": "**Rh8#**. Your king covers d7, e7 and f7, and the rook takes d8 and f8."
+    },
+    {
+      "type": "read",
+      "title": "The waiting move",
+      "body": [
+        "If your king is not facing theirs, a rook check lets the king slip away sideways. So make a quiet move first.",
+        "Here **Rf1** takes the f-file away and leaves the black king just one square. Then the rook mates."
+      ],
+      "board": {
+        "fen": "4k3/8/3K4/8/8/8/8/R7 w - - 0 1",
+        "arrows": [
+          [
+            "a1",
+            "f1"
+          ]
+        ],
+        "caption": "White to move. A check now would not mate, so wait first."
+      }
+    },
+    {
+      "type": "spot",
+      "prompt": "After Rf1, tap the only square the black king can go to.",
+      "board": {
+        "fen": "4k3/8/3K4/8/8/8/8/5R2 b - - 1 1"
+      },
+      "targets": [
+        "d8"
+      ],
+      "verify": {
+        "kind": "legalMoves",
+        "square": "e8"
+      },
+      "explain": "The rook takes the f-file, and your king covers d7, e7 and f7. That leaves **d8** and nothing else."
+    },
+    {
+      "type": "findMove",
+      "prompt": "Mate in two. Play the waiting move, then mate.",
+      "fen": "4k3/8/3K4/8/8/8/8/R7 w - - 0 1",
+      "solution": [
+        "Rf1",
+        "Kd8",
+        "Rf8#"
+      ],
+      "hint": "Take away the f-file with a quiet rook move.",
+      "explain": "**Rf1** is the waiting move. After **Kd8**, the rook checks with **Rf8#**, and your king on d6 covers c7, d7 and e7."
+    },
+    {
+      "type": "read",
+      "title": "Stalemate with a rook",
+      "body": [
+        "A rook up is not a win until you give mate. White just played Rg7 here, and it is a draw: Black has no move and is not in check.",
+        "Every time, ask: after my move, can the king move, or am I giving check?"
+      ],
+      "board": {
+        "fen": "7k/5KR1/8/8/8/8/8/8 b - - 0 1",
+        "caption": "Stalemate: Black has no legal move and is not in check.",
+        "assert": {
+          "status": "stalemate"
+        }
+      }
+    },
+    {
+      "type": "choice",
+      "prompt": "Black to move. What is this position?",
+      "board": {
+        "fen": "7k/5K2/8/8/8/8/8/7R b - - 1 1",
+        "assert": {
+          "status": "checkmate"
+        }
+      },
+      "options": [
+        "Checkmate: White wins",
+        "Stalemate: it is a draw",
+        "Neither: the game goes on"
+      ],
+      "answer": 0,
+      "explain": "The rook checks along the h-file, and the white king covers g8 and g7. The king has no escape: checkmate."
+    },
+    {
+      "type": "choice",
+      "prompt": "Black to move. What is this position?",
+      "board": {
+        "fen": "k7/2Q5/1K6/8/8/8/8/8 b - - 0 1",
+        "assert": {
+          "status": "stalemate"
+        }
+      },
+      "options": [
+        "Checkmate: White wins",
+        "Stalemate: it is a draw",
+        "Neither: the game goes on"
+      ],
+      "answer": 1,
+      "explain": "The black king is not in check, but a7, b7 and b8 are all covered. No legal move and no check: **stalemate**, a draw."
+    },
+    {
+      "type": "choice",
+      "prompt": "Black to move. What is this position?",
+      "board": {
+        "fen": "7k/5K2/8/8/8/8/8/6R1 b - - 0 1",
+        "assert": {
+          "status": "normal"
+        }
+      },
+      "options": [
+        "Checkmate: White wins",
+        "Stalemate: it is a draw",
+        "Neither: the game goes on"
+      ],
+      "answer": 2,
+      "explain": "The black king is not in check, and it still has the h7 square. The game goes on."
+    },
+    {
+      "type": "findMove",
+      "prompt": "Checkmate in one with the rook. One tempting move is stalemate.",
+      "fen": "7k/5K2/8/8/8/8/8/6R1 w - - 0 1",
+      "goal": "mate",
+      "hint": "The rook must give check, not just take squares away.",
+      "explain": "**Rh1#** is the only mate. **Rg7** is stalemate: the king has no move and is not in check."
+    },
+    {
+      "type": "puzzleSet",
+      "title": "Rook mates",
+      "theme": "king and rook mate",
+      "ratingMin": 500,
+      "ratingMax": 900,
+      "intro": "One mate in one, then two where a quiet waiting move comes first.",
+      "puzzles": [
+        {
+          "fen": "r7/8/8/8/8/4k3/8/4K3 b - - 0 1",
+          "solution": [
+            "Ra1#"
+          ],
+          "hint": "You are Black, and the kings are facing each other.",
+          "explain": "The kings face each other, so the rook checks along the first rank and the king has no escape."
+        },
+        {
+          "fen": "4k3/8/5K2/8/8/8/8/7R w - - 0 1",
+          "solution": [
+            "Rd1",
+            "Kf8",
+            "Rd8#"
+          ],
+          "hint": "The kings are not facing. Take a file away with a quiet move.",
+          "explain": "Rd1 takes the d-file and leaves the king only f8. Then Rd8 is checkmate."
+        },
+        {
+          "fen": "r7/8/8/8/8/3k4/8/4K3 b - - 0 1",
+          "solution": [
+            "Rf8",
+            "Kd1",
+            "Rf1#"
+          ],
+          "hint": "You are Black. Take away the f-file with a quiet move.",
+          "explain": "Rf8 takes the f-file and leaves the white king only d1. Then Rf1 is checkmate."
+        }
+      ]
+    }
+  ]
+}
